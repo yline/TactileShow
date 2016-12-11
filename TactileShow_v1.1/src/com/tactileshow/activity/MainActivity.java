@@ -1,4 +1,4 @@
-package com.tactileshow.main;
+package com.tactileshow.activity;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;

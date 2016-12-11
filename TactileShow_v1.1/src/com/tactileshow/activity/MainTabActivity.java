@@ -1,9 +1,10 @@
-package com.tactileshow.main;
+package com.tactileshow.activity;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.tactileshow.main.R;
 import com.tactileshow.util.BroadcastMsg;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
