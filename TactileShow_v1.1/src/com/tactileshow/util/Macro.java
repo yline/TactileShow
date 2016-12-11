@@ -20,14 +20,6 @@ public class Macro
     
     public static String BROADCAST_ADDRESS = "zju.ccnt.ble";
     
-    public static int MENU_GROUPID_BLE = 21000;
-    
-    public static int MENU_ITEMID_FRESH = 21001;
-    
-    public static int MENU_ITEMID_EXIT = 21002;
-    
-    public static int MENU_ITEMID_DEBUG = 21003;
-    
     public static String UUID_HUM_SER = "f000aa20-0451-4000-b000-000000000000";//压力
     
     public static String UUID_HUM_DAT = "f000aa21-0451-4000-b000-000000000000";

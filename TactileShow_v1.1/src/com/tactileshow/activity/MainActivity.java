@@ -8,13 +8,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import com.tactileshow.application.IApplication;
+import com.tactileshow.application.SDKConstant;
 import com.tactileshow.base.BaseActivity;
+import com.tactileshow.log.LogFileUtil;
 import com.tactileshow.main.R;
 import com.tactileshow.util.DataFile;
-import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.Macro;
+import com.tactileshow.util.StaticValue;
 
-import android.app.ActionBar;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -32,7 +35,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
@@ -55,45 +57,33 @@ import android.widget.Toast;
  */
 public class MainActivity extends BaseActivity
 {
+    // View
+    private TextView tvHello;
+    
+    private ListView lvDevice;
+    
+    private ArrayAdapter<String> deviceApdater;
+    
+    private List<String> deviceList = new ArrayList<String>();
+    
+    private MenuItem freshMenuItem;
+    
+    // blueTooth
     BluetoothManager mBluetoothManager;
     
     BluetoothAdapter mBluetoothAdapter;
     
     private ArrayList<BluetoothDevice> mLeDevices = new ArrayList<BluetoothDevice>();
     
-    private List<BluetoothGattService> mLeServices;
-    
     private boolean mIsScanning;
-    
-    private Handler mHandler = new Handler();
-    
-    private MyHandler myHandler;
     
     private BluetoothGatt mBluetoothGatt;
     
     private BluetoothGattService mGattService;
     
-    TextView tv_hello;
-    
-    ListView lv_device;
-    
     TextView tv_connect_info;
     
-    Menu me_globle;
-    
-    MenuItem mi_fresh;
-    
-    MenuItem mi_exit;
-    
-    MenuItem mi_debug;
-    
-    AlertDialog.Builder builder_dl_connect;
-    
     AlertDialog dl_connect;
-    
-    ArrayAdapter<String> lvaa_device;
-    
-    List<String> mLeDevices_lvdata = new ArrayList<String>();
     
     private final static String TAG = "测试TAG";
     
@@ -105,15 +95,68 @@ public class MainActivity extends BaseActivity
     
     private static final int STATE_CONNECTED = 2; //设备连接完毕
     
+    /**
+     * 用于扫描时间设定
+     */
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg)
+        {
+            if (msg.what == Macro.HANDLER_SCAN_STOPPED)
+            {
+                tvHello.setText(tvHello.getText() + "\n" + "扫描结束");
+            }
+            else if (msg.what == Macro.HANDLER_CONNECT_SUCCESS)
+            {
+                // IApplication.toast("连接已经建立");
+                tv_connect_info.setText("连接成功，开始寻找服务");
+            }
+            else if (msg.what == Macro.HANDLER_CONNECT_FAILED)
+            {
+                // IApplication.toast("连接建立失败");
+                tv_connect_info.setText("连接失败，请返回重连");
+            }
+            else if (msg.what == Macro.HANDLER_SERVICE_DISCOVERED)
+            {
+                // IApplication.toast("服务发现完毕");
+                tv_connect_info.setText("成功发现服务，开始启动服务");
+                boolean isHasValidData = false;
+                ListServices();
+                
+                ListCharacters(Macro.UUID_BLE_SER);
+                
+                if (EnableConfig(Macro.UUID_BLE_CON) && EnableData(Macro.UUID_BLE_DAT))
+                {
+                    tv_connect_info.setText("蓝牙数据激活成功");
+                    isHasValidData = true;
+                }
+                else
+                {
+                    tv_connect_info.setText("蓝牙数据激活失败");
+                }
+                
+                if (isHasValidData == true)
+                {
+                    Intent intent = new Intent();
+                    intent.setClass(MainActivity.this, MainTabActivity.class);
+                    intent.putExtra("str", "come from first activity");
+                    startActivityForResult(intent, Macro.INTENT_BLEACTIVITY_TESTSHOW);
+                    dl_connect.dismiss();
+                }
+            }
+        };
+    };
+    
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_ble);
-        Log.i(TAG, "MainActivity Starting...");
-        ActionBar actionBar = getActionBar();
-        actionBar.show();
+        getActionBar().show();
         
         mBluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
@@ -123,88 +166,84 @@ public class MainActivity extends BaseActivity
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, Macro.INTENT_REQUEST_ENABLE_BT);
         }
-        
-        Toast.makeText(getApplicationContext(), "蓝牙已开启", Toast.LENGTH_SHORT).show();
-        
-        tv_hello = (TextView)findViewById(R.id.layout_ble_hello);
-        
-        lv_device = (ListView)findViewById(R.id.lv_ble_device);
-        lvaa_device = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, mLeDevices_lvdata);
-        UpdateDeviceList();
-        
-        lv_device.setAdapter(lvaa_device);
-        lv_device.setOnItemClickListener(new OnItemClickListener()
+        else
         {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3)
-            {
-                // TODO Auto-generated method stub
-                BluetoothDevice tmpBleDevice = mLeDevices.get(arg2);
-                Toast.makeText(getApplicationContext(), "连接" + tmpBleDevice.getName(), Toast.LENGTH_SHORT).show();
-                scanLeDevice(false);
-                mBluetoothGatt = tmpBleDevice.connectGatt(MainActivity.this, false, mGattCallback);
-                ShowConnectDialog();
-            }
-        });
+            IApplication.toast("蓝牙已开启");
+        }
         
-        myHandler = new MyHandler(); //用于扫描时间设定
+        initView();
         
         StaticValue.data_file = new DataFile();
         
         IntentFilter filter = new IntentFilter();
         filter.addAction(Macro.BROADCAST_ADDRESS);
         registerReceiver(mGattUpdateReceiver, filter);
-        
-        tv_hello.setText("请按刷新开始搜索");
-        
     }
     
-    @Override
-    protected void onDestroy()
+    /**
+     * 初始化控件，并更新控件数据
+     */
+    private void initView()
     {
-        // TODO Auto-generated method stub
-        super.onDestroy();
+        tvHello = (TextView)findViewById(R.id.layout_ble_hello);
+        tvHello.setText("请按刷新开始搜索");
         
-        unregisterReceiver(mGattUpdateReceiver);
-        closeBle();
+        lvDevice = (ListView)findViewById(R.id.lv_ble_device);
+        deviceApdater = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, deviceList);
+        lvDevice.setAdapter(deviceApdater);
         
+        lvDevice.setOnItemClickListener(new OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3)
+            {
+                BluetoothDevice tmpBleDevice = mLeDevices.get(position);
+                
+                IApplication.toast("连接" + tmpBleDevice.getName());
+                
+                scanLeDevice(false);
+                mBluetoothGatt = tmpBleDevice.connectGatt(MainActivity.this, false, mGattCallback);
+                showConnectDialog();
+            }
+        });
+        
+        updateDeviceList();
     }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        // TODO Auto-generated method stub
-        me_globle = menu;
-        mi_debug = menu.add(Macro.MENU_GROUPID_BLE, Macro.MENU_ITEMID_DEBUG, 0, "测试");
-        mi_fresh = menu.add(Macro.MENU_GROUPID_BLE, Macro.MENU_ITEMID_FRESH, 1, "搜索");
-        mi_exit = menu.add(Macro.MENU_GROUPID_BLE, Macro.MENU_ITEMID_EXIT, 2, "退出");
-        mi_fresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        mi_exit.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(SDKConstant.MENU_GROUPID_BLE, SDKConstant.MENU_ITEMID_DEBUG, 0, "测试");
+        
+        freshMenuItem = menu.add(SDKConstant.MENU_GROUPID_BLE, SDKConstant.MENU_ITEMID_FRESH, 1, "搜索");
+        freshMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        
+        menu.add(SDKConstant.MENU_GROUPID_BLE, SDKConstant.MENU_ITEMID_EXIT, 2, "退出")
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         
         return true;
-        //return super.onCreateOptionsMenu(menu);	
     }
     
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item)
     {
-        // TODO Auto-generated method stub
-        if (item.getItemId() == Macro.MENU_ITEMID_FRESH)
+        if (item.getItemId() == SDKConstant.MENU_ITEMID_FRESH)
         {
             closeBle();
             mLeDevices.clear();
-            UpdateDeviceList();
-            tv_hello.setText("开始搜索");
+            updateDeviceList();
+            tvHello.setText("开始搜索");
             scanLeDevice(true);
         }
-        else if (item.getItemId() == Macro.MENU_ITEMID_EXIT)
+        else if (item.getItemId() == SDKConstant.MENU_ITEMID_EXIT)
         {
-            Log.w(TAG, "退出");
-            finish();
+            LogFileUtil.v(TAG, "退出");
+            IApplication.finishActivity();
         }
-        else if (item.getItemId() == Macro.MENU_ITEMID_DEBUG)
+        else if (item.getItemId() == SDKConstant.MENU_ITEMID_DEBUG)
         {
-            Log.w(TAG, "测试模式");
+            LogFileUtil.v(TAG, "测试模式");
+            
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, MainTabActivity.class);
             intent.putExtra("str", "come from first activity TEST");
@@ -214,12 +253,20 @@ public class MainActivity extends BaseActivity
         return super.onMenuItemSelected(featureId, item);
     }
     
-    void ShowConnectDialog()
+    @Override
+    protected void onDestroy()
     {
-        LayoutInflater layoutInflater = LayoutInflater.from(this);
-        View view = layoutInflater.inflate(R.layout.activity_ble_connect, null);
+        super.onDestroy();
         
-        builder_dl_connect = new AlertDialog.Builder(this);
+        unregisterReceiver(mGattUpdateReceiver);
+        closeBle();
+    }
+    
+    private void showConnectDialog()
+    {
+        View view = LayoutInflater.from(this).inflate(R.layout.activity_ble_connect, null);
+        
+        AlertDialog.Builder builder_dl_connect = new AlertDialog.Builder(this);
         builder_dl_connect.setTitle("连接状态");
         builder_dl_connect.setView(view);
         builder_dl_connect.setNegativeButton("取消连接", new DialogInterface.OnClickListener()
@@ -233,13 +280,15 @@ public class MainActivity extends BaseActivity
         });
         tv_connect_info = (TextView)view.findViewById(R.id.tv_ble_connect_info);
         if (tv_connect_info == null)
+        {
             Log.w(TAG, "NULL");
+        }
         tv_connect_info.setText("正在连接中");
         
         dl_connect = builder_dl_connect.show();
     }
     
-    public void closeBle()
+    private void closeBle()
     {
         if (mBluetoothGatt == null)
         {
@@ -249,36 +298,36 @@ public class MainActivity extends BaseActivity
         mBluetoothGatt = null;
     }
     
-    void beginScanUI()
+    private void beginScanUI()
     {
-        MenuItemCompat.setActionView(mi_fresh, R.layout.activity_ble_progressbar);
+        MenuItemCompat.setActionView(freshMenuItem, R.layout.activity_ble_progressbar);
     }
     
-    void endScanUI()
+    private void finishScanUI()
     {
-        MenuItemCompat.setActionView(mi_fresh, null);
+        MenuItemCompat.setActionView(freshMenuItem, null);
     }
     
-    void UpdateDeviceList()
+    private void updateDeviceList()
     {
-        Log.w(TAG, "更新数据");
-        mLeDevices_lvdata.clear();
+        LogFileUtil.v(TAG, "更新数据");
+        deviceList.clear();
         if (mLeDevices.size() == 0)
         {
-            mLeDevices_lvdata.add("暂时没有搜索到BLE设备");
-            lv_device.setEnabled(false);
+            deviceList.add("暂时没有搜索到BLE设备");
+            lvDevice.setEnabled(false);
         }
         else
         {
-            lv_device.setEnabled(true);
-            Iterator<BluetoothDevice> it = mLeDevices.iterator();
-            while (it.hasNext())
+            lvDevice.setEnabled(true);
+            Iterator<BluetoothDevice> iterator = mLeDevices.iterator();
+            while (iterator.hasNext())
             {
-                BluetoothDevice bd_it = it.next();
-                mLeDevices_lvdata.add(bd_it.getName() + " " + bd_it.getAddress());
+                BluetoothDevice device = iterator.next();
+                deviceList.add(device.getName() + " " + device.getAddress());
             }
         }
-        lvaa_device.notifyDataSetChanged();
+        deviceApdater.notifyDataSetChanged();
     }
     
     private void scanLeDevice(final boolean enable)
@@ -292,12 +341,14 @@ public class MainActivity extends BaseActivity
                 public void run()
                 {
                     if (mIsScanning == false)
+                    {
                         return; //已经终止扫描
+                    }
                     mIsScanning = false;
-                    endScanUI();
+                    finishScanUI();
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
                     Log.i(TAG, "扫描结束");
-                    SendHandleMsg("Scan", Macro.HANDLER_SCAN_STOPPED);
+                    mHandler.obtainMessage(Macro.HANDLER_SCAN_STOPPED).sendToTarget();
                 }
             }, Macro.BLE_SCAN_PERIOD);
             
@@ -308,17 +359,10 @@ public class MainActivity extends BaseActivity
         else
         {
             mIsScanning = false;
-            endScanUI();
+            finishScanUI();
             Log.i(TAG, "终止扫描");
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
         }
-    }
-    
-    void SendHandleMsg(String tag, int content)
-    {
-        Message msg = new Message();
-        msg.what = content;
-        myHandler.sendMessage(msg);
     }
     
     private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback()
@@ -332,11 +376,11 @@ public class MainActivity extends BaseActivity
                 public void run()
                 {
                     mLeDevices.add(device);
-                    UpdateDeviceList();
+                    updateDeviceList();
                     
                     Toast.makeText(getApplicationContext(), "扫描到新BLE设备 " + device.getName(), Toast.LENGTH_SHORT).show();
                     String out_info = device.getAddress() + " " + device.getBondState() + " " + device.getName();
-                    tv_hello.setText(tv_hello.getText() + "\n" + out_info);
+                    tvHello.setText(tvHello.getText() + "\n" + out_info);
                     
                 }
             });
@@ -355,7 +399,7 @@ public class MainActivity extends BaseActivity
                 intentAction = Macro.ACTION_GATT_CONNECTED;
                 mConnectionState = STATE_CONNECTED;
                 
-                SendHandleMsg("Device", Macro.HANDLER_CONNECT_SUCCESS);
+                mHandler.obtainMessage(Macro.HANDLER_CONNECT_SUCCESS).sendToTarget();
                 Log.i(TAG, "Connected to GATT server.");
                 mBluetoothGatt.discoverServices(); //先去发现服务
             }
@@ -363,19 +407,21 @@ public class MainActivity extends BaseActivity
             {//当设备无法连接
                 intentAction = Macro.ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
-                SendHandleMsg("Device", Macro.HANDLER_CONNECT_FAILED);
+                mHandler.obtainMessage(Macro.HANDLER_CONNECT_FAILED).sendToTarget();
                 Log.i(TAG, "Disconnected from GATT server.");
                 
             }
         }
         
+        /**
+         * 发现新服务端
+         */
         @Override
-        // 发现新服务端
         public void onServicesDiscovered(BluetoothGatt gatt, int status)
         {
             if (status == BluetoothGatt.GATT_SUCCESS)
             {
-                SendHandleMsg("service", Macro.HANDLER_SERVICE_DISCOVERED);
+                mHandler.obtainMessage(Macro.HANDLER_SERVICE_DISCOVERED).sendToTarget();
             }
             else
             {
@@ -416,20 +462,11 @@ public class MainActivity extends BaseActivity
                     broadcastUpdate("#" + "BLE" + "#" + s + "#" + datas[i]);
                 }
             }
-            //			try {
-            //				Thread.sleep(50);
-            //			} catch (InterruptedException e) {
-            //				// TODO Auto-generated catch block
-            //				e.printStackTrace();
-            //			}
-            
         }
-        
     };
     
     void broadcastUpdate(String str_intent)
     {
-        
         Intent intent = new Intent(Macro.BROADCAST_ADDRESS);
         intent.putExtra("msg", str_intent);
         sendBroadcast(intent);
@@ -444,7 +481,7 @@ public class MainActivity extends BaseActivity
             // TODO Auto-generated method stub
             final String action = arg1.getStringExtra("msg");
             Log.w(TAG, "广播来了 " + action);
-            tv_hello.setText(action);
+            tvHello.setText(action);
         }
         
     };
@@ -454,7 +491,7 @@ public class MainActivity extends BaseActivity
         String ser_str = "";
         if (mBluetoothGatt != null)
         {
-            mLeServices = mBluetoothGatt.getServices();
+            List<BluetoothGattService> mLeServices = mBluetoothGatt.getServices();
             for (int i = 0; i < mLeServices.size(); i++)
             {
                 Log.w(TAG, "找到的服务为: " + i + mLeServices.get(i).getUuid());
@@ -528,12 +565,16 @@ public class MainActivity extends BaseActivity
     boolean EnableData(String uuid)
     {
         if (mGattService == null)
+        {
             return false;
+        }
         
         BluetoothGattCharacteristic charac = mGattService.getCharacteristic(UUID.fromString(uuid));
         
         if (charac == null)
+        {
             return false;
+        }
         
         boolean noti = mBluetoothGatt.setCharacteristicNotification(charac, true);
         Log.w(TAG, "noti " + noti);
@@ -541,85 +582,12 @@ public class MainActivity extends BaseActivity
         clientConfig.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
         mBluetoothGatt.writeDescriptor(clientConfig);
         
-        //		try {
-        //			Thread.sleep(200);//200
-        //		} catch (InterruptedException e) {
-        //			// TODO Auto-generated catch block
-        //			e.printStackTrace();
-        //		}
-        
         return true;
-    }
-    
-    class MyHandler extends Handler
-    {
-        public MyHandler()
-        {
-        }
-        
-        public MyHandler(Looper L)
-        {
-            super(L);
-        }
-        
-        // 子类必须重写此方法,接受数据
-        @Override
-        public void handleMessage(Message msg)
-        {
-            super.handleMessage(msg);
-            // 此处可以更新UI
-            
-            if (msg.what == Macro.HANDLER_SCAN_STOPPED)
-            {
-                tv_hello.setText(tv_hello.getText() + "\n" + "扫描结束");
-            }
-            else if (msg.what == Macro.HANDLER_CONNECT_SUCCESS)
-            {
-                //Toast.makeText(getApplicationContext(), "连接已经建立", Toast.LENGTH_SHORT).show();
-                tv_connect_info.setText("连接成功，开始寻找服务");
-            }
-            else if (msg.what == Macro.HANDLER_CONNECT_FAILED)
-            {
-                //Toast.makeText(getApplicationContext(), "连接建立失败", Toast.LENGTH_SHORT).show();
-                tv_connect_info.setText("连接失败，请返回重连");
-            }
-            else if (msg.what == Macro.HANDLER_SERVICE_DISCOVERED)
-            {
-                //Toast.makeText(getApplicationContext(), "服务发现完毕", Toast.LENGTH_SHORT).show();
-                tv_connect_info.setText("成功发现服务，开始启动服务");
-                boolean isHasValidData = false;
-                ListServices();
-                
-                ListCharacters(Macro.UUID_BLE_SER);
-                
-                if (EnableConfig(Macro.UUID_BLE_CON) && EnableData(Macro.UUID_BLE_DAT))
-                {
-                    tv_connect_info.setText("蓝牙数据激活成功");
-                    isHasValidData = true;
-                }
-                else
-                {
-                    tv_connect_info.setText("蓝牙数据激活失败");
-                }
-                
-                if (isHasValidData == true)
-                {
-                    Intent intent = new Intent();
-                    intent.setClass(MainActivity.this, MainTabActivity.class);
-                    intent.putExtra("str", "come from first activity");
-                    startActivityForResult(intent, Macro.INTENT_BLEACTIVITY_TESTSHOW);
-                    dl_connect.dismiss();
-                }
-                
-            }
-            
-        }
     }
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        // TODO Auto-generated method stub
         super.onActivityResult(requestCode, resultCode, data);
         
         Log.w("TAG", "success" + Macro.INTENT_BLEACTIVITY_TESTSHOW);
@@ -627,8 +595,10 @@ public class MainActivity extends BaseActivity
         if (requestCode == Macro.INTENT_BLEACTIVITY_TESTSHOW)
         {
             closeBle();
-            if (Macro.SETTING_EXIT_DIRECTLY == true) //上一个activity要求直接退出。
+            if (Macro.SETTING_EXIT_DIRECTLY == true)
+            { //上一个activity要求直接退出。
                 finish();
+            }
         }
         
     }
@@ -642,7 +612,6 @@ public class MainActivity extends BaseActivity
         }
         catch (UnsupportedEncodingException e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         Log.w("tmp", "tmp = " + tmp);
