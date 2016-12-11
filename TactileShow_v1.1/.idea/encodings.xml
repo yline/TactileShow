@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/src/com/tactileshow/main/MainActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/com/tactileshow/util/BroadcastMsg.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/com/tactileshow/util/DataFile.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/com/tactileshow/util/HistoryDataComputing.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/com/tactileshow/util/StaticValue.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/com/tactileshow/util/macro.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/com/tactileshow/view/DefinedViewPager.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/com/tactileshow/view/LineChartBuilder.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/com/tactileshow/view/TXTLineChartBuilder.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/com/tactileshow/view/TXTVisualInfo.java" charset="GBK" />
+  </component>
+</project>
