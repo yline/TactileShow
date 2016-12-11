@@ -5,34 +5,38 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ScrollView;
 
-public class DefinedScrollView extends ScrollView{
-
-	private Context context;
+public class DefinedScrollView extends ScrollView
+{
     private boolean willIntercept = true;
     
-	public DefinedScrollView(Context context) {
-		super(context);
-		this.context = context;
-	}
-	
-	public DefinedScrollView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        this.context = context;
+    public DefinedScrollView(Context context)
+    {
+        this(context, null);
     }
-	
-	 @Override
-	public boolean onInterceptTouchEvent(MotionEvent arg0) {
-	    if(willIntercept){
-	     //’‚∏ˆµÿ∑Ω÷±Ω”∑µªÿtrueª·∫‹ø®
-	    	return super.onInterceptTouchEvent(arg0);
-	    }else{
-	        return false;
-	    }
-	            
-	}
-	 
-	 public void setTouchIntercept(boolean value){
-         willIntercept = value;
-	 }
-
+    
+    public DefinedScrollView(Context context, AttributeSet attrs)
+    {
+        super(context, attrs);
+    }
+    
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent arg0)
+    {
+        if (willIntercept)
+        {
+            //Ëøô‰∏™Âú∞ÊñπÁõ¥Êé•ËøîÂõûtrue‰ºöÂæàÂç°
+            return super.onInterceptTouchEvent(arg0);
+        }
+        else
+        {
+            return false;
+        }
+        
+    }
+    
+    public void setTouchIntercept(boolean value)
+    {
+        willIntercept = value;
+    }
+    
 }

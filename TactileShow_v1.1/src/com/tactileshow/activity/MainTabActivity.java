@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.tactileshow.main.R;
 import com.tactileshow.util.BroadcastMsg;
+import com.tactileshow.util.Macro;
 import com.tactileshow.util.StaticValue;
-import com.tactileshow.util.macro;
 import com.tactileshow.view.BleVisualInfo;
 import com.tactileshow.view.DefinedPagerAdapter;
 import com.tactileshow.view.DefinedViewPager;
@@ -62,10 +62,10 @@ public class MainTabActivity extends Activity
         viewPager = (DefinedViewPager)findViewById(R.id.view_pager);
         listViews = new ArrayList<View>();
         bleVisual = new BleVisualInfo(this, viewPager);
-        txtVisual = new TXTVisualInfo(this, viewPager); // 12.5调试
+        txtVisual = new TXTVisualInfo(this, viewPager);//12.5调试
         
         listViews.add(bleVisual.getView());
-        listViews.add(txtVisual.getView()); //12.5 调试
+        listViews.add(txtVisual.getView());//12.5 调试
         
         pagerAdapter = new DefinedPagerAdapter(listViews);
         viewPager.setAdapter(pagerAdapter);
@@ -118,45 +118,42 @@ public class MainTabActivity extends Activity
         ExDialog_Init();
         
         IntentFilter filter = new IntentFilter();
-        filter.addAction(macro.BROADCAST_ADDRESS);
+        filter.addAction(Macro.BROADCAST_ADDRESS);
         registerReceiver(mGattUpdateReceiver, filter);
     }
     
     private void ExDialog_Init()
     {
         builder_dl_exit = new AlertDialog.Builder(context);
-        builder_dl_exit.setTitle("�˳�");
+        builder_dl_exit.setTitle("是否退出");
         
-        builder_dl_exit.setNegativeButton("ȡ��", new DialogInterface.OnClickListener()
+        builder_dl_exit.setNegativeButton("取消", new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                
                 dialog.dismiss();
             }
         });
-        builder_dl_exit.setPositiveButton("�Ͽ�����", new DialogInterface.OnClickListener()
+        
+        builder_dl_exit.setPositiveButton("立即退出", new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface arg0, int arg1)
             {
-                // TODO Auto-generated method stub
                 ((Activity)context).finish();
             }
         });
         
-        builder_dl_exit.setNeutralButton("ֱ���˳�", new DialogInterface.OnClickListener()
+        builder_dl_exit.setNeutralButton("ֱ保存退出", new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface arg0, int arg1)
             {
-                // TODO Auto-generated method stub
-                macro.SETTING_EXIT_DIRECTLY = true;
+                Macro.SETTING_EXIT_DIRECTLY = true;
                 ((Activity)context).finish();
             }
         });
-        
     }
     
     public void ExDialog_Show()
@@ -167,7 +164,6 @@ public class MainTabActivity extends Activity
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)
     {
-        // TODO Auto-generated method stub
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0)
         {
             ExDialog_Show();
@@ -232,7 +228,6 @@ public class MainTabActivity extends Activity
         @Override
         public void onReceive(Context arg0, Intent arg1)
         {
-            // TODO Auto-generated method stub
             final String action = arg1.getStringExtra("msg");
             if (action == null)
                 return;

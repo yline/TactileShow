@@ -4,48 +4,59 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import android.text.format.Time;
-import android.util.Log;
-
 /*
- * ¶Ô½ÓÊÕµ½µÄ¹ã²¥Êý¾Ý£¨¸ñÊ½Îª£º#Sensor#Time#data#£¬½øÐÐ½âÎö¡£
+ * å¯¹æŽ¥æ”¶åˆ°çš„å¹¿æ’­æ•°æ®ï¼ˆæ ¼å¼ä¸ºï¼š#Sensor#Time#data#ï¼Œè¿›è¡Œè§£æžã€‚
  */
-public class BroadcastMsg {
-	private String sensor;
-	private Date time;
-	private String data;
-	public BroadcastMsg(String msg){
-		time = new Date();
-		parseString(msg);
-	}
-	
-	public String getSensor(){
-		return sensor;
-	}
-	
-	public Date getTime(){
-		return time;
-	}
-	
-	public String getData(){
-		return data;
-	}
-	
-	private void parseString(String msg){
-		if(msg.startsWith("#")){
-			String[] pars = msg.substring(1).split("#");
-			if(pars.length >= 3){
-				sensor = pars[0];
-				//time = new Date(Long.parseLong(pars[1]));
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ms");
-				try {
-					time = sdf.parse(pars[0]);
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				data = pars[2];
-			}
-		}
-	}
+public class BroadcastMsg
+{
+    private String sensor;
+    
+    private Date time;
+    
+    private String data;
+    
+    public BroadcastMsg(String msg)
+    {
+        time = new Date();
+        parseString(msg);
+    }
+    
+    public String getSensor()
+    {
+        return sensor;
+    }
+    
+    public Date getTime()
+    {
+        return time;
+    }
+    
+    public String getData()
+    {
+        return data;
+    }
+    
+    private void parseString(String msg)
+    {
+        if (msg.startsWith("#"))
+        {
+            String[] pars = msg.substring(1).split("#");
+            if (pars.length >= 3)
+            {
+                sensor = pars[0];
+                //time = new Date(Long.parseLong(pars[1]));
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ms");
+                try
+                {
+                    time = sdf.parse(pars[0]);
+                }
+                catch (ParseException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                data = pars[2];
+            }
+        }
+    }
 }

@@ -5,44 +5,49 @@ import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-public class DefinedViewPager extends ViewPager{
-	
-	private Context context;
+public class DefinedViewPager extends ViewPager
+{
+    private Context context;
+    
     private boolean willIntercept = true;
     
-    public DefinedViewPager(Context context) {
-            super(context);
-            this.context = context;
+    public DefinedViewPager(Context context)
+    {
+        super(context);
+        this.context = context;
     }
     
-    public DefinedViewPager(Context context, AttributeSet attrs) {
-            super(context, attrs);
-            this.context = context;
+    public DefinedViewPager(Context context, AttributeSet attrs)
+    {
+        super(context, attrs);
+        this.context = context;
     }
-
-    
     
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent arg0) {
-            if(willIntercept){
-                    //Õâ¸öµØ·½Ö±½Ó·µ»Øtrue»áºÜ¿¨
-                    return super.onInterceptTouchEvent(arg0);
-            }else{
-                    return false;
-            }
-            
-    }
-
-    /**
-     * ÉèÖÃViewPagerÊÇ·ñÀ¹½Øµã»÷ÊÂ¼ş
-     * @param value if true, ViewPagerÀ¹½Øµã»÷ÊÂ¼ş
-     *                                 if false, ViewPager½«²»ÄÜ»¬¶¯£¬ViewPagerµÄ×ÓView¿ÉÒÔ»ñµÃµã»÷ÊÂ¼ş
-     *                                 Ö÷ÒªÊÜÓ°ÏìµÄµã»÷ÊÂ¼şÎªºáÏò»¬¶¯
-     *
-     */
-    public void setTouchIntercept(boolean value){
-            willIntercept = value;
+    public boolean onInterceptTouchEvent(MotionEvent arg0)
+    {
+        if (willIntercept)
+        {
+            //è¿™ä¸ªåœ°æ–¹ç›´æ¥è¿”å›trueä¼šå¾ˆå¡
+            return super.onInterceptTouchEvent(arg0);
+        }
+        else
+        {
+            return false;
+        }
+        
     }
     
-
+    /**
+     * è®¾ç½®ViewPageræ˜¯å¦æ‹¦æˆªç‚¹å‡»äº‹ä»¶
+     * @param value if true, ViewPageræ‹¦æˆªç‚¹å‡»äº‹ä»¶
+     *                                 if false, ViewPagerå°†ä¸èƒ½æ»‘åŠ¨ï¼ŒViewPagerçš„å­Viewå¯ä»¥è·å¾—ç‚¹å‡»äº‹ä»¶
+     *                                 ä¸»è¦å—å½±å“çš„ç‚¹å‡»äº‹ä»¶ä¸ºæ¨ªå‘æ»‘åŠ¨
+     *
+     */
+    public void setTouchIntercept(boolean value)
+    {
+        willIntercept = value;
+    }
+    
 }

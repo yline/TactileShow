@@ -8,13 +8,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import com.tactileshow.base.BaseActivity;
 import com.tactileshow.main.R;
 import com.tactileshow.util.DataFile;
 import com.tactileshow.util.StaticValue;
-import com.tactileshow.util.macro;
+import com.tactileshow.util.Macro;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -34,604 +34,618 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.v4.view.MenuCompat;
 import android.support.v4.view.MenuItemCompat;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 /*
- * Ö÷½çÃæµÄActivity¡£
- * Õû¸öÁ¬½ÓÖ´ĞĞ¹ı³ÌÎª£ºonMenuItemSelectedÀïµÄmacro.MENU_ITEMID_FRESHÇé¿ö£¨µ±µã»÷Ë¢ĞÂÊ±£¬½øĞĞÉè±¸É¨Ãè£©£¬scanLeDevice£¨ÕæÕı¿ªÊ¼É¨Ãè£©
- * lv_device.setOnItemClickListener£¨µ±µã»÷Éè±¸Ê±£¬½øĞĞÁ¬½Ó£©
+ * ä¸»ç•Œé¢çš„Activityã€‚
+ * æ•´ä¸ªè¿æ¥æ‰§è¡Œè¿‡ç¨‹ä¸ºï¼šonMenuItemSelectedé‡Œçš„macro.MENU_ITEMID_FRESHæƒ…å†µï¼ˆå½“ç‚¹å‡»åˆ·æ–°æ—¶ï¼Œè¿›è¡Œè®¾å¤‡æ‰«æï¼‰ï¼ŒscanLeDeviceï¼ˆçœŸæ­£å¼€å§‹æ‰«æï¼‰
+ * lv_device.setOnItemClickListenerï¼ˆå½“ç‚¹å‡»è®¾å¤‡æ—¶ï¼Œè¿›è¡Œè¿æ¥ï¼‰
  */
-public class MainActivity extends Activity {
-
-
-
-	BluetoothManager mBluetoothManager;
-	BluetoothAdapter mBluetoothAdapter;
-	
-	
-	private ArrayList<BluetoothDevice> mLeDevices = new ArrayList<BluetoothDevice>();
-	private List<BluetoothGattService> mLeServices;
-	
-	private boolean mIsScanning;
-	private Handler mHandler = new Handler();
-	private MyHandler myHandler;
-	
-	private BluetoothGatt mBluetoothGatt;
-	private BluetoothGattService mGattService;
-	
-	TextView tv_hello;
-	ListView lv_device;
-	TextView tv_connect_info;
-	
-	Menu me_globle;
-	MenuItem mi_fresh;
-	MenuItem mi_exit;
-	MenuItem mi_debug;
-	
-	AlertDialog.Builder builder_dl_connect;
-	AlertDialog dl_connect;
-	
-	ArrayAdapter<String> lvaa_device;
-	List<String> mLeDevices_lvdata = new ArrayList<String>();
-	
-	private final static String TAG = "²âÊÔTAG";
-	
-	private int mConnectionState = STATE_DISCONNECTED;
-    private static final int STATE_DISCONNECTED = 0; //Éè±¸ÎŞ·¨Á¬½Ó
-    private static final int STATE_CONNECTING = 1;  //Éè±¸ÕıÔÚÁ¬½Ó×´Ì¬
-    private static final int STATE_CONNECTED = 2;   //Éè±¸Á¬½ÓÍê±Ï
-	
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-		setContentView(R.layout.activity_ble);
-		Log.i(TAG, "MainActivity Starting...");
-		ActionBar actionBar = getActionBar();
-		actionBar.show();
-		
-		
-		mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-		mBluetoothAdapter = mBluetoothManager.getAdapter();
-		
-		if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) 
-		{
-			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBtIntent, macro.INTENT_REQUEST_ENABLE_BT);
-		}
-		
-		Toast.makeText(getApplicationContext(), "À¶ÑÀÒÑ¿ªÆô", Toast.LENGTH_SHORT).show();
-		
-		tv_hello = (TextView)findViewById(R.id.layout_ble_hello);
-		
-		lv_device = (ListView)findViewById(R.id.lv_ble_device);
-		lvaa_device = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, mLeDevices_lvdata);
-		UpdateDeviceList();
-		
-		lv_device.setAdapter(lvaa_device);
-		lv_device.setOnItemClickListener(new OnItemClickListener() 
-		{
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				// TODO Auto-generated method stub
-				BluetoothDevice tmpBleDevice = mLeDevices.get(arg2);
-				Toast.makeText(getApplicationContext(), "Á¬½Ó" + tmpBleDevice.getName(), Toast.LENGTH_SHORT).show();
-				scanLeDevice(false);
-				mBluetoothGatt = tmpBleDevice.connectGatt(MainActivity.this, false, mGattCallback);
-				ShowConnectDialog();
-			}	
-		});
-		
-		
-		myHandler = new MyHandler(); //ÓÃÓÚÉ¨ÃèÊ±¼äÉè¶¨
-		
-		StaticValue.data_file = new DataFile();
-		
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(macro.BROADCAST_ADDRESS);
-		registerReceiver(mGattUpdateReceiver, filter);
-		
-		tv_hello.setText("Çë°´Ë¢ĞÂ¿ªÊ¼ËÑË÷");
-		
-	}
-	
-	
-	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		super.onDestroy();
-		
-		unregisterReceiver(mGattUpdateReceiver);
-		closeBle();
-		
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// TODO Auto-generated method stub
-		me_globle = menu;
-		mi_debug = menu.add(macro.MENU_GROUPID_BLE, macro.MENU_ITEMID_DEBUG, 0, "²âÊÔ");
-		mi_fresh = menu.add(macro.MENU_GROUPID_BLE, macro.MENU_ITEMID_FRESH, 1, "ËÑË÷");
-		mi_exit = menu.add(macro.MENU_GROUPID_BLE, macro.MENU_ITEMID_EXIT, 2, "ÍË³ö");
-		mi_fresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		mi_exit.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		
-		return true;
-		//return super.onCreateOptionsMenu(menu);	
-	}
-	
-	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		// TODO Auto-generated method stub
-		if(item.getItemId() == macro.MENU_ITEMID_FRESH)
-		{
-			closeBle();
-			mLeDevices.clear();
-			UpdateDeviceList();
-			tv_hello.setText("¿ªÊ¼ËÑË÷");
-			scanLeDevice(true);
-		}
-		else if(item.getItemId() == macro.MENU_ITEMID_EXIT)
-		{
-			Log.w(TAG, "ÍË³ö");
-			finish();
-		}
-		else if(item.getItemId() == macro.MENU_ITEMID_DEBUG)
-		{
-			Log.w(TAG, "²âÊÔÄ£Ê½");
-			Intent intent = new Intent();
-			intent.setClass(MainActivity.this, MainTabActivity.class);
-			intent.putExtra("str", "come from first activity TEST");
-			startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
-		}	
-        		
-		
-		return super.onMenuItemSelected(featureId, item);
-	}
-
-	void ShowConnectDialog()
-	{
-	    LayoutInflater layoutInflater = LayoutInflater.from(this);
-	    View view = layoutInflater.inflate(R.layout.activity_ble_connect, null);
-	     
-	    builder_dl_connect = new AlertDialog.Builder(this);
-	    builder_dl_connect.setTitle("Á¬½Ó×´Ì¬");
-	    builder_dl_connect.setView(view);
-	    builder_dl_connect.setNegativeButton("È¡ÏûÁ¬½Ó",
-	           new DialogInterface.OnClickListener() {
-	               @Override
-	               public void onClick(DialogInterface dialog, int which) {
-	                   closeBle(); 
-	            	   dialog.dismiss();
-	               }
-	           });
-	    tv_connect_info = (TextView)view.findViewById(R.id.tv_ble_connect_info);
-	    if(tv_connect_info == null)
-	    	Log.w(TAG, "NULL");
-	    tv_connect_info.setText("ÕıÔÚÁ¬½ÓÖĞ");
-	    
-	    dl_connect = builder_dl_connect.show();
-	}
-	
-	
-	public void closeBle() 
-	{
-	    if (mBluetoothGatt == null) {
-	        return;
-	    }
-	    mBluetoothGatt.close();
-	    mBluetoothGatt = null;
-	}
-	
-	void beginScanUI()
-	{
-		MenuItemCompat.setActionView(mi_fresh, R.layout.activity_ble_progressbar);
-	}
-	
-	void endScanUI()
-	{
-		MenuItemCompat.setActionView(mi_fresh, null);
-	}
-	
-	void UpdateDeviceList()
-	{
-		Log.w(TAG, "¸üĞÂÊı¾İ");
-		mLeDevices_lvdata.clear();
-		if(mLeDevices.size() == 0)
-		{
-			mLeDevices_lvdata.add("ÔİÊ±Ã»ÓĞËÑË÷µ½BLEÉè±¸");
-			lv_device.setEnabled(false);
-		}
-		else
-		{
-			lv_device.setEnabled(true);
-			Iterator<BluetoothDevice> it = mLeDevices.iterator();
-			while(it.hasNext())
-			{
-				BluetoothDevice bd_it = it.next();
-				mLeDevices_lvdata.add(bd_it.getName() + " " + bd_it.getAddress());
-			}
-		}
-		lvaa_device.notifyDataSetChanged();
-	}
-	
-	
-	private void scanLeDevice(final boolean enable)
-	{
-		if (enable) 
-		{
-            // ¾­¹ıÔ¤¶¨É¨ÃèÆÚºóÍ£Ö¹É¨Ãè
-            mHandler.postDelayed(new Runnable() {
+public class MainActivity extends BaseActivity
+{
+    BluetoothManager mBluetoothManager;
+    
+    BluetoothAdapter mBluetoothAdapter;
+    
+    private ArrayList<BluetoothDevice> mLeDevices = new ArrayList<BluetoothDevice>();
+    
+    private List<BluetoothGattService> mLeServices;
+    
+    private boolean mIsScanning;
+    
+    private Handler mHandler = new Handler();
+    
+    private MyHandler myHandler;
+    
+    private BluetoothGatt mBluetoothGatt;
+    
+    private BluetoothGattService mGattService;
+    
+    TextView tv_hello;
+    
+    ListView lv_device;
+    
+    TextView tv_connect_info;
+    
+    Menu me_globle;
+    
+    MenuItem mi_fresh;
+    
+    MenuItem mi_exit;
+    
+    MenuItem mi_debug;
+    
+    AlertDialog.Builder builder_dl_connect;
+    
+    AlertDialog dl_connect;
+    
+    ArrayAdapter<String> lvaa_device;
+    
+    List<String> mLeDevices_lvdata = new ArrayList<String>();
+    
+    private final static String TAG = "æµ‹è¯•TAG";
+    
+    private int mConnectionState = STATE_DISCONNECTED;
+    
+    private static final int STATE_DISCONNECTED = 0; //è®¾å¤‡æ— æ³•è¿æ¥
+    
+    private static final int STATE_CONNECTING = 1; //è®¾å¤‡æ­£åœ¨è¿æ¥çŠ¶æ€
+    
+    private static final int STATE_CONNECTED = 2; //è®¾å¤‡è¿æ¥å®Œæ¯•
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        setContentView(R.layout.activity_ble);
+        Log.i(TAG, "MainActivity Starting...");
+        ActionBar actionBar = getActionBar();
+        actionBar.show();
+        
+        mBluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = mBluetoothManager.getAdapter();
+        
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled())
+        {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, Macro.INTENT_REQUEST_ENABLE_BT);
+        }
+        
+        Toast.makeText(getApplicationContext(), "è“ç‰™å·²å¼€å¯", Toast.LENGTH_SHORT).show();
+        
+        tv_hello = (TextView)findViewById(R.id.layout_ble_hello);
+        
+        lv_device = (ListView)findViewById(R.id.lv_ble_device);
+        lvaa_device = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, mLeDevices_lvdata);
+        UpdateDeviceList();
+        
+        lv_device.setAdapter(lvaa_device);
+        lv_device.setOnItemClickListener(new OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3)
+            {
+                // TODO Auto-generated method stub
+                BluetoothDevice tmpBleDevice = mLeDevices.get(arg2);
+                Toast.makeText(getApplicationContext(), "è¿æ¥" + tmpBleDevice.getName(), Toast.LENGTH_SHORT).show();
+                scanLeDevice(false);
+                mBluetoothGatt = tmpBleDevice.connectGatt(MainActivity.this, false, mGattCallback);
+                ShowConnectDialog();
+            }
+        });
+        
+        myHandler = new MyHandler(); //ç”¨äºæ‰«ææ—¶é—´è®¾å®š
+        
+        StaticValue.data_file = new DataFile();
+        
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Macro.BROADCAST_ADDRESS);
+        registerReceiver(mGattUpdateReceiver, filter);
+        
+        tv_hello.setText("è¯·æŒ‰åˆ·æ–°å¼€å§‹æœç´¢");
+        
+    }
+    
+    @Override
+    protected void onDestroy()
+    {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        
+        unregisterReceiver(mGattUpdateReceiver);
+        closeBle();
+        
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        // TODO Auto-generated method stub
+        me_globle = menu;
+        mi_debug = menu.add(Macro.MENU_GROUPID_BLE, Macro.MENU_ITEMID_DEBUG, 0, "æµ‹è¯•");
+        mi_fresh = menu.add(Macro.MENU_GROUPID_BLE, Macro.MENU_ITEMID_FRESH, 1, "æœç´¢");
+        mi_exit = menu.add(Macro.MENU_GROUPID_BLE, Macro.MENU_ITEMID_EXIT, 2, "é€€å‡º");
+        mi_fresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        mi_exit.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        
+        return true;
+        //return super.onCreateOptionsMenu(menu);	
+    }
+    
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item)
+    {
+        // TODO Auto-generated method stub
+        if (item.getItemId() == Macro.MENU_ITEMID_FRESH)
+        {
+            closeBle();
+            mLeDevices.clear();
+            UpdateDeviceList();
+            tv_hello.setText("å¼€å§‹æœç´¢");
+            scanLeDevice(true);
+        }
+        else if (item.getItemId() == Macro.MENU_ITEMID_EXIT)
+        {
+            Log.w(TAG, "é€€å‡º");
+            finish();
+        }
+        else if (item.getItemId() == Macro.MENU_ITEMID_DEBUG)
+        {
+            Log.w(TAG, "æµ‹è¯•æ¨¡å¼");
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this, MainTabActivity.class);
+            intent.putExtra("str", "come from first activity TEST");
+            startActivityForResult(intent, Macro.INTENT_BLEACTIVITY_TESTSHOW);
+        }
+        
+        return super.onMenuItemSelected(featureId, item);
+    }
+    
+    void ShowConnectDialog()
+    {
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View view = layoutInflater.inflate(R.layout.activity_ble_connect, null);
+        
+        builder_dl_connect = new AlertDialog.Builder(this);
+        builder_dl_connect.setTitle("è¿æ¥çŠ¶æ€");
+        builder_dl_connect.setView(view);
+        builder_dl_connect.setNegativeButton("å–æ¶ˆè¿æ¥", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                closeBle();
+                dialog.dismiss();
+            }
+        });
+        tv_connect_info = (TextView)view.findViewById(R.id.tv_ble_connect_info);
+        if (tv_connect_info == null)
+            Log.w(TAG, "NULL");
+        tv_connect_info.setText("æ­£åœ¨è¿æ¥ä¸­");
+        
+        dl_connect = builder_dl_connect.show();
+    }
+    
+    public void closeBle()
+    {
+        if (mBluetoothGatt == null)
+        {
+            return;
+        }
+        mBluetoothGatt.close();
+        mBluetoothGatt = null;
+    }
+    
+    void beginScanUI()
+    {
+        MenuItemCompat.setActionView(mi_fresh, R.layout.activity_ble_progressbar);
+    }
+    
+    void endScanUI()
+    {
+        MenuItemCompat.setActionView(mi_fresh, null);
+    }
+    
+    void UpdateDeviceList()
+    {
+        Log.w(TAG, "æ›´æ–°æ•°æ®");
+        mLeDevices_lvdata.clear();
+        if (mLeDevices.size() == 0)
+        {
+            mLeDevices_lvdata.add("æš‚æ—¶æ²¡æœ‰æœç´¢åˆ°BLEè®¾å¤‡");
+            lv_device.setEnabled(false);
+        }
+        else
+        {
+            lv_device.setEnabled(true);
+            Iterator<BluetoothDevice> it = mLeDevices.iterator();
+            while (it.hasNext())
+            {
+                BluetoothDevice bd_it = it.next();
+                mLeDevices_lvdata.add(bd_it.getName() + " " + bd_it.getAddress());
+            }
+        }
+        lvaa_device.notifyDataSetChanged();
+    }
+    
+    private void scanLeDevice(final boolean enable)
+    {
+        if (enable)
+        {
+            // ç»è¿‡é¢„å®šæ‰«ææœŸååœæ­¢æ‰«æ
+            mHandler.postDelayed(new Runnable()
+            {
                 @Override
-                public void run() 
+                public void run()
                 {
-                	if(mIsScanning == false)
-                		return; //ÒÑ¾­ÖÕÖ¹É¨Ãè
+                    if (mIsScanning == false)
+                        return; //å·²ç»ç»ˆæ­¢æ‰«æ
                     mIsScanning = false;
                     endScanUI();
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    Log.i(TAG, "É¨Ãè½áÊø");
-                    SendHandleMsg("Scan", macro.HANDLER_SCAN_STOPPED);
+                    Log.i(TAG, "æ‰«æç»“æŸ");
+                    SendHandleMsg("Scan", Macro.HANDLER_SCAN_STOPPED);
                 }
-            }, macro.BLE_SCAN_PERIOD);
+            }, Macro.BLE_SCAN_PERIOD);
             
             mIsScanning = true;
             beginScanUI();
-            mBluetoothAdapter.startLeScan(mLeScanCallback);//À¶ÑÀÊÊÅäÆ÷¿ªÊ¼½øĞĞÉ¨ÃèÉè±¸£¬»Øµ÷mLeScanCallBack±äÁ¿
-        } 
-		else 
-		{
+            mBluetoothAdapter.startLeScan(mLeScanCallback);//è“ç‰™é€‚é…å™¨å¼€å§‹è¿›è¡Œæ‰«æè®¾å¤‡ï¼Œå›è°ƒmLeScanCallBackå˜é‡
+        }
+        else
+        {
             mIsScanning = false;
             endScanUI();
-            Log.i(TAG, "ÖÕÖ¹É¨Ãè");
+            Log.i(TAG, "ç»ˆæ­¢æ‰«æ");
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
         }
-	}
-	
-	void SendHandleMsg(String tag, int content)
-	{
-		Message msg = new Message();
+    }
+    
+    void SendHandleMsg(String tag, int content)
+    {
+        Message msg = new Message();
         msg.what = content;
         myHandler.sendMessage(msg);
-	}
-	
-	
-	private BluetoothAdapter.LeScanCallback mLeScanCallback =
-	        new BluetoothAdapter.LeScanCallback() 
-	{
-	    @Override
-	    public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) 
-	    {
-	        runOnUiThread(new Runnable() {
-	           @Override
-	           public void run() {
-	        	   mLeDevices.add(device);
-	        	   UpdateDeviceList();
-	        	   
-				   Toast.makeText(getApplicationContext(), "É¨Ãèµ½ĞÂBLEÉè±¸ " + device.getName(), Toast.LENGTH_SHORT).show();
-	        	   String out_info = device.getAddress() + " " + device.getBondState() + " " + device.getName();
-	        	   tv_hello.setText(tv_hello.getText() + "\n" + out_info);
-	        	   
-	           }
-	       });
-	   }
-	};
-	
-	private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback()
-
-	{
-		 @Override
-	     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
-		 {
-			 String intentAction;
-	         if (newState == BluetoothProfile.STATE_CONNECTED) 
-	         {
-	        	 intentAction = macro.ACTION_GATT_CONNECTED;
-	        	 mConnectionState = STATE_CONNECTED;
-	
-	        	 SendHandleMsg("Device", macro.HANDLER_CONNECT_SUCCESS);
-	             Log.i(TAG, "Connected to GATT server.");
-	             mBluetoothGatt.discoverServices(); //ÏÈÈ¥·¢ÏÖ·şÎñ
-	         } 
-	         else if (newState == BluetoothProfile.STATE_DISCONNECTED) 
-	         {//µ±Éè±¸ÎŞ·¨Á¬½Ó
-	        	 intentAction = macro.ACTION_GATT_DISCONNECTED;
-	             mConnectionState = STATE_DISCONNECTED;
-	             SendHandleMsg("Device", macro.HANDLER_CONNECT_FAILED);
-	             Log.i(TAG, "Disconnected from GATT server.");
-	
-	         }
-		 }
-	     
-		 @Override
-	     // ·¢ÏÖĞÂ·şÎñ¶Ë
-	     public void onServicesDiscovered(BluetoothGatt gatt, int status) 
-		 {
-			 if (status == BluetoothGatt.GATT_SUCCESS) 
-			 {
-				 SendHandleMsg("service", macro.HANDLER_SERVICE_DISCOVERED);
-	         } 
-			 else 
-			 {
-				 Log.w(TAG, "onServicesDiscovered received: " + status);
-	         }
-		 }
-	        
-		 @Override
-	     // ¶ÁĞ´ÌØĞÔ
-	     public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) 
-		 {
-			 Log.w("TAG", "READ!!");
-	         if (status == BluetoothGatt.GATT_SUCCESS) 
-	         {
-	        	 //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);  
-	         }
-	     }
-
-		@Override
-		public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-			// TODO Auto-generated method stub
-			super.onCharacteristicChanged(gatt, characteristic);
-			
-			
-			String uuid = characteristic.getUuid().toString();
-			
-			if(uuid.equals(macro.UUID_BLE_DAT))
-			{
-				String data = blueRead(characteristic.getValue());
-				String[] datas = data.split("\n");
-
-				for(int i = 0; i < datas.length; ++i){
-					Date date = new Date();
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ms");
-					String s = sdf.format(date);
-					Log.w(TAG, "¸Ä±äÊÇ " + data);
-					broadcastUpdate("#" + "BLE" + "#" + s + "#" + datas[i]);
-				}
-			}
-//			try {
-//				Thread.sleep(50);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-			
-		}
-		 
-	};
-	
-	
-	void broadcastUpdate(String str_intent)
-	{
-
-		Intent intent = new Intent(macro.BROADCAST_ADDRESS);
-	    intent.putExtra("msg", str_intent);  
-	    sendBroadcast(intent); 
-	}
-	
-	private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver()
-	{
-
-		@Override
-		public void onReceive(Context arg0, Intent arg1) {
-			// TODO Auto-generated method stub
-			final String action = arg1.getStringExtra("msg");
-			Log.w(TAG, "¹ã²¥À´ÁË " + action); 
-			tv_hello.setText(action);
-		}
-		
-	};
-	
-	String ListServices()
-	{
-		String ser_str = "";
-		if(mBluetoothGatt != null)
-		{
-			mLeServices = mBluetoothGatt.getServices();
-			for(int i = 0; i < mLeServices.size(); i++)
-			{
-				Log.w(TAG, "ÕÒµ½µÄ·şÎñÎª: " + i + mLeServices.get(i).getUuid());
-				ser_str += "\n" + mLeServices.get(i).getUuid();
-			}
-			return ser_str;
-		}
-		else 
-		{
-			return "Error Gatt";
-		}
-	}
-	
-	String ListCharacters(String uuid)
-	{
-		String ser_str = "";
-		mGattService = mBluetoothGatt.getService(UUID.fromString(uuid));
-		List<BluetoothGattCharacteristic> tmp_listcha;
-		if(mGattService == null)
-		{
-			Toast.makeText(getApplicationContext(), "·şÎñ»ñÈ¡Ê§°Ü", Toast.LENGTH_SHORT).show();
-			return "Error Service";
-		}
-		else
-		{
-			Toast.makeText(getApplicationContext(), "·şÎñ»ñÈ¡³É¹¦", Toast.LENGTH_SHORT).show();
-			
-			tmp_listcha = mGattService.getCharacteristics();
-			ser_str = "";
-			for(int i = 0; i < tmp_listcha.size(); i++)
-			{
-				Log.w(TAG, "ÕÒµ½µÄÌØÕ÷Îª: " + i + tmp_listcha.get(i).getUuid() + " " + tmp_listcha.get(i).getValue());
-				ser_str += "\n" + tmp_listcha.get(i).getUuid() + " " + tmp_listcha.get(i).getValue();
-			}
-			
-			return ser_str;
-		}
-	}
-	
-	boolean EnableConfig(String uuid)
-	{
-		//´Ë´¦¿ªÊ¼°´ÕÕĞ­Òé¶ÔÄÚÈİ½øĞĞ»ñÈ¡
-		byte[] val = new byte[1];
-		val[0] = 1;
-		
-		if(mGattService == null)
-			return false;
-		
-		BluetoothGattCharacteristic charac = mGattService.getCharacteristic(UUID.fromString(uuid));
-		
-		if(charac == null)
-			return false;
-		
-		charac.setValue(val); //conf
-		mBluetoothGatt.writeCharacteristic(charac);
-		
-//		try {
-//			Thread.sleep(200);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-		return true;
-		
-	}
-	
-	/*
-	 * ¶ÁÈ¡Êı¾İÇ°µÄÅäÖÃ¹¤×÷£¬ÎÂ¶ÈºÍÑ¹Á¦´«¸ĞÆ÷µÄ¶ÁÈ¡¶¼ÒªÖ´ĞĞÕâ¸ö·½·¨
-	 */
-	boolean EnableData(String uuid)
-	{
-		if(mGattService == null)
-			return false;
-		
-		BluetoothGattCharacteristic charac = mGattService.getCharacteristic(UUID.fromString(uuid));
-		
-		if(charac == null)
-			return false;
-		
-		boolean noti = mBluetoothGatt.setCharacteristicNotification(charac, true);
-		Log.w(TAG, "noti " + noti);
-		BluetoothGattDescriptor clientConfig = charac.getDescriptor(UUID.fromString(macro.UUID_CLIENT_CONFIG));
-		clientConfig.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-		mBluetoothGatt.writeDescriptor(clientConfig);
-		
-//		try {
-//			Thread.sleep(200);//200
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-		return true;
-	}
-		
-	
-	class MyHandler extends Handler 
-	{
-		public MyHandler() {}
-		
-		public MyHandler(Looper L) 
-		{
-			super(L);
-		}
-		// ×ÓÀà±ØĞëÖØĞ´´Ë·½·¨,½ÓÊÜÊı¾İ
-		@Override
-		public void handleMessage(Message msg) 
-		{
-			super.handleMessage(msg);
-			// ´Ë´¦¿ÉÒÔ¸üĞÂUI
-			
-
-			if(msg.what == macro.HANDLER_SCAN_STOPPED)
-			{
-				tv_hello.setText(tv_hello.getText() + "\n" + "É¨Ãè½áÊø");
-			}
-			else if(msg.what == macro.HANDLER_CONNECT_SUCCESS)
-			{
-				//Toast.makeText(getApplicationContext(), "Á¬½ÓÒÑ¾­½¨Á¢", Toast.LENGTH_SHORT).show();
-				tv_connect_info.setText("Á¬½Ó³É¹¦£¬¿ªÊ¼Ñ°ÕÒ·şÎñ");
-			}
-			else if(msg.what == macro.HANDLER_CONNECT_FAILED)
-			{
-				//Toast.makeText(getApplicationContext(), "Á¬½Ó½¨Á¢Ê§°Ü", Toast.LENGTH_SHORT).show();
-				tv_connect_info.setText("Á¬½ÓÊ§°Ü£¬Çë·µ»ØÖØÁ¬");
-			}
-			else if(msg.what == macro.HANDLER_SERVICE_DISCOVERED)
-			{
-				//Toast.makeText(getApplicationContext(), "·şÎñ·¢ÏÖÍê±Ï", Toast.LENGTH_SHORT).show();
-				tv_connect_info.setText("³É¹¦·¢ÏÖ·şÎñ£¬¿ªÊ¼Æô¶¯·şÎñ");
-				boolean isHasValidData = false;
-				ListServices();
-				
-				ListCharacters(macro.UUID_BLE_SER);
-				
-				if(EnableConfig(macro.UUID_BLE_CON) && EnableData(macro.UUID_BLE_DAT))
-				{
-					tv_connect_info.setText("À¶ÑÀÊı¾İ¼¤»î³É¹¦");
-					isHasValidData = true;
-				}
-				else
-				{
-					tv_connect_info.setText("À¶ÑÀÊı¾İ¼¤»îÊ§°Ü");
-				}
-				
-				if(isHasValidData == true)
-				{
-					Intent intent = new Intent();
-					intent.setClass(MainActivity.this, MainTabActivity.class);
-					intent.putExtra("str", "come from first activity");
-					startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
-					dl_connect.dismiss();
-				}
-				
-				
-			}
-
-		}
-	}
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
-		super.onActivityResult(requestCode, resultCode, data);
-		
-		Log.w("TAG", "success" + macro.INTENT_BLEACTIVITY_TESTSHOW);
-		
-		if(requestCode == macro.INTENT_BLEACTIVITY_TESTSHOW)
-		{
-			closeBle();
-			if(macro.SETTING_EXIT_DIRECTLY == true) //ÉÏÒ»¸öactivityÒªÇóÖ±½ÓÍË³ö¡£
-				finish();
-		}
-		
-		
-	}
-
-	public String blueRead(byte[] value){
-		String tmp = "";
-		try {
-			tmp = new String(value, "GB2312");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Log.w("tmp", "tmp = " + tmp);
-		return tmp;
-	}
+    }
+    
+    private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback()
+    {
+        @Override
+        public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord)
+        {
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    mLeDevices.add(device);
+                    UpdateDeviceList();
+                    
+                    Toast.makeText(getApplicationContext(), "æ‰«æåˆ°æ–°BLEè®¾å¤‡ " + device.getName(), Toast.LENGTH_SHORT).show();
+                    String out_info = device.getAddress() + " " + device.getBondState() + " " + device.getName();
+                    tv_hello.setText(tv_hello.getText() + "\n" + out_info);
+                    
+                }
+            });
+        }
+    };
+    
+    private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback()
+    
+    {
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
+        {
+            String intentAction;
+            if (newState == BluetoothProfile.STATE_CONNECTED)
+            {
+                intentAction = Macro.ACTION_GATT_CONNECTED;
+                mConnectionState = STATE_CONNECTED;
+                
+                SendHandleMsg("Device", Macro.HANDLER_CONNECT_SUCCESS);
+                Log.i(TAG, "Connected to GATT server.");
+                mBluetoothGatt.discoverServices(); //å…ˆå»å‘ç°æœåŠ¡
+            }
+            else if (newState == BluetoothProfile.STATE_DISCONNECTED)
+            {//å½“è®¾å¤‡æ— æ³•è¿æ¥
+                intentAction = Macro.ACTION_GATT_DISCONNECTED;
+                mConnectionState = STATE_DISCONNECTED;
+                SendHandleMsg("Device", Macro.HANDLER_CONNECT_FAILED);
+                Log.i(TAG, "Disconnected from GATT server.");
+                
+            }
+        }
+        
+        @Override
+        // å‘ç°æ–°æœåŠ¡ç«¯
+        public void onServicesDiscovered(BluetoothGatt gatt, int status)
+        {
+            if (status == BluetoothGatt.GATT_SUCCESS)
+            {
+                SendHandleMsg("service", Macro.HANDLER_SERVICE_DISCOVERED);
+            }
+            else
+            {
+                Log.w(TAG, "onServicesDiscovered received: " + status);
+            }
+        }
+        
+        @Override
+        // è¯»å†™ç‰¹æ€§
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status)
+        {
+            Log.w("TAG", "READ!!");
+            if (status == BluetoothGatt.GATT_SUCCESS)
+            {
+                //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);  
+            }
+        }
+        
+        @Override
+        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic)
+        {
+            // TODO Auto-generated method stub
+            super.onCharacteristicChanged(gatt, characteristic);
+            
+            String uuid = characteristic.getUuid().toString();
+            
+            if (uuid.equals(Macro.UUID_BLE_DAT))
+            {
+                String data = blueRead(characteristic.getValue());
+                String[] datas = data.split("\n");
+                
+                for (int i = 0; i < datas.length; ++i)
+                {
+                    Date date = new Date();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ms");
+                    String s = sdf.format(date);
+                    Log.w(TAG, "æ”¹å˜æ˜¯ " + data);
+                    broadcastUpdate("#" + "BLE" + "#" + s + "#" + datas[i]);
+                }
+            }
+            //			try {
+            //				Thread.sleep(50);
+            //			} catch (InterruptedException e) {
+            //				// TODO Auto-generated catch block
+            //				e.printStackTrace();
+            //			}
+            
+        }
+        
+    };
+    
+    void broadcastUpdate(String str_intent)
+    {
+        
+        Intent intent = new Intent(Macro.BROADCAST_ADDRESS);
+        intent.putExtra("msg", str_intent);
+        sendBroadcast(intent);
+    }
+    
+    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver()
+    {
+        
+        @Override
+        public void onReceive(Context arg0, Intent arg1)
+        {
+            // TODO Auto-generated method stub
+            final String action = arg1.getStringExtra("msg");
+            Log.w(TAG, "å¹¿æ’­æ¥äº† " + action);
+            tv_hello.setText(action);
+        }
+        
+    };
+    
+    String ListServices()
+    {
+        String ser_str = "";
+        if (mBluetoothGatt != null)
+        {
+            mLeServices = mBluetoothGatt.getServices();
+            for (int i = 0; i < mLeServices.size(); i++)
+            {
+                Log.w(TAG, "æ‰¾åˆ°çš„æœåŠ¡ä¸º: " + i + mLeServices.get(i).getUuid());
+                ser_str += "\n" + mLeServices.get(i).getUuid();
+            }
+            return ser_str;
+        }
+        else
+        {
+            return "Error Gatt";
+        }
+    }
+    
+    String ListCharacters(String uuid)
+    {
+        String ser_str = "";
+        mGattService = mBluetoothGatt.getService(UUID.fromString(uuid));
+        List<BluetoothGattCharacteristic> tmp_listcha;
+        if (mGattService == null)
+        {
+            Toast.makeText(getApplicationContext(), "æœåŠ¡è·å–å¤±è´¥", Toast.LENGTH_SHORT).show();
+            return "Error Service";
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(), "æœåŠ¡è·å–æˆåŠŸ", Toast.LENGTH_SHORT).show();
+            
+            tmp_listcha = mGattService.getCharacteristics();
+            ser_str = "";
+            for (int i = 0; i < tmp_listcha.size(); i++)
+            {
+                Log.w(TAG, "æ‰¾åˆ°çš„ç‰¹å¾ä¸º: " + i + tmp_listcha.get(i).getUuid() + " " + tmp_listcha.get(i).getValue());
+                ser_str += "\n" + tmp_listcha.get(i).getUuid() + " " + tmp_listcha.get(i).getValue();
+            }
+            
+            return ser_str;
+        }
+    }
+    
+    boolean EnableConfig(String uuid)
+    {
+        //æ­¤å¤„å¼€å§‹æŒ‰ç…§åè®®å¯¹å†…å®¹è¿›è¡Œè·å–
+        byte[] val = new byte[1];
+        val[0] = 1;
+        
+        if (mGattService == null)
+            return false;
+        
+        BluetoothGattCharacteristic charac = mGattService.getCharacteristic(UUID.fromString(uuid));
+        
+        if (charac == null)
+            return false;
+        
+        charac.setValue(val); //conf
+        mBluetoothGatt.writeCharacteristic(charac);
+        
+        //		try {
+        //			Thread.sleep(200);
+        //		} catch (InterruptedException e) {
+        //			// TODO Auto-generated catch block
+        //			e.printStackTrace();
+        //		}
+        
+        return true;
+        
+    }
+    
+    /*
+     * è¯»å–æ•°æ®å‰çš„é…ç½®å·¥ä½œï¼Œæ¸©åº¦å’Œå‹åŠ›ä¼ æ„Ÿå™¨çš„è¯»å–éƒ½è¦æ‰§è¡Œè¿™ä¸ªæ–¹æ³•
+     */
+    boolean EnableData(String uuid)
+    {
+        if (mGattService == null)
+            return false;
+        
+        BluetoothGattCharacteristic charac = mGattService.getCharacteristic(UUID.fromString(uuid));
+        
+        if (charac == null)
+            return false;
+        
+        boolean noti = mBluetoothGatt.setCharacteristicNotification(charac, true);
+        Log.w(TAG, "noti " + noti);
+        BluetoothGattDescriptor clientConfig = charac.getDescriptor(UUID.fromString(Macro.UUID_CLIENT_CONFIG));
+        clientConfig.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+        mBluetoothGatt.writeDescriptor(clientConfig);
+        
+        //		try {
+        //			Thread.sleep(200);//200
+        //		} catch (InterruptedException e) {
+        //			// TODO Auto-generated catch block
+        //			e.printStackTrace();
+        //		}
+        
+        return true;
+    }
+    
+    class MyHandler extends Handler
+    {
+        public MyHandler()
+        {
+        }
+        
+        public MyHandler(Looper L)
+        {
+            super(L);
+        }
+        
+        // å­ç±»å¿…é¡»é‡å†™æ­¤æ–¹æ³•,æ¥å—æ•°æ®
+        @Override
+        public void handleMessage(Message msg)
+        {
+            super.handleMessage(msg);
+            // æ­¤å¤„å¯ä»¥æ›´æ–°UI
+            
+            if (msg.what == Macro.HANDLER_SCAN_STOPPED)
+            {
+                tv_hello.setText(tv_hello.getText() + "\n" + "æ‰«æç»“æŸ");
+            }
+            else if (msg.what == Macro.HANDLER_CONNECT_SUCCESS)
+            {
+                //Toast.makeText(getApplicationContext(), "è¿æ¥å·²ç»å»ºç«‹", Toast.LENGTH_SHORT).show();
+                tv_connect_info.setText("è¿æ¥æˆåŠŸï¼Œå¼€å§‹å¯»æ‰¾æœåŠ¡");
+            }
+            else if (msg.what == Macro.HANDLER_CONNECT_FAILED)
+            {
+                //Toast.makeText(getApplicationContext(), "è¿æ¥å»ºç«‹å¤±è´¥", Toast.LENGTH_SHORT).show();
+                tv_connect_info.setText("è¿æ¥å¤±è´¥ï¼Œè¯·è¿”å›é‡è¿");
+            }
+            else if (msg.what == Macro.HANDLER_SERVICE_DISCOVERED)
+            {
+                //Toast.makeText(getApplicationContext(), "æœåŠ¡å‘ç°å®Œæ¯•", Toast.LENGTH_SHORT).show();
+                tv_connect_info.setText("æˆåŠŸå‘ç°æœåŠ¡ï¼Œå¼€å§‹å¯åŠ¨æœåŠ¡");
+                boolean isHasValidData = false;
+                ListServices();
+                
+                ListCharacters(Macro.UUID_BLE_SER);
+                
+                if (EnableConfig(Macro.UUID_BLE_CON) && EnableData(Macro.UUID_BLE_DAT))
+                {
+                    tv_connect_info.setText("è“ç‰™æ•°æ®æ¿€æ´»æˆåŠŸ");
+                    isHasValidData = true;
+                }
+                else
+                {
+                    tv_connect_info.setText("è“ç‰™æ•°æ®æ¿€æ´»å¤±è´¥");
+                }
+                
+                if (isHasValidData == true)
+                {
+                    Intent intent = new Intent();
+                    intent.setClass(MainActivity.this, MainTabActivity.class);
+                    intent.putExtra("str", "come from first activity");
+                    startActivityForResult(intent, Macro.INTENT_BLEACTIVITY_TESTSHOW);
+                    dl_connect.dismiss();
+                }
+                
+            }
+            
+        }
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        // TODO Auto-generated method stub
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        Log.w("TAG", "success" + Macro.INTENT_BLEACTIVITY_TESTSHOW);
+        
+        if (requestCode == Macro.INTENT_BLEACTIVITY_TESTSHOW)
+        {
+            closeBle();
+            if (Macro.SETTING_EXIT_DIRECTLY == true) //ä¸Šä¸€ä¸ªactivityè¦æ±‚ç›´æ¥é€€å‡ºã€‚
+                finish();
+        }
+        
+    }
+    
+    public String blueRead(byte[] value)
+    {
+        String tmp = "";
+        try
+        {
+            tmp = new String(value, "GB2312");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        Log.w("tmp", "tmp = " + tmp);
+        return tmp;
+    }
 }
