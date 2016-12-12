@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.tactileshow.application.IApplication;
+import com.tactileshow.base.BaseActivity;
 import com.tactileshow.main.R;
 import com.tactileshow.util.BroadcastMsg;
-import com.tactileshow.util.Macro;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.view.BleVisualInfo;
 import com.tactileshow.view.DefinedPagerAdapter;
 import com.tactileshow.view.DefinedViewPager;
 import com.tactileshow.view.TXTVisualInfo;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -30,10 +30,8 @@ import android.view.WindowManager;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 
-public class MainTabActivity extends Activity
+public class MainTabActivity extends BaseActivity
 {
-    private Context context;
-    
     private TabHost tabHost;
     
     private List<View> listViews;
@@ -46,9 +44,7 @@ public class MainTabActivity extends Activity
     
     private TXTVisualInfo txtVisual;
     
-    AlertDialog.Builder builder_dl_exit;
-    
-    AlertDialog dl_exit;
+    private AlertDialog.Builder exitBuilder;
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,7 +52,6 @@ public class MainTabActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab);
         getScreenMetrics();
-        context = this;
         
         tabHost = (TabHost)findViewById(R.id.tabhost);
         viewPager = (DefinedViewPager)findViewById(R.id.view_pager);
@@ -103,7 +98,6 @@ public class MainTabActivity extends Activity
             @Override
             public void onTabChanged(String tabId)
             {
-                
                 if (StaticValue.visual_info_tab_name.equals(tabId))
                 {
                     viewPager.setCurrentItem(0);
@@ -115,19 +109,19 @@ public class MainTabActivity extends Activity
             }
         });
         
-        ExDialog_Init();
+        initExitDialog();
         
         IntentFilter filter = new IntentFilter();
-        filter.addAction(Macro.BROADCAST_ADDRESS);
+        filter.addAction(MainActivity.BROADCAST_ADDRESS);
         registerReceiver(mGattUpdateReceiver, filter);
     }
     
-    private void ExDialog_Init()
+    private void initExitDialog()
     {
-        builder_dl_exit = new AlertDialog.Builder(context);
-        builder_dl_exit.setTitle("是否退出");
+        exitBuilder = new AlertDialog.Builder(this);
+        exitBuilder.setTitle("是否退出");
         
-        builder_dl_exit.setNegativeButton("取消", new DialogInterface.OnClickListener()
+        exitBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialog, int which)
@@ -136,29 +130,23 @@ public class MainTabActivity extends Activity
             }
         });
         
-        builder_dl_exit.setPositiveButton("立即退出", new DialogInterface.OnClickListener()
+        exitBuilder.setNeutralButton("ֱ退出应用", new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface arg0, int arg1)
             {
-                ((Activity)context).finish();
+                IApplication.finishActivity();
             }
         });
         
-        builder_dl_exit.setNeutralButton("ֱ保存退出", new DialogInterface.OnClickListener()
+        exitBuilder.setPositiveButton("结束测试", new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface arg0, int arg1)
             {
-                Macro.SETTING_EXIT_DIRECTLY = true;
-                ((Activity)context).finish();
+                finish();
             }
         });
-    }
-    
-    public void ExDialog_Show()
-    {
-        dl_exit = builder_dl_exit.show();
     }
     
     @Override
@@ -166,17 +154,13 @@ public class MainTabActivity extends Activity
     {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0)
         {
-            ExDialog_Show();
+            exitBuilder.show();
             return true;
         }
         else
+        {
             return super.onKeyDown(keyCode, event);
-    }
-    
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
+        }
     }
     
     @Override
@@ -226,11 +210,14 @@ public class MainTabActivity extends Activity
     {
         
         @Override
-        public void onReceive(Context arg0, Intent arg1)
+        public void onReceive(Context context, Intent intent)
         {
-            final String action = arg1.getStringExtra("msg");
+            final String action = intent.getStringExtra("msg");
             if (action == null)
+            {
                 return;
+            }
+            
             BroadcastMsg bm = new BroadcastMsg(action);
             if (bm.getSensor() == null)
             {
@@ -243,4 +230,9 @@ public class MainTabActivity extends Activity
             }
         }
     };
+    
+    public static void actionStart(Context context)
+    {
+        context.startActivity(new Intent(context, MainTabActivity.class));
+    }
 }
