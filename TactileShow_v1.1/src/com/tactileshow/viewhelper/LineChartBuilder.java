@@ -14,6 +14,7 @@ import com.tactileshow.util.StaticValue;
 import com.tactileshow.view.DefinedScrollView;
 import com.tactileshow.view.DefinedViewPager;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -26,138 +27,135 @@ import android.widget.TextView;
 
 public class LineChartBuilder
 {
-    private XYMultipleSeriesDataset mDataset = new XYMultipleSeriesDataset();
+    private static final String DEFAULT_CHART_TITLE = "蓝牙数据变化趋势";
     
-    private XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
+    private static final int MAX_POINTS = 100;
     
-    private XYSeries series, history_series;
+    // 图标绘制相关
+    private XYSeriesRenderer seriesRenderer;
     
-    private GraphicalView mChartView;
+    private XYMultipleSeriesDataset multipleSeriesDataset;
     
-    private XYSeriesRenderer renderer;
+    private XYMultipleSeriesRenderer multipleSeriesRenderer;
     
-    private Context context;
+    private XYSeries currentSeries, historySeries;
     
-    private LinearLayout layout;
+    private GraphicalView chartView;
     
-    private int maxPoints = 100;
+    private TextView tvTitle;
     
-    private String title;
-    
-    private DefinedViewPager pager;
-    
-    private DefinedScrollView scroll;
-    
+    // 其他
     private int is_touch = 0;
     
-    private TextView tv;
+    private int rec_after_touch = 0;
     
-    private String sensor;
-    
-    public LineChartBuilder(Context context, LinearLayout layout, String title, DefinedViewPager pager,
-        DefinedScrollView scroll, String sensor)
+    public LineChartBuilder(Context context, LinearLayout layout, DefinedViewPager pager, DefinedScrollView scroll)
     {
-        this.context = context;
-        this.layout = layout;
-        this.title = title;
-        this.pager = pager;
-        this.scroll = scroll;
-        this.sensor = sensor;
+        initSeriesRenderer();
         
-        mRenderer.setAxisTitleTextSize(30);
-        mRenderer.setChartTitleTextSize(30);
-        mRenderer.setLabelsTextSize(30);
-        mRenderer.setLegendTextSize(30);
-        mRenderer.setMargins(new int[] {5, 5, 0, 5});
-        mRenderer.setZoomButtonsVisible(true);
-        mRenderer.setPointSize(5);
-        mRenderer.setApplyBackgroundColor(true);
-        mRenderer.setBackgroundColor(Color.argb(0, 50, 50, 50));
-        mRenderer.setShowGridX(true);
-        mRenderer.setGridColor(Color.BLACK);
+        initMultipleSeriesRenderer(seriesRenderer);
         
-        //    String seriesTitle = "Series " + (mDataset.getSeriesCount() + 1);
-        series = new XYSeries("实时信息");
-        history_series = new XYSeries("历史记录");
-        mDataset.addSeries(series);
-        renderer = new XYSeriesRenderer();
+        currentSeries = new XYSeries("实时信息");
+        historySeries = new XYSeries("历史记录");
+        multipleSeriesDataset = new XYMultipleSeriesDataset();
+        multipleSeriesDataset.addSeries(currentSeries);
         
-        renderer.setColor(Color.RED);
-        renderer.setPointStyle(PointStyle.POINT);
-        
-        mRenderer.addSeriesRenderer(renderer);
-        renderer.setPointStyle(PointStyle.CIRCLE);
-        renderer.setFillPoints(true);
-        renderer.setLineWidth(4);
-        mRenderer.setYLabels(10);
-        mRenderer.setYLabelsPadding(-50);
-        mRenderer.setYLabelsColor(0, Color.BLACK);
-        init();
+        initView(context, layout, pager, scroll);
     }
     
-    public void init()
+    private void initSeriesRenderer()
     {
-        if (mChartView == null)
+        seriesRenderer = new XYSeriesRenderer();
+        seriesRenderer.setColor(Color.RED);
+        // seriesRenderer.setPointStyle(PointStyle.POINT);
+        seriesRenderer.setPointStyle(PointStyle.CIRCLE);
+        seriesRenderer.setFillPoints(true);
+        seriesRenderer.setLineWidth(4);
+    }
+    
+    private void initMultipleSeriesRenderer(XYSeriesRenderer xySeriesRenderer)
+    {
+        multipleSeriesRenderer = new XYMultipleSeriesRenderer();
+        multipleSeriesRenderer.setAxisTitleTextSize(30);
+        multipleSeriesRenderer.setChartTitleTextSize(30);
+        multipleSeriesRenderer.setLabelsTextSize(30);
+        multipleSeriesRenderer.setLegendTextSize(30);
+        multipleSeriesRenderer.setMargins(new int[] {5, 5, 0, 5});
+        multipleSeriesRenderer.setZoomButtonsVisible(true);
+        multipleSeriesRenderer.setPointSize(5);
+        multipleSeriesRenderer.setApplyBackgroundColor(true);
+        multipleSeriesRenderer.setBackgroundColor(Color.argb(0, 50, 50, 50));
+        multipleSeriesRenderer.setShowGridX(true);
+        multipleSeriesRenderer.setGridColor(Color.BLACK);
+        multipleSeriesRenderer.setYLabels(10);
+        multipleSeriesRenderer.setYLabelsPadding(-50);
+        multipleSeriesRenderer.setYLabelsColor(0, Color.BLACK);
+        multipleSeriesRenderer.addSeriesRenderer(xySeriesRenderer);
+    }
+    
+    private void initView(Context context, LinearLayout containerLayout, final DefinedViewPager pager,
+        final DefinedScrollView scroll)
+    {
+        if (null == chartView)
         {
-            //mChartView = ChartFactory.getCubeLineChartView(context, mDataset, mRenderer, 0.33f);
-            mChartView = ChartFactory.getLineChartView(context, mDataset, mRenderer);
-            mRenderer.setClickEnabled(true);
-            mRenderer.setSelectableBuffer(10);
-            mChartView.setOnClickListener(new View.OnClickListener()
+            // 添加 ChartView
+            chartView = ChartFactory.getLineChartView(context, multipleSeriesDataset, multipleSeriesRenderer);
+            multipleSeriesRenderer.setClickEnabled(true);
+            multipleSeriesRenderer.setSelectableBuffer(10);
+            
+            // 事件拦截
+            chartView.setOnTouchListener(new OnTouchListener()
             {
-                public void onClick(View v)
-                {
-                    
-                }
-            });
-            mChartView.setOnTouchListener(new OnTouchListener()
-            {
-                
+                @SuppressLint("ClickableViewAccessibility")
                 @Override
                 public boolean onTouch(View v, MotionEvent event)
                 {
-                    if (event.getAction() == MotionEvent.ACTION_UP)
+                    switch (event.getAction())
                     {
-                        pager.setTouchIntercept(true);
-                        scroll.setTouchIntercept(true);
-                        is_touch = 2;
-                    }
-                    else if (event.getAction() == MotionEvent.ACTION_DOWN)
-                    {
-                        pager.setTouchIntercept(false);
-                        scroll.setTouchIntercept(false);
-                        is_touch = 1;
+                        case MotionEvent.ACTION_DOWN:
+                            pager.setTouchIntercept(false);
+                            scroll.setTouchIntercept(false);
+                            is_touch = 1;
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            pager.setTouchIntercept(true);
+                            scroll.setTouchIntercept(true);
+                            is_touch = 2;
+                            break;
+                        default:
+                            break;
                     }
                     return false;
                 }
-                
             });
-            tv = new TextView(context);
-            tv.setText(title);
-            tv.setTextSize(context.getResources().getDimension(R.dimen.dimen_visual_text_size) / 3);
-            layout.addView(tv);
-            layout.addView(mChartView, ScreenUtil.getScreenWidth(context) - 5, ScreenUtil.getScreenHeight(context) / 2);
+            
+            // 添加默认标题
+            tvTitle = new TextView(context);
+            tvTitle.setText(DEFAULT_CHART_TITLE);
+            tvTitle.setTextSize(context.getResources().getDimension(R.dimen.dimen_visual_text_size) / 3);
+            
+            containerLayout.addView(tvTitle);
+            containerLayout.addView(chartView,
+                ScreenUtil.getScreenWidth(context) - 5,
+                ScreenUtil.getScreenHeight(context) / 2);
         }
         else
         {
-            mChartView.repaint();
+            chartView.repaint();
         }
     }
     
     public void changeMode()
     {
-        if (sensor.equals(StaticValue.BLE))
+        if (StaticValue.ble_real_time)
         {
-            if (StaticValue.ble_real_time)
-            {
-                mDataset.clear();
-                mDataset.addSeries(series);
-            }
-            else
-            {
-                mDataset.clear();
-                mDataset.addSeries(history_series);
-            }
+            multipleSeriesDataset.clear();
+            multipleSeriesDataset.addSeries(currentSeries);
+        }
+        else
+        {
+            multipleSeriesDataset.clear();
+            multipleSeriesDataset.addSeries(historySeries);
         }
     }
     
@@ -166,58 +164,52 @@ public class LineChartBuilder
      */
     public void addHistoryData(double x, double y)
     {
-        history_series.add(x, y);
+        historySeries.add(x, y);
     }
     
     public void clearHistory()
     {
-        history_series.clear();
+        historySeries.clear();
     }
     
-    public void setRange(long fr, long to)
+    public void setXRange(long fr, long to)
     {
-        mRenderer.setXAxisMax(to);
-        mRenderer.setXAxisMin(fr);
+        multipleSeriesRenderer.setXAxisMax(to);
+        multipleSeriesRenderer.setXAxisMin(fr);
     }
     
     public void setYRange(double fr, double to)
     {
-        mRenderer.setYAxisMax(to);
-        mRenderer.setYAxisMin(fr);
-    }
-    
-    public void repaint()
-    {
-        mChartView.repaint();
+        multipleSeriesRenderer.setYAxisMax(to);
+        multipleSeriesRenderer.setYAxisMin(fr);
     }
     
     public void setTitle(String title)
     {
-        tv.setText(title);
+        tvTitle.setText(title);
     }
-    
-    private int rec_after_touch = 0;
     
     public void addData(double x, double y)
     {
-        series.add(x, y);
-        if (StaticValue.ble_real_time && sensor.equals(StaticValue.BLE))
+        currentSeries.add(x, y);
+        if (StaticValue.ble_real_time)
         {
             if (is_touch == 2)
             {//刚按过
                 rec_after_touch++;
                 if (rec_after_touch > 3)
                 {
-                    mRenderer.setXAxisMax(x);
-                    if (series.getItemCount() > maxPoints)
+                    multipleSeriesRenderer.setXAxisMax(x);
+                    if (currentSeries.getItemCount() > MAX_POINTS)
                     {
-                        Log.e("wshg", "" + series.getX(series.getItemCount() - maxPoints));
-                        mRenderer.setXAxisMin(series.getX(series.getItemCount() - maxPoints));
+                        Log.e("wshg", "" + currentSeries.getX(currentSeries.getItemCount() - MAX_POINTS));
+                        multipleSeriesRenderer
+                            .setXAxisMin(currentSeries.getX(currentSeries.getItemCount() - MAX_POINTS));
                     }
                     else
                     {
-                        Log.e("wshg", "" + series.getX(0));
-                        mRenderer.setXAxisMin(series.getX(0));
+                        Log.e("wshg", "" + currentSeries.getX(0));
+                        multipleSeriesRenderer.setXAxisMin(currentSeries.getX(0));
                     }
                     rec_after_touch = 0;
                     is_touch = 0;
@@ -225,46 +217,40 @@ public class LineChartBuilder
             }
             else if (is_touch == 0)
             {
-                mRenderer.setXAxisMax(x);
-                if (series.getItemCount() > maxPoints)
+                multipleSeriesRenderer.setXAxisMax(x);
+                if (currentSeries.getItemCount() > MAX_POINTS)
                 {
-                    Log.e("wshg", "" + series.getX(series.getItemCount() - maxPoints));
-                    mRenderer.setXAxisMin(series.getX(series.getItemCount() - maxPoints));
+                    Log.e("wshg", "" + currentSeries.getX(currentSeries.getItemCount() - MAX_POINTS));
+                    multipleSeriesRenderer.setXAxisMin(currentSeries.getX(currentSeries.getItemCount() - MAX_POINTS));
                 }
                 else
                 {
-                    Log.e("wshg", "" + series.getX(0));
-                    mRenderer.setXAxisMin(series.getX(0));
+                    Log.e("wshg", "" + currentSeries.getX(0));
+                    multipleSeriesRenderer.setXAxisMin(currentSeries.getX(0));
                 }
             }
         }
-        mChartView.repaint();
-    }
-    
-    public void setMaxPoints(int maxPoints)
-    {
-        this.maxPoints = maxPoints;
+        chartView.repaint();
     }
     
     public void onSaveInstanceState(Bundle outState)
     {
         // save the current data, for instance when changing screen orientation
-        outState.putSerializable("dataset", mDataset);
-        outState.putSerializable("renderer", mRenderer);
-        outState.putSerializable("current_series", series);
-        outState.putSerializable("current_renderer", renderer);
-        outState.putSerializable("history_series", history_series);
+        outState.putSerializable("dataset", multipleSeriesDataset);
+        outState.putSerializable("renderer", multipleSeriesRenderer);
+        outState.putSerializable("current_renderer", seriesRenderer);
+        outState.putSerializable("current_series", currentSeries);
+        outState.putSerializable("history_series", historySeries);
     }
     
     public void onRestoreInstanceState(Bundle savedState)
     {
-        // restore the current data, for instance when changing the screen
-        // orientation
-        mDataset = (XYMultipleSeriesDataset)savedState.getSerializable("dataset");
-        mRenderer = (XYMultipleSeriesRenderer)savedState.getSerializable("renderer");
-        series = (XYSeries)savedState.getSerializable("current_series");
-        renderer = (XYSeriesRenderer)savedState.getSerializable("current_renderer");
-        history_series = (XYSeries)savedState.getSerializable("history_series");
+        // restore the current data, for instance when changing the screen orientation
+        multipleSeriesDataset = (XYMultipleSeriesDataset)savedState.getSerializable("dataset");
+        multipleSeriesRenderer = (XYMultipleSeriesRenderer)savedState.getSerializable("renderer");
+        seriesRenderer = (XYSeriesRenderer)savedState.getSerializable("current_renderer");
+        currentSeries = (XYSeries)savedState.getSerializable("current_series");
+        historySeries = (XYSeries)savedState.getSerializable("history_series");
     }
     
 }

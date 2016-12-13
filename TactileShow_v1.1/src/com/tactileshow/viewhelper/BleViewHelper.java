@@ -58,7 +58,7 @@ public class BleViewHelper
         DefinedScrollView scroll = (DefinedScrollView)view.findViewById(R.id.scroll);
         LinearLayout chartLayout = (LinearLayout)view.findViewById(R.id.visual_chart_layout);
         
-        lineChartBuilder = new LineChartBuilder(context, chartLayout, "蓝牙数据变化趋势", pager, scroll, StaticValue.BLE);
+        lineChartBuilder = new LineChartBuilder(context, chartLayout, pager, scroll);
         lineChartBuilder.setYRange(BLE_MIN_AXIS, BLE_MAX_AXIS);
     }
     
@@ -131,7 +131,7 @@ public class BleViewHelper
                 //chartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
                 chartBuilder.setTitle("蓝牙数据历史记录(一小时)");
                 
-                chartBuilder.setRange(from.getTime(), to.getTime());
+                chartBuilder.setXRange(from.getTime(), to.getTime());
             }
         });
         
@@ -157,7 +157,7 @@ public class BleViewHelper
                 chartBuilder.changeMode();
                 //chartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
                 chartBuilder.setTitle("蓝牙数据历史记录(一天)");
-                chartBuilder.setRange(from.getTime(), to.getTime());
+                chartBuilder.setXRange(from.getTime(), to.getTime());
             }
         });
         
@@ -184,7 +184,7 @@ public class BleViewHelper
                 chartBuilder.changeMode();
                 //chartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.month+1) + "-" + dateFormat(from.monthDay) + " - " + dateFormat(to.month+1) + "-" + dateFormat(to.monthDay) + ")");
                 chartBuilder.setTitle("蓝牙数据历史记录(一月)");
-                chartBuilder.setRange(from.getTime(), to.getTime());
+                chartBuilder.setXRange(from.getTime(), to.getTime());
             }
         });
         
@@ -214,7 +214,7 @@ public class BleViewHelper
                 chartBuilder.changeMode();
                 chartBuilder.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");
                 
-                chartBuilder.setRange(from.getTime(), tot.getTime());
+                chartBuilder.setXRange(from.getTime(), tot.getTime());
             }
         });
         
@@ -244,7 +244,7 @@ public class BleViewHelper
                 chartBuilder.changeMode();
                 chartBuilder.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");
                 
-                chartBuilder.setRange(from.getTime(), tot.getTime());
+                chartBuilder.setXRange(from.getTime(), tot.getTime());
                 Log.e("wshg", "from: " + from_str + "; to: " + to_str);
             }
         });
@@ -255,19 +255,9 @@ public class BleViewHelper
         return contentView;
     }
     
-    public void repaint()
-    {
-        lineChartBuilder.init();
-    }
-    
     public void setBle(double t, double data)
     {
         lineChartBuilder.addData(t, data);//Log.e("wshg", "set temp visual. data = " + data);
-    }
-    
-    public void setMaxPoints(int maxPoints)
-    {
-        lineChartBuilder.setMaxPoints(maxPoints);
     }
     
     public void onSaveInstanceState(Bundle outState)

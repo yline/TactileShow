@@ -42,6 +42,8 @@ class Record
 
 public class HistoryDataComputing
 {
+    private static final int MAX_POINTS = 100;
+    
     private LineChartBuilder view;
     
     public HistoryDataComputing(LineChartBuilder view)
@@ -56,9 +58,9 @@ public class HistoryDataComputing
     private void addData(List<Record> ls)
     {
         int size = ls.size();
-        if (size > StaticValue.max_points)
+        if (size > MAX_POINTS)
         {
-            long team = size / StaticValue.max_points;
+            long team = size / MAX_POINTS;
             Log.e("wshg", "size = " + size + "; team = " + team);
             double all_data = 0;
             for (int i = 0; i < size;)
