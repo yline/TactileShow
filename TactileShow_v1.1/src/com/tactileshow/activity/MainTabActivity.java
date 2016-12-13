@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.tactileshow.adapter.ViewPagerAdapter;
 import com.tactileshow.application.IApplication;
 import com.tactileshow.base.BaseActivity;
 import com.tactileshow.main.R;
 import com.tactileshow.util.BroadcastMsg;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.view.BleVisualInfo;
-import com.tactileshow.view.DefinedPagerAdapter;
 import com.tactileshow.view.DefinedViewPager;
 import com.tactileshow.view.TXTVisualInfo;
 
@@ -22,11 +22,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 
@@ -34,11 +32,9 @@ public class MainTabActivity extends BaseActivity
 {
     private TabHost tabHost;
     
-    private List<View> listViews;
-    
     private DefinedViewPager viewPager;
     
-    private DefinedPagerAdapter pagerAdapter;
+    private ViewPagerAdapter pagerAdapter;
     
     private BleVisualInfo bleVisual;
     
@@ -51,18 +47,23 @@ public class MainTabActivity extends BaseActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab);
-        getScreenMetrics();
         
+        initView();
+        
+        initExitDialog();
+        
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(MainActivity.BROADCAST_ADDRESS);
+        registerReceiver(mGattUpdateReceiver, filter);
+    }
+    
+    private void initView()
+    {
         tabHost = (TabHost)findViewById(R.id.tabhost);
         viewPager = (DefinedViewPager)findViewById(R.id.view_pager);
-        listViews = new ArrayList<View>();
-        bleVisual = new BleVisualInfo(this, viewPager);
-        txtVisual = new TXTVisualInfo(this, viewPager);//12.5调试
         
-        listViews.add(bleVisual.getView());
-        listViews.add(txtVisual.getView());//12.5 调试
-        
-        pagerAdapter = new DefinedPagerAdapter(listViews);
+        pagerAdapter = new ViewPagerAdapter();
+        pagerAdapter.addViewAll(getViewList());
         viewPager.setAdapter(pagerAdapter);
         
         tabHost.setup();
@@ -72,7 +73,7 @@ public class MainTabActivity extends BaseActivity
             .setContent(R.id.view1));
         tabHost.addTab(tabHost.newTabSpec(StaticValue.visual_info_tab_txt_name)
             .setIndicator(StaticValue.visual_info_tab_txt_name)
-            .setContent(R.id.view1)); //12.5调试
+            .setContent(R.id.view1));
         
         viewPager.setOnPageChangeListener(new OnPageChangeListener()
         {
@@ -108,12 +109,21 @@ public class MainTabActivity extends BaseActivity
                 }
             }
         });
+    }
+    
+    private List<View> getViewList()
+    {
+        List<View> viewList = new ArrayList<View>();
         
-        initExitDialog();
+        // 12.5调试
+        bleVisual = new BleVisualInfo(this, viewPager);
+        txtVisual = new TXTVisualInfo(this, viewPager);
         
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(MainActivity.BROADCAST_ADDRESS);
-        registerReceiver(mGattUpdateReceiver, filter);
+        //12.5 调试
+        viewList.add(bleVisual.getView());
+        viewList.add(txtVisual.getView());
+        
+        return viewList;
     }
     
     private void initExitDialog()
@@ -177,15 +187,6 @@ public class MainTabActivity extends BaseActivity
         bleVisual.onRestoreInstanceState(savedState);
     }
     
-    private void getScreenMetrics()
-    {
-        WindowManager wm = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics dm = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(dm);
-        StaticValue.width = dm.widthPixels;
-        StaticValue.height = dm.heightPixels;
-    }
-    
     @Override
     protected void onDestroy()
     {
@@ -193,7 +194,7 @@ public class MainTabActivity extends BaseActivity
         unregisterReceiver(mGattUpdateReceiver);
     }
     
-    public void setBle(Date t, String str)
+    private void setBle(Date date, String str)
     {
         try
         {

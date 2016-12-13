@@ -12,7 +12,7 @@ import org.achartengine.renderer.XYSeriesRenderer;
 
 import com.tactileshow.main.R;
 import com.tactileshow.util.DataReader;
-import com.tactileshow.util.StaticValue;
+import com.tactileshow.util.ScreenUtil;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -143,7 +143,7 @@ public class TXTLineChartBuilder
             tv.setText(title);
             tv.setTextSize(context.getResources().getDimension(R.dimen.dimen_visual_text_size) / 3);
             layout.addView(tv);
-            layout.addView(mChartView, StaticValue.width - 5, StaticValue.height / 2);
+            layout.addView(mChartView, ScreenUtil.getScreenWidth(context) - 5, ScreenUtil.getScreenHeight(context) / 2);
         }
         else
         {

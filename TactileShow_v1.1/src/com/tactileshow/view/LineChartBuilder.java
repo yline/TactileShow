@@ -1,4 +1,5 @@
 package com.tactileshow.view;
+
 /**
  * Copyright (C) 2009 - 2013 SC 4ViewSoft SRL
  *  
@@ -14,7 +15,6 @@ package com.tactileshow.view;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
@@ -24,6 +24,7 @@ import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
 import com.tactileshow.main.R;
+import com.tactileshow.util.ScreenUtil;
 import com.tactileshow.util.StaticValue;
 
 import android.content.Context;
@@ -150,7 +151,7 @@ public class LineChartBuilder
             tv.setText(title);
             tv.setTextSize(context.getResources().getDimension(R.dimen.dimen_visual_text_size) / 3);
             layout.addView(tv);
-            layout.addView(mChartView, StaticValue.width - 5, StaticValue.height / 2);
+            layout.addView(mChartView, ScreenUtil.getScreenWidth(context) - 5, ScreenUtil.getScreenHeight(context) / 2);
         }
         else
         {

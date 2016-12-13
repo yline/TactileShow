@@ -8,8 +8,6 @@ public class StaticValue
     
     public static String visual_info_tab_txt_name = "文本图像信息";
     
-    public static int width, height;
-    
     public static String BLE = "BLE";
     
     public static boolean ble_real_time = true;
