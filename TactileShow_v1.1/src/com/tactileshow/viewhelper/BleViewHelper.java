@@ -12,9 +12,10 @@ import com.tactileshow.view.DefinedViewPager;
 import com.tactileshow.view.TimeEditText;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -30,8 +31,6 @@ public class BleViewHelper
     
     private LineChartBuilder bleMap;
     
-    private Activity context;
-    
     private View view;
     
     private LinearLayout layout;
@@ -46,16 +45,12 @@ public class BleViewHelper
     
     private HistoryDataComputing history;
     
-    private String sensor;
-    
     @SuppressLint("InflateParams")
-    public BleViewHelper(Activity activity, DefinedViewPager pager)
+    public BleViewHelper(Context context, DefinedViewPager pager)
     {
-        this.context = activity;
         this.pager = pager;
         
-        sensor = StaticValue.BLE;
-        view = context.getLayoutInflater().inflate(R.layout.activity_visual_info, null);
+        view = LayoutInflater.from(context).inflate(R.layout.activity_visual_info, null);
         scroll = (DefinedScrollView)view.findViewById(R.id.scroll);
         layout = (LinearLayout)view.findViewById(R.id.visual_chart_layout);
         if (layout == null)
@@ -64,7 +59,7 @@ public class BleViewHelper
             return;
         }
         
-        bleMap = new LineChartBuilder(context, layout, "蓝牙数据变化趋势", this.pager, scroll, sensor);
+        bleMap = new LineChartBuilder(context, layout, "蓝牙数据变化趋势", this.pager, scroll, StaticValue.BLE);
         bleMap.setYRange(BLE_MIN_AXIS, BLE_MAX_AXIS);
         
         history_layout = (RelativeLayout)view.findViewById(R.id.visual_history_layout);
@@ -112,7 +107,6 @@ public class BleViewHelper
     
     private void historyListen()
     {
-        
         Button query_one_hour = (Button)view.findViewById(R.id.button_one_hour);
         query_one_hour.setOnClickListener(new OnClickListener()
         {
@@ -129,7 +123,7 @@ public class BleViewHelper
                 //				from.setToNow(); to.setToNow();
                 //				from.minute -= 60;
                 //				from.normalize(false);
-                history.getHoursHistory(from, to, sensor);
+                history.getHoursHistory(from, to, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
                 bleMap.changeMode();
                 //bleMap.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
@@ -159,7 +153,7 @@ public class BleViewHelper
                 c.set(Calendar.SECOND, 0);
                 c.set(Calendar.MILLISECOND, 0);
                 Date from = c.getTime();
-                history.getHoursHistory(from, to, sensor);
+                history.getHoursHistory(from, to, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
                 bleMap.changeMode();
                 //bleMap.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
@@ -189,7 +183,7 @@ public class BleViewHelper
                 c.set(Calendar.SECOND, 0);
                 c.set(Calendar.MILLISECOND, 0);
                 Date from = c.getTime();
-                history.getDaysHistory(from, to, sensor);
+                history.getDaysHistory(from, to, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
                 bleMap.changeMode();
                 //bleMap.setTitle("蓝牙数据历史记录(" + dateFormat(from.month+1) + "-" + dateFormat(from.monthDay) + " - " + dateFormat(to.month+1) + "-" + dateFormat(to.monthDay) + ")");
@@ -222,7 +216,7 @@ public class BleViewHelper
                 c.set(Calendar.MINUTE, Integer.parseInt(pars[1]));
                 Date tot = c.getTime();
                 //				tot.hour = Integer.parseInt(pars[0]); tot.minute = Integer.parseInt(pars[1]);
-                history.getHoursHistory(from, tot, sensor);
+                history.getHoursHistory(from, tot, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
                 bleMap.changeMode();
                 bleMap.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");
@@ -255,7 +249,7 @@ public class BleViewHelper
                 c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(pars[2]));
                 Date tot = c.getTime();
                 //				tot.month = Integer.parseInt(pars[1]) - 1; tot.monthDay = Integer.parseInt(pars[2]);
-                history.getDaysHistory(from, tot, sensor);
+                history.getDaysHistory(from, tot, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
                 bleMap.changeMode();
                 bleMap.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");

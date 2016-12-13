@@ -29,7 +29,6 @@ class Record
         }
         catch (ParseException e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         data = Double.parseDouble(pars[1]);
