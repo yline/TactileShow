@@ -25,7 +25,17 @@ public class DataFile
     
     private int records_ble;
     
-    public DataFile()
+    public static DataFile getInstance()
+    {
+        return DataFileHolder.sInstance;
+    }
+    
+    private static class DataFileHolder
+    {
+        private static DataFile sInstance = new DataFile();
+    }
+    
+    private DataFile()
     {
         //time 改成 date
         StaticValue.record_time = Calendar.getInstance();

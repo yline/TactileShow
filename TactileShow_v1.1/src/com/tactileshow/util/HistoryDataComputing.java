@@ -50,8 +50,12 @@ public class HistoryDataComputing
         this.view = view;
     }
     
+    /**
+     * 根据数据量不同采取不同大小的分组，保证总共的数据点不大于max_points；
+     * @param ls
+     */
     private void addData(List<Record> ls)
-    {//根据数据量不同采取不同大小的分组，保证总共的数据点不大于max_points；
+    {
         int size = ls.size();
         if (size > StaticValue.max_points)
         {
@@ -91,7 +95,7 @@ public class HistoryDataComputing
         {
             for (; calendar.getTime().getTime() <= to.getTime(); calendar.add(Calendar.HOUR_OF_DAY, 1))
             {
-                BufferedReader in = StaticValue.data_file.getTimeBufferedReader(calendar, sensor, "data");
+                BufferedReader in = DataFile.getInstance().getTimeBufferedReader(calendar, sensor, "data");
                 if (in != null)
                 {
                     String line = in.readLine();
@@ -130,7 +134,7 @@ public class HistoryDataComputing
         {
             for (; calendar.getTime().getTime() <= to.getTime(); calendar.add(Calendar.HOUR_OF_DAY, 1))
             {
-                BufferedReader in = StaticValue.data_file.getTimeBufferedReader(calendar, sensor, "avg");
+                BufferedReader in = DataFile.getInstance().getTimeBufferedReader(calendar, sensor, "avg");
                 if (in != null)
                 {
                     String line = in.readLine();
@@ -153,13 +157,5 @@ public class HistoryDataComputing
             e.printStackTrace();
         }
         return true;
-        
     }
-    
-    /*public boolean getDayHistory(Time from, Time to, String sensor){
-    	if( Time.compare(from, StaticValue.record_time) > 0 || Time.compare(from, to) > 0)
-    		return false;
-    	return true;
-    }
-    */
 }

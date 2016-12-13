@@ -9,6 +9,7 @@ import com.tactileshow.application.IApplication;
 import com.tactileshow.base.BaseActivity;
 import com.tactileshow.bean.BleReceiverBean;
 import com.tactileshow.main.R;
+import com.tactileshow.util.DataFile;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.view.DefinedViewPager;
 import com.tactileshow.viewhelper.BleViewHelper;
@@ -227,7 +228,7 @@ public class MainTabActivity extends BaseActivity
             else if (bm.getSensor().equals(StaticValue.BLE))
             {
                 setBle(bm.getTime(), bm.getData());
-                StaticValue.data_file.writeData(bm.getTime(), StaticValue.BLE, bm.getData());
+                DataFile.getInstance().writeData(bm.getTime(), StaticValue.BLE, bm.getData());
             }
         }
     };

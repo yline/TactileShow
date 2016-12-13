@@ -10,8 +10,6 @@ public class StaticValue
     
     public static Calendar record_time;
     
-    public static DataFile data_file;
-    
     public static int max_points = 100;
     
     public static double xcnt = 0;

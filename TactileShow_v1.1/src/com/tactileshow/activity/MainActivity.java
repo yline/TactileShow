@@ -13,8 +13,6 @@ import com.tactileshow.application.IApplication;
 import com.tactileshow.base.BaseActivity;
 import com.tactileshow.log.LogFileUtil;
 import com.tactileshow.main.R;
-import com.tactileshow.util.DataFile;
-import com.tactileshow.util.StaticValue;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -211,8 +209,6 @@ public class MainActivity extends BaseActivity
         }
         
         initView();
-        
-        StaticValue.data_file = new DataFile();
         
         IntentFilter filter = new IntentFilter();
         filter.addAction(BROADCAST_ADDRESS);
