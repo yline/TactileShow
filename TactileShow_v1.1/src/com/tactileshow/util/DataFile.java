@@ -91,24 +91,6 @@ public class DataFile
         }
     }
     
-    public BufferedReader getTimeBufferedReader(Calendar t, String sensor, String fileName)
-    {
-        File f = new File(getTimeDirectory(t, sensor) + fileName);
-        try
-        {
-            if (!f.isFile())
-            {
-                return null;
-            }
-            return new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
     public void writeAvgData(Calendar t, String sensor, String data)
     {
         PrintWriter print = getTimePrintWriter(t, sensor, "avg", false);
@@ -140,7 +122,7 @@ public class DataFile
      * Return: the number of lines in data file.
      *         -1: error in compute average.
      */
-    public int computeAvgData(String sensor)
+    private int computeAvgData(String sensor)
     {
         BufferedReader in = getTimeBufferedReader(StaticValue.record_time, sensor, "data");
         if (in == null)
@@ -204,6 +186,24 @@ public class DataFile
         avg_ble = -1;
         
         records_ble = computeAvgData(StaticValue.BLE);
+    }
+    
+    public BufferedReader getTimeBufferedReader(Calendar t, String sensor, String fileName)
+    {
+        File f = new File(getTimeDirectory(t, sensor) + fileName);
+        try
+        {
+            if (!f.isFile())
+            {
+                return null;
+            }
+            return new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
     
     public void writeData(Date t, String sensor, String data)

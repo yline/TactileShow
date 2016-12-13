@@ -11,7 +11,7 @@ import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
 import com.tactileshow.main.R;
-import com.tactileshow.util.DataReaderUtil;
+import com.tactileshow.util.FileHelper;
 import com.tactileshow.util.ScreenUtil;
 import com.tactileshow.view.DefinedScrollView;
 import com.tactileshow.view.DefinedViewPager;
@@ -150,8 +150,10 @@ public class TXTLineChartBuilder
         {
             mChartView.repaint();
         }
-        List<String> ls = DataReaderUtil.getDataList();
-        if (ls != null || ls.size() != 0)
+        
+        List<String> ls = FileHelper.getInstance().readMapData();
+        
+        if (ls != null && ls.size() != 0)
         {
             double YMax = Double.MIN_VALUE, YMin = Double.MAX_VALUE;
             for (int i = 0; i < ls.size(); ++i)
