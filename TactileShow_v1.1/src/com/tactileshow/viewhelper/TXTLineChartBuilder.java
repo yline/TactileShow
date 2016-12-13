@@ -139,7 +139,6 @@ public class TXTLineChartBuilder
                     }
                     return false;
                 }
-                
             });
             tv = new TextView(context);
             tv.setText(title);

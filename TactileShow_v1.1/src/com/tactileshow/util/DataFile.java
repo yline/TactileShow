@@ -61,7 +61,9 @@ public class DataFile
             File parent = new File(f.getParent());
             parent.mkdirs();
             if (!f.isFile())
+            {
                 f.createNewFile();
+            }
             return new RandomAccessFile(f, "rw");
         }
         catch (IOException e)
@@ -95,7 +97,9 @@ public class DataFile
         try
         {
             if (!f.isFile())
+            {
                 return null;
+            }
             return new BufferedReader(new InputStreamReader(new FileInputStream(f)));
         }
         catch (IOException e)
