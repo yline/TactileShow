@@ -31,13 +31,11 @@ public class BleViewHelper
     
     private LineChartBuilder bleMap;
     
-    private View view;
+    private View contentView;
     
     private LinearLayout layout;
     
     private DefinedScrollView scroll;
-    
-    private DefinedViewPager pager;
     
     private RelativeLayout history_layout;
     
@@ -48,26 +46,26 @@ public class BleViewHelper
     @SuppressLint("InflateParams")
     public BleViewHelper(Context context, DefinedViewPager pager)
     {
-        this.pager = pager;
+        contentView = LayoutInflater.from(context).inflate(R.layout.view_maintab_ble, null);
         
-        view = LayoutInflater.from(context).inflate(R.layout.activity_visual_info, null);
-        scroll = (DefinedScrollView)view.findViewById(R.id.scroll);
-        layout = (LinearLayout)view.findViewById(R.id.visual_chart_layout);
+        scroll = (DefinedScrollView)contentView.findViewById(R.id.scroll);
+        layout = (LinearLayout)contentView.findViewById(R.id.visual_chart_layout);
+        
         if (layout == null)
         {
             Log.e("wshg", "Null");
             return;
         }
         
-        bleMap = new LineChartBuilder(context, layout, "蓝牙数据变化趋势", this.pager, scroll, StaticValue.BLE);
+        bleMap = new LineChartBuilder(context, layout, "蓝牙数据变化趋势", pager, scroll, StaticValue.BLE);
         bleMap.setYRange(BLE_MIN_AXIS, BLE_MAX_AXIS);
         
-        history_layout = (RelativeLayout)view.findViewById(R.id.visual_history_layout);
+        history_layout = (RelativeLayout)contentView.findViewById(R.id.visual_history_layout);
         
         history = new HistoryDataComputing(bleMap);
         initQueryHost();
         
-        final Button btn = (Button)view.findViewById(R.id.button_history_area);
+        final Button btn = (Button)contentView.findViewById(R.id.button_history_area);
         btn.setOnClickListener(new OnClickListener()
         {
             
@@ -97,17 +95,9 @@ public class BleViewHelper
         historyListen();
     }
     
-    private String dateFormat(int val)
-    {
-        if (val >= 10)
-            return "" + val;
-        else
-            return "0" + val;
-    }
-    
     private void historyListen()
     {
-        Button query_one_hour = (Button)view.findViewById(R.id.button_one_hour);
+        Button query_one_hour = (Button)contentView.findViewById(R.id.button_one_hour);
         query_one_hour.setOnClickListener(new OnClickListener()
         {
             
@@ -134,7 +124,7 @@ public class BleViewHelper
             
         });
         
-        Button query_one_day = (Button)view.findViewById(R.id.button_one_day);
+        Button query_one_day = (Button)contentView.findViewById(R.id.button_one_day);
         query_one_day.setOnClickListener(new OnClickListener()
         {
             
@@ -163,7 +153,7 @@ public class BleViewHelper
             
         });
         
-        Button query_one_month = (Button)view.findViewById(R.id.button_one_month);
+        Button query_one_month = (Button)contentView.findViewById(R.id.button_one_month);
         query_one_month.setOnClickListener(new OnClickListener()
         {
             
@@ -193,7 +183,7 @@ public class BleViewHelper
             
         });
         
-        Button query_hour = (Button)view.findViewById(R.id.button_query_hour);
+        Button query_hour = (Button)contentView.findViewById(R.id.button_query_hour);
         query_hour.setOnClickListener(new OnClickListener()
         {
             
@@ -201,8 +191,8 @@ public class BleViewHelper
             public void onClick(View v)
             {
                 bleMap.clearHistory();
-                TimeEditText fr = (TimeEditText)view.findViewById(R.id.edit_from_hour);
-                TimeEditText to = (TimeEditText)view.findViewById(R.id.edit_to_hour);
+                TimeEditText fr = (TimeEditText)contentView.findViewById(R.id.edit_from_hour);
+                TimeEditText to = (TimeEditText)contentView.findViewById(R.id.edit_to_hour);
                 String from_str = fr.getText().toString(), to_str = to.getText().toString();
                 Calendar c = Calendar.getInstance();
                 //				Time from = new Time(), tot = new Time();from.setToNow(); tot.setToNow();
@@ -226,7 +216,7 @@ public class BleViewHelper
             
         });
         
-        Button query_day = (Button)view.findViewById(R.id.button_query_day);
+        Button query_day = (Button)contentView.findViewById(R.id.button_query_day);
         query_day.setOnClickListener(new OnClickListener()
         {
             
@@ -234,8 +224,8 @@ public class BleViewHelper
             public void onClick(View v)
             {
                 bleMap.clearHistory();
-                DateEditText fr = (DateEditText)view.findViewById(R.id.edit_from_day);
-                DateEditText to = (DateEditText)view.findViewById(R.id.edit_to_day);
+                DateEditText fr = (DateEditText)contentView.findViewById(R.id.edit_from_day);
+                DateEditText to = (DateEditText)contentView.findViewById(R.id.edit_to_day);
                 String from_str = fr.getText().toString(), to_str = to.getText().toString();
                 Calendar c = Calendar.getInstance();
                 //				Time from = new Time(), tot = new Time();from.setToNow(); tot.setToNow();from.hour = 0; tot.hour = 23;
@@ -263,7 +253,7 @@ public class BleViewHelper
     
     private void initQueryHost()
     {
-        queryHost = (TabHost)view.findViewById(R.id.history_query_host);
+        queryHost = (TabHost)contentView.findViewById(R.id.history_query_host);
         queryHost.setup();
         queryHost.addTab(queryHost.newTabSpec("按小时查询").setIndicator("按小时查询").setContent(R.id.one_hour_query_layout));
         queryHost.addTab(queryHost.newTabSpec("按天查询").setIndicator("按天查询").setContent(R.id.one_day_query_layout));
@@ -272,7 +262,7 @@ public class BleViewHelper
     
     public View getView()
     {
-        return view;
+        return contentView;
     }
     
     public void repaint()

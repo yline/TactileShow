@@ -92,7 +92,7 @@ public class XYChartActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.xy_chart);
+        setContentView(R.layout.activity_xy_chart);
         
         // the top part of the UI components for adding new data points
         mX = (EditText)findViewById(R.id.xValue);

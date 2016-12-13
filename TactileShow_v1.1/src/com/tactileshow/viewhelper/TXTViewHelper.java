@@ -36,7 +36,7 @@ public class TXTViewHelper
         this.context = activity;
         this.pager = pager;
         
-        view = context.getLayoutInflater().inflate(R.layout.activity_visual_txt_info, null);
+        view = context.getLayoutInflater().inflate(R.layout.view_maintab_txt, null);
         scroll = (DefinedScrollView)view.findViewById(R.id.scroll_txt);
         layout = (LinearLayout)view.findViewById(R.id.visual_txt_chart_layout);
         if (layout == null)

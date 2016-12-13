@@ -192,7 +192,7 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-        setContentView(R.layout.activity_ble);
+        setContentView(R.layout.activity_main);
         getActionBar().show();
         
         mBluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
@@ -297,7 +297,7 @@ public class MainActivity extends BaseActivity
     @SuppressLint("InflateParams")
     private void showConnectDialog()
     {
-        View view = LayoutInflater.from(this).inflate(R.layout.activity_ble_connect, null);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_main_ble_connect, null);
         
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("连接状态");
@@ -378,7 +378,7 @@ public class MainActivity extends BaseActivity
             }, BLE_SCAN_PERIOD);
             
             mIsScanning = true;
-            MenuItemCompat.setActionView(freshMenuItem, R.layout.activity_ble_progressbar);
+            MenuItemCompat.setActionView(freshMenuItem, R.layout.menu_main_ble_progressbar);
             mBluetoothAdapter.startLeScan(mLeScanCallback);//蓝牙适配器开始进行扫描设备，回调mLeScanCallBack变量
         }
         else
