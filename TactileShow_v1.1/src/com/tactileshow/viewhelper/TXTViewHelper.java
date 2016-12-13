@@ -1,7 +1,9 @@
-package com.tactileshow.view;
+package com.tactileshow.viewhelper;
 
 import com.tactileshow.main.R;
 import com.tactileshow.util.StaticValue;
+import com.tactileshow.view.DefinedScrollView;
+import com.tactileshow.view.DefinedViewPager;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,7 +12,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 
-public class TXTVisualInfo
+public class TXTViewHelper
 {
     private TXTLineChartBuilder txtMap;
     
@@ -26,7 +28,7 @@ public class TXTVisualInfo
     
     private TabHost queryHost;
     
-    public TXTVisualInfo(Activity activity, DefinedViewPager pager)
+    public TXTViewHelper(Activity activity, DefinedViewPager pager)
     {
         this.context = activity;
         this.pager = pager;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tactileshow.view;
+package com.tactileshow.activity;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -36,7 +36,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-public class XYChartBuilder extends Activity
+public class XYChartActivity extends Activity
 {
     /** The main dataset that includes all the series that go into a chart. */
     private XYMultipleSeriesDataset mDataset = new XYMultipleSeriesDataset();
@@ -189,12 +189,12 @@ public class XYChartBuilder extends Activity
                     SeriesSelection seriesSelection = mChartView.getCurrentSeriesAndPoint();
                     if (seriesSelection == null)
                     {
-                        Toast.makeText(XYChartBuilder.this, "No chart element", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(XYChartActivity.this, "No chart element", Toast.LENGTH_SHORT).show();
                     }
                     else
                     {
                         // display information of the clicked point
-                        Toast.makeText(XYChartBuilder.this,
+                        Toast.makeText(XYChartActivity.this,
                             "Chart element in series index " + seriesSelection.getSeriesIndex() + " data point index "
                                 + seriesSelection.getPointIndex() + " was clicked" + " closest point value X="
                                 + seriesSelection.getXValue() + ", Y=" + seriesSelection.getValue(),

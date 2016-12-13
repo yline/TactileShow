@@ -1,4 +1,4 @@
-package com.tactileshow.view;
+package com.tactileshow.viewhelper;
 
 import java.util.List;
 
@@ -13,6 +13,8 @@ import org.achartengine.renderer.XYSeriesRenderer;
 import com.tactileshow.main.R;
 import com.tactileshow.util.DataReader;
 import com.tactileshow.util.ScreenUtil;
+import com.tactileshow.view.DefinedScrollView;
+import com.tactileshow.view.DefinedViewPager;
 
 import android.content.Context;
 import android.graphics.Color;

@@ -37,13 +37,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.tactileshow.activity.ExMainActivity" >
-        </activity>
         <activity
             android:name="com.tactileshow.activity.MainTabActivity"
             android:theme="@style/TabTheme" >
         </activity>
-        <activity android:name="com.tactileshow.view.XYChartBuilder" >
+        <activity android:name="com.tactileshow.view.XYChartActivity" >
         </activity>
     </application>
 

@@ -9,7 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import com.tactileshow.view.LineChartBuilder;
+import com.tactileshow.viewhelper.LineChartBuilder;
 
 import android.util.Log;
 

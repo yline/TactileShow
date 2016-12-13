@@ -6,27 +6,26 @@ import android.content.DialogInterface;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TimePicker;
 
-public class TimeEditor extends EditText
+public class DateEditText extends EditText
 {
+    private Time date;
     
     private Context context;
     
-    private Time t;
+    private DateEditText thisCla;
     
-    private TimeEditor thisCla;
-    
-    public TimeEditor(Context ccontext, AttributeSet attrs)
+    public DateEditText(Context ccontext, AttributeSet attrs)
     {
         super(ccontext, attrs);
-        context = ccontext;
         thisCla = this;
-        this.setFocusable(false);
-        t = new Time();
-        t.setToNow();
+        date = new Time();
+        date.setToNow();
         setTime();
+        context = ccontext;
+        this.setFocusable(false);
         this.setOnClickListener(new OnClickListener()
         {
             
@@ -34,8 +33,8 @@ public class TimeEditor extends EditText
             public void onClick(View v)
             {
                 AlertDialog.Builder ab = new AlertDialog.Builder(context);
-                ab.setTitle("时间设定");
-                final TimePicker te = new TimePicker(context);
+                ab.setTitle("日期设定");
+                final DatePicker te = new DatePicker(context);
                 ab.setView(te);
                 ab.setPositiveButton("确定", new DialogInterface.OnClickListener()
                 {
@@ -43,8 +42,9 @@ public class TimeEditor extends EditText
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        t.hour = te.getCurrentHour();
-                        t.minute = te.getCurrentMinute();
+                        date.year = te.getYear();
+                        date.month = te.getMonth();
+                        date.monthDay = te.getDayOfMonth();
                         setTime();
                     }
                 });
@@ -52,25 +52,18 @@ public class TimeEditor extends EditText
             }
             
         });
+        
     }
     
     private void setTime()
     {
-        String str = "";
-        if (t.hour < 10)
-            str += "0" + t.hour;
-        else
-            str += t.hour;
-        str += " : ";
-        if (t.minute < 10)
-            str += "0" + t.minute;
-        else
-            str += t.minute;
+        String str = date.year + "-" + (date.month + 1) + "-" + date.monthDay;
         thisCla.setText(str);
     }
     
-    public TimeEditor(Context context)
+    public DateEditText(Context context)
     {
         super(context);
     }
+    
 }

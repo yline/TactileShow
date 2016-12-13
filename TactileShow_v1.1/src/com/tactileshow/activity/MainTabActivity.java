@@ -10,9 +10,9 @@ import com.tactileshow.base.BaseActivity;
 import com.tactileshow.main.R;
 import com.tactileshow.util.BroadcastMsg;
 import com.tactileshow.util.StaticValue;
-import com.tactileshow.view.BleVisualInfo;
 import com.tactileshow.view.DefinedViewPager;
-import com.tactileshow.view.TXTVisualInfo;
+import com.tactileshow.viewhelper.BleViewHelper;
+import com.tactileshow.viewhelper.TXTViewHelper;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -36,9 +36,9 @@ public class MainTabActivity extends BaseActivity
     
     private ViewPagerAdapter pagerAdapter;
     
-    private BleVisualInfo bleVisual;
+    private BleViewHelper bleVisual;
     
-    private TXTVisualInfo txtVisual;
+    private TXTViewHelper txtVisual;
     
     private AlertDialog.Builder exitBuilder;
     
@@ -116,8 +116,8 @@ public class MainTabActivity extends BaseActivity
         List<View> viewList = new ArrayList<View>();
         
         // 12.5调试
-        bleVisual = new BleVisualInfo(this, viewPager);
-        txtVisual = new TXTVisualInfo(this, viewPager);
+        bleVisual = new BleViewHelper(this, viewPager);
+        txtVisual = new TXTViewHelper(this, viewPager);
         
         //12.5 调试
         viewList.add(bleVisual.getView());

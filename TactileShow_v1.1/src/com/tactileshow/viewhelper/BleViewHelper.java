@@ -1,4 +1,4 @@
-package com.tactileshow.view;
+package com.tactileshow.viewhelper;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -6,6 +6,10 @@ import java.util.Date;
 import com.tactileshow.main.R;
 import com.tactileshow.util.HistoryDataComputing;
 import com.tactileshow.util.StaticValue;
+import com.tactileshow.view.DateEditText;
+import com.tactileshow.view.DefinedScrollView;
+import com.tactileshow.view.DefinedViewPager;
+import com.tactileshow.view.TimeEditText;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -18,7 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 
-public class BleVisualInfo
+public class BleViewHelper
 {
     private LineChartBuilder bleMap;
     
@@ -41,7 +45,7 @@ public class BleVisualInfo
     private String sensor;
     
     @SuppressLint("InflateParams")
-    public BleVisualInfo(Activity activity, DefinedViewPager pager)
+    public BleViewHelper(Activity activity, DefinedViewPager pager)
     {
         this.context = activity;
         this.pager = pager;
@@ -199,8 +203,8 @@ public class BleVisualInfo
             public void onClick(View v)
             {
                 bleMap.clearHistory();
-                TimeEditor fr = (TimeEditor)view.findViewById(R.id.edit_from_hour);
-                TimeEditor to = (TimeEditor)view.findViewById(R.id.edit_to_hour);
+                TimeEditText fr = (TimeEditText)view.findViewById(R.id.edit_from_hour);
+                TimeEditText to = (TimeEditText)view.findViewById(R.id.edit_to_hour);
                 String from_str = fr.getText().toString(), to_str = to.getText().toString();
                 Calendar c = Calendar.getInstance();
                 //				Time from = new Time(), tot = new Time();from.setToNow(); tot.setToNow();
@@ -232,8 +236,8 @@ public class BleVisualInfo
             public void onClick(View v)
             {
                 bleMap.clearHistory();
-                DateEditor fr = (DateEditor)view.findViewById(R.id.edit_from_day);
-                DateEditor to = (DateEditor)view.findViewById(R.id.edit_to_day);
+                DateEditText fr = (DateEditText)view.findViewById(R.id.edit_from_day);
+                DateEditText to = (DateEditText)view.findViewById(R.id.edit_to_day);
                 String from_str = fr.getText().toString(), to_str = to.getText().toString();
                 Calendar c = Calendar.getInstance();
                 //				Time from = new Time(), tot = new Time();from.setToNow(); tot.setToNow();from.hour = 0; tot.hour = 23;

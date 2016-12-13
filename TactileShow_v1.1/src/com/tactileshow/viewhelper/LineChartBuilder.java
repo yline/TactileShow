@@ -1,4 +1,4 @@
-package com.tactileshow.view;
+package com.tactileshow.viewhelper;
 
 /**
  * Copyright (C) 2009 - 2013 SC 4ViewSoft SRL
@@ -26,6 +26,8 @@ import org.achartengine.renderer.XYSeriesRenderer;
 import com.tactileshow.main.R;
 import com.tactileshow.util.ScreenUtil;
 import com.tactileshow.util.StaticValue;
+import com.tactileshow.view.DefinedScrollView;
+import com.tactileshow.view.DefinedViewPager;
 
 import android.content.Context;
 import android.graphics.Color;
