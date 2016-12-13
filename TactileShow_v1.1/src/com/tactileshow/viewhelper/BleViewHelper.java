@@ -44,11 +44,15 @@ public class BleViewHelper
         
         history = new HistoryDataComputing(lineChartBuilder);
         
-        initHistoryView(contentView);
-        
-        historyListen();
+        initHistoryView(contentView, lineChartBuilder);
     }
     
+    /**
+     * 初始化与 Chart相关常量
+     * @param context
+     * @param pager
+     * @param view
+     */
     private void initChartView(Context context, DefinedViewPager pager, View view)
     {
         DefinedScrollView scroll = (DefinedScrollView)view.findViewById(R.id.scroll);
@@ -58,7 +62,12 @@ public class BleViewHelper
         lineChartBuilder.setYRange(BLE_MIN_AXIS, BLE_MAX_AXIS);
     }
     
-    private void initHistoryView(View view)
+    /**
+     * 初始化 与 History Query相关的量,并设置好与Chart的关联
+     * @param view
+     * @param chartBuilder
+     */
+    private void initHistoryView(final View view, final LineChartBuilder chartBuilder)
     {
         // 打开用的 Button
         final RelativeLayout historyRelativeLayout = (RelativeLayout)view.findViewById(R.id.visual_history_layout);
@@ -69,7 +78,7 @@ public class BleViewHelper
             @Override
             public void onClick(View v)
             {
-                lineChartBuilder.changeMode();
+                chartBuilder.changeMode();
                 if (historyRelativeLayout.getVisibility() == View.INVISIBLE) // 当前显示的是实时信息，变成现实历史信息
                 {
                     historyRelativeLayout.setVisibility(View.VISIBLE);
@@ -88,64 +97,54 @@ public class BleViewHelper
                     btnSwitch.setText(R.string.label_history_area_str);
                     
                     StaticValue.ble_real_time = true;
-                    lineChartBuilder.changeMode();
-                    lineChartBuilder.setTitle("蓝牙数据变化趋势");
+                    chartBuilder.changeMode();
+                    chartBuilder.setTitle("蓝牙数据变化趋势");
                 }
             }
         });
         
         // 选择日期 选择方式的 TabHost
-        TabHost queryHost = (TabHost)contentView.findViewById(R.id.history_query_host);
+        TabHost queryHost = (TabHost)view.findViewById(R.id.history_query_host);
         queryHost.setup();
         queryHost.addTab(queryHost.newTabSpec("按小时查询").setIndicator("按小时查询").setContent(R.id.one_hour_query_layout));
         queryHost.addTab(queryHost.newTabSpec("按天查询").setIndicator("按天查询").setContent(R.id.one_day_query_layout));
         queryHost.setCurrentTab(0);
         
         // 每个Button对应的点击事件
-        
-    }
-    
-    private void historyListen()
-    {
-        Button query_one_hour = (Button)contentView.findViewById(R.id.button_one_hour);
-        query_one_hour.setOnClickListener(new OnClickListener()
+        view.findViewById(R.id.button_one_hour).setOnClickListener(new OnClickListener()
         {
-            
             @Override
             public void onClick(View v)
             {
-                lineChartBuilder.clearHistory();
+                chartBuilder.clearHistory();
                 Calendar c = Calendar.getInstance();
                 Date to = c.getTime();
                 c.add(Calendar.MINUTE, -60);
                 Date from = c.getTime();
-                //				Time from = new Time(); Time to = new Time();
-                //				from.setToNow(); to.setToNow();
-                //				from.minute -= 60;
-                //				from.normalize(false);
+                //              Time from = new Time(); Time to = new Time();
+                //              from.setToNow(); to.setToNow();
+                //              from.minute -= 60;
+                //              from.normalize(false);
                 history.getHoursHistory(from, to, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
-                lineChartBuilder.changeMode();
-                //lineChartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
-                lineChartBuilder.setTitle("蓝牙数据历史记录(一小时)");
+                chartBuilder.changeMode();
+                //chartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
+                chartBuilder.setTitle("蓝牙数据历史记录(一小时)");
                 
-                lineChartBuilder.setRange(from.getTime(), to.getTime());
+                chartBuilder.setRange(from.getTime(), to.getTime());
             }
-            
         });
         
-        Button query_one_day = (Button)contentView.findViewById(R.id.button_one_day);
-        query_one_day.setOnClickListener(new OnClickListener()
+        view.findViewById(R.id.button_one_day).setOnClickListener(new OnClickListener()
         {
-            
             @Override
             public void onClick(View v)
             {
-                lineChartBuilder.clearHistory();
-                //				Time from = new Time(); Time to = new Time();
-                //				from.setToNow(); to.setToNow();
-                //				from.hour = from.minute = from.second = 0;
-                //				from.normalize(false);
+                chartBuilder.clearHistory();
+                //              Time from = new Time(); Time to = new Time();
+                //              from.setToNow(); to.setToNow();
+                //              from.hour = from.minute = from.second = 0;
+                //              from.normalize(false);
                 Calendar c = Calendar.getInstance();
                 Date to = c.getTime();
                 c.set(Calendar.HOUR_OF_DAY, 0);
@@ -155,26 +154,23 @@ public class BleViewHelper
                 Date from = c.getTime();
                 history.getHoursHistory(from, to, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
-                lineChartBuilder.changeMode();
-                //lineChartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
-                lineChartBuilder.setTitle("蓝牙数据历史记录(一天)");
-                lineChartBuilder.setRange(from.getTime(), to.getTime());
+                chartBuilder.changeMode();
+                //chartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
+                chartBuilder.setTitle("蓝牙数据历史记录(一天)");
+                chartBuilder.setRange(from.getTime(), to.getTime());
             }
-            
         });
         
-        Button query_one_month = (Button)contentView.findViewById(R.id.button_one_month);
-        query_one_month.setOnClickListener(new OnClickListener()
+        view.findViewById(R.id.button_one_month).setOnClickListener(new OnClickListener()
         {
-            
             @Override
             public void onClick(View v)
             {
-                lineChartBuilder.clearHistory();
-                //				Time from = new Time(); Time to = new Time();
-                //				from.setToNow(); to.setToNow();
-                //				from.monthDay = 1;from.hour = from.minute = from.second = 0;
-                //				from.normalize(false);
+                chartBuilder.clearHistory();
+                //              Time from = new Time(); Time to = new Time();
+                //              from.setToNow(); to.setToNow();
+                //              from.monthDay = 1;from.hour = from.minute = from.second = 0;
+                //              from.normalize(false);
                 Calendar c = Calendar.getInstance();
                 Date to = c.getTime();
                 c.set(Calendar.DAY_OF_MONTH, 1);
@@ -185,79 +181,72 @@ public class BleViewHelper
                 Date from = c.getTime();
                 history.getDaysHistory(from, to, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
-                lineChartBuilder.changeMode();
-                //lineChartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.month+1) + "-" + dateFormat(from.monthDay) + " - " + dateFormat(to.month+1) + "-" + dateFormat(to.monthDay) + ")");
-                lineChartBuilder.setTitle("蓝牙数据历史记录(一月)");
-                lineChartBuilder.setRange(from.getTime(), to.getTime());
+                chartBuilder.changeMode();
+                //chartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.month+1) + "-" + dateFormat(from.monthDay) + " - " + dateFormat(to.month+1) + "-" + dateFormat(to.monthDay) + ")");
+                chartBuilder.setTitle("蓝牙数据历史记录(一月)");
+                chartBuilder.setRange(from.getTime(), to.getTime());
             }
-            
         });
         
-        Button query_hour = (Button)contentView.findViewById(R.id.button_query_hour);
-        query_hour.setOnClickListener(new OnClickListener()
+        view.findViewById(R.id.button_query_hour).setOnClickListener(new OnClickListener()
         {
-            
             @Override
             public void onClick(View v)
             {
-                lineChartBuilder.clearHistory();
-                TimeEditText fr = (TimeEditText)contentView.findViewById(R.id.edit_from_hour);
-                TimeEditText to = (TimeEditText)contentView.findViewById(R.id.edit_to_hour);
+                chartBuilder.clearHistory();
+                TimeEditText fr = (TimeEditText)view.findViewById(R.id.edit_from_hour);
+                TimeEditText to = (TimeEditText)view.findViewById(R.id.edit_to_hour);
                 String from_str = fr.getText().toString(), to_str = to.getText().toString();
                 Calendar c = Calendar.getInstance();
-                //				Time from = new Time(), tot = new Time();from.setToNow(); tot.setToNow();
+                //              Time from = new Time(), tot = new Time();from.setToNow(); tot.setToNow();
                 String[] pars = from_str.split(" : ");
                 c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(pars[0]));
                 c.set(Calendar.MINUTE, Integer.parseInt(pars[1]));
                 Date from = c.getTime();
-                //				from.hour = Integer.parseInt(pars[0]); from.minute = Integer.parseInt(pars[1]);
+                //              from.hour = Integer.parseInt(pars[0]); from.minute = Integer.parseInt(pars[1]);
                 pars = to_str.split(" : ");
                 c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(pars[0]));
                 c.set(Calendar.MINUTE, Integer.parseInt(pars[1]));
                 Date tot = c.getTime();
-                //				tot.hour = Integer.parseInt(pars[0]); tot.minute = Integer.parseInt(pars[1]);
+                //              tot.hour = Integer.parseInt(pars[0]); tot.minute = Integer.parseInt(pars[1]);
                 history.getHoursHistory(from, tot, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
-                lineChartBuilder.changeMode();
-                lineChartBuilder.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");
+                chartBuilder.changeMode();
+                chartBuilder.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");
                 
-                lineChartBuilder.setRange(from.getTime(), tot.getTime());
+                chartBuilder.setRange(from.getTime(), tot.getTime());
             }
-            
         });
         
-        Button query_day = (Button)contentView.findViewById(R.id.button_query_day);
-        query_day.setOnClickListener(new OnClickListener()
+        view.findViewById(R.id.button_query_day).setOnClickListener(new OnClickListener()
         {
-            
             @Override
             public void onClick(View v)
             {
-                lineChartBuilder.clearHistory();
-                DateEditText fr = (DateEditText)contentView.findViewById(R.id.edit_from_day);
-                DateEditText to = (DateEditText)contentView.findViewById(R.id.edit_to_day);
+                chartBuilder.clearHistory();
+                DateEditText fr = (DateEditText)view.findViewById(R.id.edit_from_day);
+                DateEditText to = (DateEditText)view.findViewById(R.id.edit_to_day);
                 String from_str = fr.getText().toString(), to_str = to.getText().toString();
                 Calendar c = Calendar.getInstance();
-                //				Time from = new Time(), tot = new Time();from.setToNow(); tot.setToNow();from.hour = 0; tot.hour = 23;
+                //              Time from = new Time(), tot = new Time();from.setToNow(); tot.setToNow();from.hour = 0; tot.hour = 23;
                 String[] pars = from_str.split("-");
                 c.set(Calendar.MONTH, Integer.parseInt(pars[1]) - 1);
                 c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(pars[2]));
                 Date from = c.getTime();
-                //				from.month = Integer.parseInt(pars[1]) - 1; from.monthDay = Integer.parseInt(pars[2]);
+                //              from.month = Integer.parseInt(pars[1]) - 1; from.monthDay = Integer.parseInt(pars[2]);
                 pars = to_str.split("-");
                 c.set(Calendar.MONTH, Integer.parseInt(pars[1]) - 1);
                 c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(pars[2]));
                 Date tot = c.getTime();
-                //				tot.month = Integer.parseInt(pars[1]) - 1; tot.monthDay = Integer.parseInt(pars[2]);
+                //              tot.month = Integer.parseInt(pars[1]) - 1; tot.monthDay = Integer.parseInt(pars[2]);
                 history.getDaysHistory(from, tot, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
-                lineChartBuilder.changeMode();
-                lineChartBuilder.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");
+                chartBuilder.changeMode();
+                chartBuilder.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");
                 
-                lineChartBuilder.setRange(from.getTime(), tot.getTime());
+                chartBuilder.setRange(from.getTime(), tot.getTime());
                 Log.e("wshg", "from: " + from_str + "; to: " + to_str);
             }
-            
         });
     }
     
