@@ -41,7 +41,8 @@
             android:name="com.tactileshow.activity.MainTabActivity"
             android:theme="@style/TabTheme" >
         </activity>
-        <activity android:name="com.tactileshow.view.XYChartActivity" >
+        <!-- 是一个独立的 Activity, 作为演示作用 -->
+        <activity android:name="com.tactileshow.activity.XYChartActivity" >
         </activity>
     </application>
 

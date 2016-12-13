@@ -1,4 +1,4 @@
-package com.tactileshow.util;
+package com.tactileshow.bean;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -7,7 +7,7 @@ import java.util.Date;
 /*
  * 对接收到的广播数据（格式为：#Sensor#Time#data#，进行解析。
  */
-public class BroadcastMsg
+public class BleReceiverBean
 {
     private String sensor;
     
@@ -15,7 +15,7 @@ public class BroadcastMsg
     
     private String data;
     
-    public BroadcastMsg(String msg)
+    public BleReceiverBean(String msg)
     {
         time = new Date();
         parseString(msg);

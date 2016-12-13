@@ -24,6 +24,10 @@ import android.widget.TabHost;
 
 public class BleViewHelper
 {
+    private static final double BLE_MIN_AXIS = -32768;
+    
+    private static final double BLE_MAX_AXIS = 32767;
+    
     private LineChartBuilder bleMap;
     
     private Activity context;
@@ -61,7 +65,7 @@ public class BleViewHelper
         }
         
         bleMap = new LineChartBuilder(context, layout, "蓝牙数据变化趋势", this.pager, scroll, sensor);
-        bleMap.setYRange(StaticValue.ble_min_axis, StaticValue.ble_max_axis);
+        bleMap.setYRange(BLE_MIN_AXIS, BLE_MAX_AXIS);
         
         history_layout = (RelativeLayout)view.findViewById(R.id.visual_history_layout);
         

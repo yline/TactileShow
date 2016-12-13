@@ -7,8 +7,8 @@ import java.util.List;
 import com.tactileshow.adapter.ViewPagerAdapter;
 import com.tactileshow.application.IApplication;
 import com.tactileshow.base.BaseActivity;
+import com.tactileshow.bean.BleReceiverBean;
 import com.tactileshow.main.R;
-import com.tactileshow.util.BroadcastMsg;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.view.DefinedViewPager;
 import com.tactileshow.viewhelper.BleViewHelper;
@@ -30,15 +30,19 @@ import android.widget.TabHost.OnTabChangeListener;
 
 public class MainTabActivity extends BaseActivity
 {
+    private static final String BLE_TAB_NAME = "蓝牙图像信息";
+    
+    private static final String TXT_TAB_NAME = "文本图像信息";
+    
     private TabHost tabHost;
     
     private DefinedViewPager viewPager;
     
     private ViewPagerAdapter pagerAdapter;
     
-    private BleViewHelper bleVisual;
+    private BleViewHelper bleViewHelper;
     
-    private TXTViewHelper txtVisual;
+    private TXTViewHelper txtViewHelper;
     
     private AlertDialog.Builder exitBuilder;
     
@@ -68,12 +72,8 @@ public class MainTabActivity extends BaseActivity
         
         tabHost.setup();
         
-        tabHost.addTab(tabHost.newTabSpec(StaticValue.visual_info_tab_name)
-            .setIndicator(StaticValue.visual_info_tab_name)
-            .setContent(R.id.view1));
-        tabHost.addTab(tabHost.newTabSpec(StaticValue.visual_info_tab_txt_name)
-            .setIndicator(StaticValue.visual_info_tab_txt_name)
-            .setContent(R.id.view1));
+        tabHost.addTab(tabHost.newTabSpec(BLE_TAB_NAME).setIndicator(BLE_TAB_NAME).setContent(R.id.view1));
+        tabHost.addTab(tabHost.newTabSpec(TXT_TAB_NAME).setIndicator(TXT_TAB_NAME).setContent(R.id.view1));
         
         viewPager.setOnPageChangeListener(new OnPageChangeListener()
         {
@@ -99,11 +99,11 @@ public class MainTabActivity extends BaseActivity
             @Override
             public void onTabChanged(String tabId)
             {
-                if (StaticValue.visual_info_tab_name.equals(tabId))
+                if (BLE_TAB_NAME.equals(tabId))
                 {
                     viewPager.setCurrentItem(0);
                 }
-                else if (StaticValue.visual_info_tab_txt_name.equals(tabId))
+                else if (TXT_TAB_NAME.equals(tabId))
                 {
                     viewPager.setCurrentItem(1);
                 }
@@ -116,12 +116,12 @@ public class MainTabActivity extends BaseActivity
         List<View> viewList = new ArrayList<View>();
         
         // 12.5调试
-        bleVisual = new BleViewHelper(this, viewPager);
-        txtVisual = new TXTViewHelper(this, viewPager);
+        bleViewHelper = new BleViewHelper(this, viewPager);
+        txtViewHelper = new TXTViewHelper(this, viewPager);
         
         //12.5 调试
-        viewList.add(bleVisual.getView());
-        viewList.add(txtVisual.getView());
+        viewList.add(bleViewHelper.getView());
+        viewList.add(txtViewHelper.getView());
         
         return viewList;
     }
@@ -177,14 +177,14 @@ public class MainTabActivity extends BaseActivity
     protected void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
-        bleVisual.onSaveInstanceState(outState);
+        bleViewHelper.onSaveInstanceState(outState);
     }
     
     @Override
     protected void onRestoreInstanceState(Bundle savedState)
     {
         super.onRestoreInstanceState(savedState);
-        bleVisual.onRestoreInstanceState(savedState);
+        bleViewHelper.onRestoreInstanceState(savedState);
     }
     
     @Override
@@ -199,7 +199,7 @@ public class MainTabActivity extends BaseActivity
         try
         {
             double data = Double.parseDouble(str);
-            bleVisual.setBle(StaticValue.xcnt++, data);
+            bleViewHelper.setBle(StaticValue.xcnt++, data);
         }
         catch (NumberFormatException e)
         {
@@ -219,7 +219,7 @@ public class MainTabActivity extends BaseActivity
                 return;
             }
             
-            BroadcastMsg bm = new BroadcastMsg(action);
+            BleReceiverBean bm = new BleReceiverBean(action);
             if (bm.getSensor() == null)
             {
                 Log.e("toy", "Receive error msg format or msg is null");

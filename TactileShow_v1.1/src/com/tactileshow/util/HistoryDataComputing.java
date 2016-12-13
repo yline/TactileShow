@@ -43,7 +43,6 @@ class Record
 
 public class HistoryDataComputing
 {
-    
     private LineChartBuilder view;
     
     public HistoryDataComputing(LineChartBuilder view)

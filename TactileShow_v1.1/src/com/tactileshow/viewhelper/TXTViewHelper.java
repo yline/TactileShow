@@ -1,7 +1,6 @@
 package com.tactileshow.viewhelper;
 
 import com.tactileshow.main.R;
-import com.tactileshow.util.StaticValue;
 import com.tactileshow.view.DefinedScrollView;
 import com.tactileshow.view.DefinedViewPager;
 
@@ -14,6 +13,10 @@ import android.widget.TabHost;
 
 public class TXTViewHelper
 {
+    private final static double TXT_MIN_AXIS = -500;
+    
+    private final static double TXT_MAX_AXIS = 500;
+    
     private TXTLineChartBuilder txtMap;
     
     private Activity context;
@@ -43,7 +46,7 @@ public class TXTViewHelper
         }
         
         txtMap = new TXTLineChartBuilder(context, layout, "文本数据变化趋势", this.pager, scroll);
-        txtMap.setYRange(StaticValue.txt_min_axis, StaticValue.txt_max_axis);
+        txtMap.setYRange(TXT_MIN_AXIS, TXT_MAX_AXIS);
     }
     
     public View getView()
