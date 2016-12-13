@@ -113,7 +113,6 @@ public class LineChartBuilder
     
     public void init()
     {
-        
         if (mChartView == null)
         {
             //mChartView = ChartFactory.getCubeLineChartView(context, mDataset, mRenderer, 0.33f);

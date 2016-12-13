@@ -29,17 +29,9 @@ public class BleViewHelper
     
     private static final double BLE_MAX_AXIS = 32767;
     
-    private LineChartBuilder bleMap;
+    private LineChartBuilder lineChartBuilder;
     
     private View contentView;
-    
-    private LinearLayout layout;
-    
-    private DefinedScrollView scroll;
-    
-    private RelativeLayout history_layout;
-    
-    private TabHost queryHost;
     
     private HistoryDataComputing history;
     
@@ -48,51 +40,69 @@ public class BleViewHelper
     {
         contentView = LayoutInflater.from(context).inflate(R.layout.view_maintab_ble, null);
         
-        scroll = (DefinedScrollView)contentView.findViewById(R.id.scroll);
-        layout = (LinearLayout)contentView.findViewById(R.id.visual_chart_layout);
+        initChartView(context, pager, contentView);
         
-        if (layout == null)
-        {
-            Log.e("wshg", "Null");
-            return;
-        }
+        history = new HistoryDataComputing(lineChartBuilder);
         
-        bleMap = new LineChartBuilder(context, layout, "蓝牙数据变化趋势", pager, scroll, StaticValue.BLE);
-        bleMap.setYRange(BLE_MIN_AXIS, BLE_MAX_AXIS);
+        initHistoryView(contentView);
         
-        history_layout = (RelativeLayout)contentView.findViewById(R.id.visual_history_layout);
+        historyListen();
+    }
+    
+    private void initChartView(Context context, DefinedViewPager pager, View view)
+    {
+        DefinedScrollView scroll = (DefinedScrollView)view.findViewById(R.id.scroll);
+        LinearLayout chartLayout = (LinearLayout)view.findViewById(R.id.visual_chart_layout);
         
-        history = new HistoryDataComputing(bleMap);
-        initQueryHost();
-        
-        final Button btn = (Button)contentView.findViewById(R.id.button_history_area);
-        btn.setOnClickListener(new OnClickListener()
+        lineChartBuilder = new LineChartBuilder(context, chartLayout, "蓝牙数据变化趋势", pager, scroll, StaticValue.BLE);
+        lineChartBuilder.setYRange(BLE_MIN_AXIS, BLE_MAX_AXIS);
+    }
+    
+    private void initHistoryView(View view)
+    {
+        // 打开用的 Button
+        final RelativeLayout historyRelativeLayout = (RelativeLayout)view.findViewById(R.id.visual_history_layout);
+        final Button btnSwitch = (Button)view.findViewById(R.id.button_history_area);
+        btnSwitch.setOnClickListener(new OnClickListener()
         {
             
             @Override
             public void onClick(View v)
             {
-                bleMap.changeMode();
-                if (history_layout.getVisibility() == View.INVISIBLE)
-                {//当前显示的是实时信息，变成现实历史信息
-                    btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.history_area_visible, 0);
-                    history_layout.setVisibility(View.VISIBLE);
-                    btn.setText(R.string.label_realtime_area_str);
+                lineChartBuilder.changeMode();
+                if (historyRelativeLayout.getVisibility() == View.INVISIBLE) // 当前显示的是实时信息，变成现实历史信息
+                {
+                    historyRelativeLayout.setVisibility(View.VISIBLE);
+                    
+                    btnSwitch.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.history_area_visible, 0);
+                    btnSwitch.setText(R.string.label_realtime_area_str);
                 }
-                else
-                {//当前显示的是历史信息，变成显示实时信息
-                    history_layout.setVisibility(View.INVISIBLE);
-                    btn.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.history_area_unvisible, 0);
-                    btn.setText(R.string.label_history_area_str);
+                else // 当前显示的是历史信息，变成显示实时信息
+                {
+                    historyRelativeLayout.setVisibility(View.INVISIBLE);
+                    
+                    btnSwitch.setCompoundDrawablesRelativeWithIntrinsicBounds(0,
+                        0,
+                        R.drawable.history_area_unvisible,
+                        0);
+                    btnSwitch.setText(R.string.label_history_area_str);
+                    
                     StaticValue.ble_real_time = true;
-                    bleMap.changeMode();
-                    bleMap.setTitle("蓝牙数据变化趋势");
+                    lineChartBuilder.changeMode();
+                    lineChartBuilder.setTitle("蓝牙数据变化趋势");
                 }
             }
-            
         });
         
-        historyListen();
+        // 选择日期 选择方式的 TabHost
+        TabHost queryHost = (TabHost)contentView.findViewById(R.id.history_query_host);
+        queryHost.setup();
+        queryHost.addTab(queryHost.newTabSpec("按小时查询").setIndicator("按小时查询").setContent(R.id.one_hour_query_layout));
+        queryHost.addTab(queryHost.newTabSpec("按天查询").setIndicator("按天查询").setContent(R.id.one_day_query_layout));
+        queryHost.setCurrentTab(0);
+        
+        // 每个Button对应的点击事件
+        
     }
     
     private void historyListen()
@@ -104,7 +114,7 @@ public class BleViewHelper
             @Override
             public void onClick(View v)
             {
-                bleMap.clearHistory();
+                lineChartBuilder.clearHistory();
                 Calendar c = Calendar.getInstance();
                 Date to = c.getTime();
                 c.add(Calendar.MINUTE, -60);
@@ -115,11 +125,11 @@ public class BleViewHelper
                 //				from.normalize(false);
                 history.getHoursHistory(from, to, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
-                bleMap.changeMode();
-                //bleMap.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
-                bleMap.setTitle("蓝牙数据历史记录(一小时)");
+                lineChartBuilder.changeMode();
+                //lineChartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
+                lineChartBuilder.setTitle("蓝牙数据历史记录(一小时)");
                 
-                bleMap.setRange(from.getTime(), to.getTime());
+                lineChartBuilder.setRange(from.getTime(), to.getTime());
             }
             
         });
@@ -131,7 +141,7 @@ public class BleViewHelper
             @Override
             public void onClick(View v)
             {
-                bleMap.clearHistory();
+                lineChartBuilder.clearHistory();
                 //				Time from = new Time(); Time to = new Time();
                 //				from.setToNow(); to.setToNow();
                 //				from.hour = from.minute = from.second = 0;
@@ -145,10 +155,10 @@ public class BleViewHelper
                 Date from = c.getTime();
                 history.getHoursHistory(from, to, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
-                bleMap.changeMode();
-                //bleMap.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
-                bleMap.setTitle("蓝牙数据历史记录(一天)");
-                bleMap.setRange(from.getTime(), to.getTime());
+                lineChartBuilder.changeMode();
+                //lineChartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.hour) + " : " + dateFormat(from.minute) + " - " + dateFormat(to.hour) + " : " + dateFormat(to.minute) + ")");
+                lineChartBuilder.setTitle("蓝牙数据历史记录(一天)");
+                lineChartBuilder.setRange(from.getTime(), to.getTime());
             }
             
         });
@@ -160,7 +170,7 @@ public class BleViewHelper
             @Override
             public void onClick(View v)
             {
-                bleMap.clearHistory();
+                lineChartBuilder.clearHistory();
                 //				Time from = new Time(); Time to = new Time();
                 //				from.setToNow(); to.setToNow();
                 //				from.monthDay = 1;from.hour = from.minute = from.second = 0;
@@ -175,10 +185,10 @@ public class BleViewHelper
                 Date from = c.getTime();
                 history.getDaysHistory(from, to, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
-                bleMap.changeMode();
-                //bleMap.setTitle("蓝牙数据历史记录(" + dateFormat(from.month+1) + "-" + dateFormat(from.monthDay) + " - " + dateFormat(to.month+1) + "-" + dateFormat(to.monthDay) + ")");
-                bleMap.setTitle("蓝牙数据历史记录(一月)");
-                bleMap.setRange(from.getTime(), to.getTime());
+                lineChartBuilder.changeMode();
+                //lineChartBuilder.setTitle("蓝牙数据历史记录(" + dateFormat(from.month+1) + "-" + dateFormat(from.monthDay) + " - " + dateFormat(to.month+1) + "-" + dateFormat(to.monthDay) + ")");
+                lineChartBuilder.setTitle("蓝牙数据历史记录(一月)");
+                lineChartBuilder.setRange(from.getTime(), to.getTime());
             }
             
         });
@@ -190,7 +200,7 @@ public class BleViewHelper
             @Override
             public void onClick(View v)
             {
-                bleMap.clearHistory();
+                lineChartBuilder.clearHistory();
                 TimeEditText fr = (TimeEditText)contentView.findViewById(R.id.edit_from_hour);
                 TimeEditText to = (TimeEditText)contentView.findViewById(R.id.edit_to_hour);
                 String from_str = fr.getText().toString(), to_str = to.getText().toString();
@@ -208,10 +218,10 @@ public class BleViewHelper
                 //				tot.hour = Integer.parseInt(pars[0]); tot.minute = Integer.parseInt(pars[1]);
                 history.getHoursHistory(from, tot, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
-                bleMap.changeMode();
-                bleMap.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");
+                lineChartBuilder.changeMode();
+                lineChartBuilder.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");
                 
-                bleMap.setRange(from.getTime(), tot.getTime());
+                lineChartBuilder.setRange(from.getTime(), tot.getTime());
             }
             
         });
@@ -223,7 +233,7 @@ public class BleViewHelper
             @Override
             public void onClick(View v)
             {
-                bleMap.clearHistory();
+                lineChartBuilder.clearHistory();
                 DateEditText fr = (DateEditText)contentView.findViewById(R.id.edit_from_day);
                 DateEditText to = (DateEditText)contentView.findViewById(R.id.edit_to_day);
                 String from_str = fr.getText().toString(), to_str = to.getText().toString();
@@ -241,23 +251,14 @@ public class BleViewHelper
                 //				tot.month = Integer.parseInt(pars[1]) - 1; tot.monthDay = Integer.parseInt(pars[2]);
                 history.getDaysHistory(from, tot, StaticValue.BLE);
                 StaticValue.ble_real_time = false;
-                bleMap.changeMode();
-                bleMap.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");
+                lineChartBuilder.changeMode();
+                lineChartBuilder.setTitle("蓝牙数据历史记录(" + from_str + " - " + to_str + ")");
                 
-                bleMap.setRange(from.getTime(), tot.getTime());
+                lineChartBuilder.setRange(from.getTime(), tot.getTime());
                 Log.e("wshg", "from: " + from_str + "; to: " + to_str);
             }
             
         });
-    }
-    
-    private void initQueryHost()
-    {
-        queryHost = (TabHost)contentView.findViewById(R.id.history_query_host);
-        queryHost.setup();
-        queryHost.addTab(queryHost.newTabSpec("按小时查询").setIndicator("按小时查询").setContent(R.id.one_hour_query_layout));
-        queryHost.addTab(queryHost.newTabSpec("按天查询").setIndicator("按天查询").setContent(R.id.one_day_query_layout));
-        queryHost.setCurrentTab(0);
     }
     
     public View getView()
@@ -267,28 +268,28 @@ public class BleViewHelper
     
     public void repaint()
     {
-        bleMap.init();
+        lineChartBuilder.init();
     }
     
     public void setBle(double t, double data)
     {
-        bleMap.addData(t, data);//Log.e("wshg", "set temp visual. data = " + data);
+        lineChartBuilder.addData(t, data);//Log.e("wshg", "set temp visual. data = " + data);
     }
     
     public void setMaxPoints(int maxPoints)
     {
-        bleMap.setMaxPoints(maxPoints);
+        lineChartBuilder.setMaxPoints(maxPoints);
     }
     
     public void onSaveInstanceState(Bundle outState)
     {
-        bleMap.onSaveInstanceState(outState);
+        lineChartBuilder.onSaveInstanceState(outState);
         //	humMap.onSaveInstanceState(outState);
     }
     
     public void onRestoreInstanceState(Bundle savedState)
     {
-        bleMap.onRestoreInstanceState(savedState);
+        lineChartBuilder.onRestoreInstanceState(savedState);
         //	humMap.onRestoreInstanceState(savedState);
     }
     
