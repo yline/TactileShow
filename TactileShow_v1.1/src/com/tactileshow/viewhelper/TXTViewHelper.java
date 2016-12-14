@@ -1,11 +1,15 @@
 package com.tactileshow.viewhelper;
 
+import java.util.List;
+
 import com.tactileshow.main.R;
 import com.tactileshow.view.DefinedScrollView;
 import com.tactileshow.view.DefinedViewPager;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,12 +25,17 @@ public class TXTViewHelper
     
     private View contentView;
     
+    private List<Integer> multiChoiceId;
+    
+    private AlertDialog dialog;
+    
     @SuppressLint("InflateParams")
     public TXTViewHelper(Context context, DefinedViewPager pager)
     {
         contentView = LayoutInflater.from(context).inflate(R.layout.view_maintab_txt, null);
         
         initChartView(context, pager, contentView);
+        initOtherView(context, contentView);
     }
     
     private void initChartView(Context context, DefinedViewPager pager, View view)
@@ -36,6 +45,56 @@ public class TXTViewHelper
         
         lineChartBuilder = new TXTLineChartBuilder(context, chartLayout, pager, scroll);
         lineChartBuilder.setYRange(TXT_MIN_AXIS, TXT_MAX_AXIS);
+    }
+    
+    private void initOtherView(Context context, View view)
+    {
+        view.findViewById(R.id.btn_choose_cnt).setOnClickListener(new View.OnClickListener()
+        {
+            
+            @Override
+            public void onClick(View v)
+            {
+                dialog.show();
+            }
+        });
+        
+        initChooseCntDialog(context);
+    }
+    
+    private void initChooseCntDialog(Context context)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(false);
+        builder.setTitle("请选择通道");
+        builder.setMultiChoiceItems(lineChartBuilder.getCntNames(),
+            lineChartBuilder.getCntFirstState(),
+            new DialogInterface.OnMultiChoiceClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which, boolean isChecked)
+                {
+                    // 数组越界
+                    if (isChecked)
+                    {
+                        lineChartBuilder.addSeries(which);
+                    }
+                    else
+                    {
+                        lineChartBuilder.removeSeries(which);
+                    }
+                }
+            });
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
+        { // 确定按钮
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                lineChartBuilder.repaint();
+            }
+        });
+        
+        dialog = builder.create();
     }
     
     public View getView()

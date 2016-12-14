@@ -4,23 +4,28 @@
     android:id="@+id/scroll_txt"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="vertical">
+    android:scrollbars="vertical" >
 
-  <LinearLayout
+    <LinearLayout
         android:id="@+id/visual_layout_txt"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical" >
-        
-    <LinearLayout
+
+        <LinearLayout
             android:id="@+id/visual_txt_chart_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical" >
+        </LinearLayout>
+        
+        <Button 
+            android:id="@+id/btn_choose_cnt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="选择通道"/>
     </LinearLayout>
 
-  </LinearLayout>
-   
 </com.tactileshow.view.DefinedScrollView>

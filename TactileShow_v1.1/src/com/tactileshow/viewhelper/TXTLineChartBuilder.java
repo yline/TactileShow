@@ -38,6 +38,12 @@ public class TXTLineChartBuilder
     /** 通道绘制的颜色 */
     private static final int[] CNT_COLORS = new int[] {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
     
+    /** 通道的名称 */
+    private static final String[] CNT_NAME = new String[] {"通道1", "通道2", "通道3", "通道4"};
+    
+    /** 通道状态 */
+    private static final boolean[] CNT_FIRST_STATE = new boolean[] {true, false, false, false};
+    
     // 图标绘制相关
     private XYSeries[] series;
     
@@ -90,7 +96,10 @@ public class TXTLineChartBuilder
             renderers[i].setPointStyle(PointStyle.CIRCLE);
             renderers[i].setFillPoints(true);
             renderers[i].setLineWidth(4);
-            multipleSeriesRenderer.addSeriesRenderer(renderers[i]);
+            if (CNT_FIRST_STATE[i])
+            {
+                multipleSeriesRenderer.addSeriesRenderer(renderers[i]);
+            }
         }
     }
     
@@ -100,8 +109,11 @@ public class TXTLineChartBuilder
         series = new XYSeries[CNT];
         for (int i = 0; i < CNT; ++i)
         {
-            series[i] = new XYSeries("通道" + (i + 1));
-            multipleSeriesDataset.addSeries(series[i]);
+            series[i] = new XYSeries(CNT_NAME[i]);
+            if (CNT_FIRST_STATE[i])
+            {
+                multipleSeriesDataset.addSeries(series[i]);
+            }
         }
     }
     
@@ -226,6 +238,28 @@ public class TXTLineChartBuilder
         
         multipleSeriesRenderer.setYAxisMax(realMax);
         multipleSeriesRenderer.setYAxisMin(realMin);
+    }
+    
+    public String[] getCntNames()
+    {
+        return CNT_NAME;
+    }
+    
+    public boolean[] getCntFirstState()
+    {
+        return CNT_FIRST_STATE;
+    }
+    
+    public void addSeries(int i)
+    {
+        multipleSeriesDataset.addSeries(series[i]);
+        multipleSeriesRenderer.addSeriesRenderer(renderers[i]);
+    }
+    
+    public void removeSeries(int i)
+    {
+        multipleSeriesDataset.removeSeries(series[i]);
+        multipleSeriesRenderer.removeSeriesRenderer(renderers[i]);
     }
     
     public void repaint()
