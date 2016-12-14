@@ -13,9 +13,9 @@ import android.widget.LinearLayout;
 
 public class TXTViewHelper
 {
-    private final static double TXT_MIN_AXIS = -500;
+    private final static float TXT_MIN_AXIS = -500;
     
-    private final static double TXT_MAX_AXIS = 500;
+    private final static float TXT_MAX_AXIS = 500;
     
     private TXTLineChartBuilder lineChartBuilder;
     

@@ -180,53 +180,52 @@ public class TXTLineChartBuilder
             multipleSeriesRenderer.setXAxisMin(length - MAX_POINTS);
         }
         
-        //     // 图标绘制相关
-        //        private XYSeries[] series;
-        //        
-        //        /** 管理数据的 */
-        //        private XYMultipleSeriesDataset multipleSeriesDataset;
-        //        
-        //        private XYSeriesRenderer[] renderers;
-        //        
-        //        /** 管理 坐标系的 */
-        //        private XYMultipleSeriesRenderer multipleSeriesRenderer;
-        //        
-        //        private GraphicalView chartView;
+        // 添加数据,并计算出最大值和最小值
+        float max = getMapDataFloat(result, 0, 0);
+        float min = max;
         
-        //        
-        //        List<String> ls = new ArrayList<String>();
-        //        
-        //        if (ls != null && ls.size() != 0)
-        //        {
-        //            double YMax = Double.MIN_VALUE, YMin = Double.MAX_VALUE;
-        //            for (int i = 0; i < ls.size(); ++i)
-        //            {
-        //                String[] strs = ls.get(i).split("\t");
-        //                double[] nums = new double[CNT];
-        //                for (int j = 0; j < CNT; ++j)
-        //                {
-        //                    nums[j] = Double.parseDouble(strs[j]);
-        //                       // series[j].add(i, nums[j]); 设置数据的地方
-        //                    YMax = nums[j] > YMax ? nums[j] : YMax;
-        //                    YMin = nums[j] < YMin ? nums[j] : YMin;
-        //                }
-        //            }
-        //            //setYRange(YMax * 1.1, YMin * 1.1);
-        //            
-        //            chartView.repaint();
-        //        }
+        for (int i = 0; i < CNT; i++)
+        {
+            // 一次绘制一支
+            
+            for (int j = 0; j < result.size(); j++)
+            {
+                float number = getMapDataFloat(result, j, i);
+                series[i].add(j, j, number);
+                
+                max = max > number ? max : number;
+                min = min < number ? max : number;
+            }
+        }
+        
+        setYRange(min, max);
+        chartView.repaint();
     }
     
-    public void setXRange(long fr, long to)
+    /**
+     * @param result
+     * @param i 行(List<String>)
+     * @param j 列(String)
+     */
+    private float getMapDataFloat(List<List<String>> listStr, int i, int j)
     {
-        multipleSeriesRenderer.setXAxisMax(to);
-        multipleSeriesRenderer.setXAxisMin(fr);
+        float result = Float.parseFloat(listStr.get(i).get(j));
+        return result;
     }
     
-    public void setYRange(double fr, double to)
+    public void setXRange(int min, int max)
     {
-        multipleSeriesRenderer.setYAxisMax(to);
-        multipleSeriesRenderer.setYAxisMin(fr);
+        multipleSeriesRenderer.setXAxisMax(max + 2);
+        multipleSeriesRenderer.setXAxisMin(min - 2);
+    }
+    
+    public void setYRange(float min, float max)
+    {
+        float realMax = max > 0 ? max * 1.1f : max * 0.9f;
+        float realMin = min > 0 ? min * 0.9f : min * 1.1f;
+        
+        multipleSeriesRenderer.setYAxisMax(realMax);
+        multipleSeriesRenderer.setYAxisMin(realMin);
     }
     
     public void repaint()
