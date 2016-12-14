@@ -41,10 +41,12 @@ public class TXTLineChartBuilder
     // 图标绘制相关
     private XYSeries[] series;
     
-    private XYMultipleSeriesDataset multipleSeriesDataset = new XYMultipleSeriesDataset();
+    /** 管理数据的 */
+    private XYMultipleSeriesDataset multipleSeriesDataset;
     
     private XYSeriesRenderer[] renderers;
     
+    /** 管理 坐标系的 */
     private XYMultipleSeriesRenderer multipleSeriesRenderer;
     
     private GraphicalView chartView;
@@ -53,9 +55,6 @@ public class TXTLineChartBuilder
     
     public TXTLineChartBuilder(Context context, LinearLayout layout, DefinedViewPager pager, DefinedScrollView scroll)
     {
-        //        this.pager = pager;
-        //        this.scroll = scroll;
-        
         initRenderer();
         initDataSet();
         
@@ -63,10 +62,6 @@ public class TXTLineChartBuilder
         
         updateChartView();
     }
-    
-    //    private DefinedViewPager pager;
-    //    
-    //    private DefinedScrollView scroll;
     
     private void initRenderer()
     {
@@ -101,6 +96,7 @@ public class TXTLineChartBuilder
     
     private void initDataSet()
     {
+        multipleSeriesDataset = new XYMultipleSeriesDataset();
         series = new XYSeries[CNT];
         for (int i = 0; i < CNT; ++i)
         {
@@ -183,6 +179,20 @@ public class TXTLineChartBuilder
         {
             multipleSeriesRenderer.setXAxisMin(length - MAX_POINTS);
         }
+        
+        //     // 图标绘制相关
+        //        private XYSeries[] series;
+        //        
+        //        /** 管理数据的 */
+        //        private XYMultipleSeriesDataset multipleSeriesDataset;
+        //        
+        //        private XYSeriesRenderer[] renderers;
+        //        
+        //        /** 管理 坐标系的 */
+        //        private XYMultipleSeriesRenderer multipleSeriesRenderer;
+        //        
+        //        private GraphicalView chartView;
+        
         //        
         //        List<String> ls = new ArrayList<String>();
         //        
@@ -196,7 +206,7 @@ public class TXTLineChartBuilder
         //                for (int j = 0; j < CNT; ++j)
         //                {
         //                    nums[j] = Double.parseDouble(strs[j]);
-        //                    series[j].add(i, nums[j]);
+        //                       // series[j].add(i, nums[j]); 设置数据的地方
         //                    YMax = nums[j] > YMax ? nums[j] : YMax;
         //                    YMin = nums[j] < YMin ? nums[j] : YMin;
         //                }
@@ -207,7 +217,7 @@ public class TXTLineChartBuilder
         //        }
     }
     
-    public void setRange(long fr, long to)
+    public void setXRange(long fr, long to)
     {
         multipleSeriesRenderer.setXAxisMax(to);
         multipleSeriesRenderer.setXAxisMin(fr);

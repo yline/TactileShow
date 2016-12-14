@@ -51,9 +51,6 @@ public class LineChartBuilder
     
     public LineChartBuilder(Context context, LinearLayout layout, DefinedViewPager pager, DefinedScrollView scroll)
     {
-        //        this.pager = pager;
-        //        this.scroll = scroll;
-        
         initSeriesRenderer();
         
         initMultipleSeriesRenderer(seriesRenderer);
@@ -65,10 +62,6 @@ public class LineChartBuilder
         
         initView(context, layout, pager, scroll); // , pager, scroll
     }
-    
-    //    private DefinedViewPager pager;
-    //    
-    //    private DefinedScrollView scroll;
     
     private void initSeriesRenderer()
     {
