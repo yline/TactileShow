@@ -2,6 +2,11 @@ package com.tactileshow.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -9,12 +14,15 @@ import java.util.Scanner;
 
 import com.tactileshow.application.IApplication;
 import com.tactileshow.log.FileUtil;
+import com.tactileshow.log.LogFileUtil;
 
 public abstract class BaseFileHelper
 {
+    public static final String TAG = "FileHelper";
+    
     private static final String TACTILE = "TactileShow";
     
-    private static final String BLE = "BLE";
+    public static final String BLE = "BLE";
     
     private static final String MAP_DATA_NAME = "mapdata1.txt";
     
@@ -37,9 +45,15 @@ public abstract class BaseFileHelper
         mapDataFileName = parentFileName + MAP_DATA_NAME;
     }
     
-    public List<String> readFile(File file)
+    /** 读取本地文件 */
+    public List<String> readMapDataFile(File file)
     {
         List<String> dataList = new ArrayList<String>();
+        
+        if (null == file)
+        {
+            return dataList;
+        }
         
         Scanner scanner = null;
         try
@@ -62,6 +76,91 @@ public abstract class BaseFileHelper
             }
         }
         return dataList;
+    }
+    
+    /** 写入本地文件 avg 中 */
+    public void writeAvgFile(File file, String content)
+    {
+        if (null == file)
+        {
+            return;
+        }
+        
+        RandomAccessFile randomAccessFile = null;
+        try
+        {
+            File parentFile = new File(file.getParent());
+            parentFile.mkdirs();
+            if (!file.isFile())
+            {
+                file.createNewFile();
+            }
+            
+            randomAccessFile = new RandomAccessFile(file, "rw");
+            randomAccessFile.seek(0);
+            randomAccessFile.writeUTF(content);
+        }
+        catch (FileNotFoundException e)
+        {
+            LogFileUtil.e(TAG, "RandomAccessFile FileNotFoundException", e);
+        }
+        catch (IOException e)
+        {
+            LogFileUtil.e(TAG, "file IOException", e);
+        }
+        finally
+        {
+            if (null != randomAccessFile)
+            {
+                try
+                {
+                    randomAccessFile.close();
+                }
+                catch (IOException e)
+                {
+                    LogFileUtil.e(TAG, "randomAccessFile close IOException", e);
+                }
+            }
+        }
+    }
+    
+    /** 写入本地文件 data 中 */
+    public void writeDataFile(File file, String content)
+    {
+        if (null == file)
+        {
+            return;
+        }
+        
+        PrintWriter printWriter = null;
+        try
+        {
+            File parentFile = new File(file.getParent());
+            parentFile.mkdirs();
+            if (!file.isFile())
+            {
+                file.createNewFile();
+            }
+            
+            printWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file, true)));
+            printWriter.print(content);
+            printWriter.flush();
+        }
+        catch (FileNotFoundException e)
+        {
+            LogFileUtil.e(TAG, "RandomAccessFile FileNotFoundException", e);
+        }
+        catch (IOException e)
+        {
+            LogFileUtil.e(TAG, "file IOException", e);
+        }
+        finally
+        {
+            if (null != printWriter)
+            {
+                printWriter.close();
+            }
+        }
     }
     
     public String getParentFileName()

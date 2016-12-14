@@ -91,13 +91,13 @@ public class DataFile
         }
     }
     
-    public void writeAvgData(Calendar t, String sensor, String data)
-    {
-        PrintWriter print = getTimePrintWriter(t, sensor, "avg", false);
-        print.println(data);
-        print.flush();
-        print.close();
-    }
+    //    public void writeAvgData(Calendar t, String sensor, String data)
+    //    {
+    //        PrintWriter print = getTimePrintWriter(t, sensor, "avg", false);
+    //        print.println(data);
+    //        print.flush();
+    //        print.close();
+    //    }
     
     public String readAvgData(Calendar t, String sensor)
     {
@@ -223,6 +223,7 @@ public class DataFile
                 out_avg_ble.seek(0);
                 out_avg_ble
                     .writeUTF(Double.toString(((avg_ble * records_ble++) + Double.parseDouble(data)) / records_ble));
+                
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ms");
                 String s = sdf.format(t);
                 out_ble.println(s + "%" + data);

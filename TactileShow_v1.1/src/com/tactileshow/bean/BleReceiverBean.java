@@ -52,11 +52,16 @@ public class BleReceiverBean
                 }
                 catch (ParseException e)
                 {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
                 data = pars[2];
             }
         }
+    }
+    
+    @Override
+    public String toString()
+    {
+        return "BleReceiverBean [sensor=" + sensor + ", time=" + time + ", data=" + data + "]";
     }
 }

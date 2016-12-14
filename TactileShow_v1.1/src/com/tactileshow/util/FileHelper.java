@@ -1,9 +1,12 @@
 package com.tactileshow.util;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
+import com.tactileshow.bean.BleReceiverBean;
 import com.tactileshow.log.LogFileUtil;
 
 /**
@@ -40,20 +43,62 @@ public class FileHelper extends BaseFileHelper
         LogFileUtil.v("MapDataFileName = " + fileName);
         
         File file = new File(fileName);
-        List<String> dataList = readFile(file);
+        List<String> dataList = readMapDataFile(file);
+        LogFileUtil.v("dataList size = " + dataList.size());
         
         return dataList;
     }
     
-    public void writeData()
+    /**
+     * 该方法未经过测试,但基本内容Ok,日志OK
+     * @param bean
+     */
+    public void writeData(BleReceiverBean bean)
     {
+        if (null == bean)
+        {
+            LogFileUtil.e(TAG, "BleReceiverBean is null");
+            return;
+        }
+        
+        if (!BLE.equals(bean.getSensor()))
+        {
+            LogFileUtil.e(TAG, "BleReceiverBean sensor is not right");
+            return;
+        }
+        
         if (!compareTime(recordCalendar))
         {
             recordCalendar = Calendar.getInstance();
+            
+            String timeDirectory = getTimeDirectory();
+            LogFileUtil.v("timeDirectory = " + timeDirectory);
+            
+            // 写入 Avg
+            String AvgDirStr = timeDirectory + "avg";
+            if (null != AvgDirStr)
+            {
+                File file = new File(AvgDirStr);
+                writeAvgFile(file, "content");
+            }
+            
+            // 写入 Data
+            String dataDirStr = timeDirectory + "data";
+            if (null != dataDirStr)
+            {
+                File file = new File(dataDirStr);
+                
+                String time =
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ms", Locale.getDefault()).format(bean.getTime());
+                String dataDirResult = time + "%" + bean.getData();
+                LogFileUtil.v("dataDirResult = " + dataDirResult);
+                
+                writeDataFile(file, dataDirResult);
+            }
         }
         else
         {
-            LogFileUtil.v("writeData time is same");
+            LogFileUtil.v("writeAvgData time is same");
         }
     }
     

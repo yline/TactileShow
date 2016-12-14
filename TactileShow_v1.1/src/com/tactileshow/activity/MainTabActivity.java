@@ -195,6 +195,11 @@ public class MainTabActivity extends BaseActivity
         unregisterReceiver(mGattUpdateReceiver);
     }
     
+    /**
+     * 用于显示 
+     * @param date
+     * @param str
+     */
     private void setBle(Date date, String str)
     {
         try
