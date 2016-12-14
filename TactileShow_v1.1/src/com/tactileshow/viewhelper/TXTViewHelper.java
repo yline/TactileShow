@@ -4,12 +4,12 @@ import com.tactileshow.main.R;
 import com.tactileshow.view.DefinedScrollView;
 import com.tactileshow.view.DefinedViewPager;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TabHost;
 
 public class TXTViewHelper
 {
@@ -17,50 +17,39 @@ public class TXTViewHelper
     
     private final static double TXT_MAX_AXIS = 500;
     
-    private TXTLineChartBuilder txtMap;
+    private TXTLineChartBuilder lineChartBuilder;
     
-    private Activity context;
+    private View contentView;
     
-    private View view;
-    
-    private LinearLayout layout;
-    
-    private DefinedScrollView scroll;
-    
-    private DefinedViewPager pager;
-    
-    private TabHost queryHost;
-    
-    public TXTViewHelper(Activity activity, DefinedViewPager pager)
+    @SuppressLint("InflateParams")
+    public TXTViewHelper(Context context, DefinedViewPager pager)
     {
-        this.context = activity;
-        this.pager = pager;
+        contentView = LayoutInflater.from(context).inflate(R.layout.view_maintab_txt, null);
         
-        view = context.getLayoutInflater().inflate(R.layout.view_maintab_txt, null);
-        scroll = (DefinedScrollView)view.findViewById(R.id.scroll_txt);
-        layout = (LinearLayout)view.findViewById(R.id.visual_txt_chart_layout);
-        if (layout == null)
-        {
-            Log.e("wshg", "Null");
-            return;
-        }
+        initChartView(context, pager, contentView);
+    }
+    
+    private void initChartView(Context context, DefinedViewPager pager, View view)
+    {
+        DefinedScrollView scroll = (DefinedScrollView)view.findViewById(R.id.scroll_txt);
+        LinearLayout chartLayout = (LinearLayout)view.findViewById(R.id.visual_txt_chart_layout);
         
-        txtMap = new TXTLineChartBuilder(context, layout, "文本数据变化趋势", this.pager, scroll);
-        txtMap.setYRange(TXT_MIN_AXIS, TXT_MAX_AXIS);
+        lineChartBuilder = new TXTLineChartBuilder(context, chartLayout, pager, scroll);
+        lineChartBuilder.setYRange(TXT_MIN_AXIS, TXT_MAX_AXIS);
     }
     
     public View getView()
     {
-        return view;
+        return contentView;
     }
     
     public void onSaveInstanceState(Bundle outState)
     {
-        txtMap.onSaveInstanceState(outState);
+        lineChartBuilder.onSaveInstanceState(outState);
     }
     
     public void onRestoreInstanceState(Bundle savedState)
     {
-        txtMap.onRestoreInstanceState(savedState);
+        lineChartBuilder.onRestoreInstanceState(savedState);
     }
 }

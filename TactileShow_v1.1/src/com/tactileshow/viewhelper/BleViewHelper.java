@@ -257,19 +257,18 @@ public class BleViewHelper
     
     public void setBle(double t, double data)
     {
-        lineChartBuilder.addData(t, data);//Log.e("wshg", "set temp visual. data = " + data);
+        lineChartBuilder.addData(t, data);
+        //Log.e("wshg", "set temp visual. data = " + data);
     }
     
     public void onSaveInstanceState(Bundle outState)
     {
         lineChartBuilder.onSaveInstanceState(outState);
-        //	humMap.onSaveInstanceState(outState);
     }
     
     public void onRestoreInstanceState(Bundle savedState)
     {
         lineChartBuilder.onRestoreInstanceState(savedState);
-        //	humMap.onRestoreInstanceState(savedState);
     }
     
 }
