@@ -1,6 +1,5 @@
 package com.tactileshow.viewhelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.achartengine.ChartFactory;
@@ -12,6 +11,7 @@ import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
 import com.tactileshow.main.R;
+import com.tactileshow.util.FileHelper;
 import com.tactileshow.util.ScreenUtil;
 import com.tactileshow.view.DefinedScrollView;
 import com.tactileshow.view.DefinedViewPager;
@@ -53,13 +53,20 @@ public class TXTLineChartBuilder
     
     public TXTLineChartBuilder(Context context, LinearLayout layout, DefinedViewPager pager, DefinedScrollView scroll)
     {
+        //        this.pager = pager;
+        //        this.scroll = scroll;
+        
         initRenderer();
         initDataSet();
         
-        initView(context, layout, pager, scroll);
+        initView(context, layout, pager, scroll); // , pager, scroll
         
         updateChartView();
     }
+    
+    //    private DefinedViewPager pager;
+    //    
+    //    private DefinedScrollView scroll;
     
     private void initRenderer()
     {
@@ -112,6 +119,15 @@ public class TXTLineChartBuilder
             multipleSeriesRenderer.setSelectableBuffer(10);
             
             // 事件拦截
+            chartView.setOnClickListener(new View.OnClickListener()
+            {
+                
+                @Override
+                public void onClick(View v)
+                {
+                    
+                }
+            });
             chartView.setOnTouchListener(new OnTouchListener()
             {
                 
@@ -119,15 +135,18 @@ public class TXTLineChartBuilder
                 @Override
                 public boolean onTouch(View v, MotionEvent event)
                 {
-                    if (event.getAction() == MotionEvent.ACTION_UP)
+                    switch (event.getAction())
                     {
-                        pager.setTouchIntercept(true);
-                        scroll.setTouchIntercept(true);
-                    }
-                    else if (event.getAction() == MotionEvent.ACTION_DOWN)
-                    {
-                        pager.setTouchIntercept(false);
-                        scroll.setTouchIntercept(false);
+                        case MotionEvent.ACTION_DOWN:
+                            pager.setTouchIntercept(false);
+                            scroll.setTouchIntercept(false);
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            pager.setTouchIntercept(true);
+                            scroll.setTouchIntercept(true);
+                            break;
+                        default:
+                            break;
                     }
                     return false;
                 }
@@ -151,37 +170,41 @@ public class TXTLineChartBuilder
     
     private void updateChartView()
     {
-        List<String> ls = new ArrayList<String>();
+        List<List<String>> result = FileHelper.getInstance().readMapData();
         
-        if (ls != null && ls.size() != 0)
+        // 确定X轴范围
+        int length = result.size() + 2;
+        multipleSeriesRenderer.setXAxisMax(length);
+        if (length < MAX_POINTS)
         {
-            double YMax = Double.MIN_VALUE, YMin = Double.MAX_VALUE;
-            for (int i = 0; i < ls.size(); ++i)
-            {
-                String[] strs = ls.get(i).split("\t");
-                double[] nums = new double[CNT];
-                for (int j = 0; j < CNT; ++j)
-                {
-                    nums[j] = Double.parseDouble(strs[j]);
-                    series[j].add(i, nums[j]);
-                    YMax = nums[j] > YMax ? nums[j] : YMax;
-                    YMin = nums[j] < YMin ? nums[j] : YMin;
-                }
-            }
-            //setYRange(YMax * 1.1, YMin * 1.1);
-            int len = ls.size();
-            multipleSeriesRenderer.setXAxisMax(len);
-            if (len < MAX_POINTS)
-            {
-                multipleSeriesRenderer.setXAxisMin(0);
-            }
-            else
-            {
-                multipleSeriesRenderer.setXAxisMin(len - MAX_POINTS);
-            }
-            
-            chartView.repaint();
+            multipleSeriesRenderer.setXAxisMin(0);
         }
+        else
+        {
+            multipleSeriesRenderer.setXAxisMin(length - MAX_POINTS);
+        }
+        //        
+        //        List<String> ls = new ArrayList<String>();
+        //        
+        //        if (ls != null && ls.size() != 0)
+        //        {
+        //            double YMax = Double.MIN_VALUE, YMin = Double.MAX_VALUE;
+        //            for (int i = 0; i < ls.size(); ++i)
+        //            {
+        //                String[] strs = ls.get(i).split("\t");
+        //                double[] nums = new double[CNT];
+        //                for (int j = 0; j < CNT; ++j)
+        //                {
+        //                    nums[j] = Double.parseDouble(strs[j]);
+        //                    series[j].add(i, nums[j]);
+        //                    YMax = nums[j] > YMax ? nums[j] : YMax;
+        //                    YMin = nums[j] < YMin ? nums[j] : YMin;
+        //                }
+        //            }
+        //            //setYRange(YMax * 1.1, YMin * 1.1);
+        //            
+        //            chartView.repaint();
+        //        }
     }
     
     public void setRange(long fr, long to)

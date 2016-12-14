@@ -51,6 +51,9 @@ public class LineChartBuilder
     
     public LineChartBuilder(Context context, LinearLayout layout, DefinedViewPager pager, DefinedScrollView scroll)
     {
+        //        this.pager = pager;
+        //        this.scroll = scroll;
+        
         initSeriesRenderer();
         
         initMultipleSeriesRenderer(seriesRenderer);
@@ -60,8 +63,12 @@ public class LineChartBuilder
         multipleSeriesDataset = new XYMultipleSeriesDataset();
         multipleSeriesDataset.addSeries(currentSeries);
         
-        initView(context, layout, pager, scroll);
+        initView(context, layout, pager, scroll); // , pager, scroll
     }
+    
+    //    private DefinedViewPager pager;
+    //    
+    //    private DefinedScrollView scroll;
     
     private void initSeriesRenderer()
     {
@@ -104,6 +111,15 @@ public class LineChartBuilder
             multipleSeriesRenderer.setSelectableBuffer(10);
             
             // 事件拦截
+            chartView.setOnClickListener(new View.OnClickListener()
+            {
+                
+                @Override
+                public void onClick(View v)
+                {
+                    
+                }
+            });
             chartView.setOnTouchListener(new OnTouchListener()
             {
                 @SuppressLint("ClickableViewAccessibility")
