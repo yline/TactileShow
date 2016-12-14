@@ -1,5 +1,6 @@
 package com.tactileshow.viewhelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.achartengine.ChartFactory;
@@ -11,7 +12,6 @@ import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
 import com.tactileshow.main.R;
-import com.tactileshow.util.FileHelper;
 import com.tactileshow.util.ScreenUtil;
 import com.tactileshow.view.DefinedScrollView;
 import com.tactileshow.view.DefinedViewPager;
@@ -151,7 +151,8 @@ public class TXTLineChartBuilder
             mChartView.repaint();
         }
         
-        List<String> ls = FileHelper.getInstance().readMapData();
+        //  = FileHelper.getInstance().readMapData();
+        List<String> ls = new ArrayList<String>();
         
         if (ls != null && ls.size() != 0)
         {

@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
@@ -46,22 +47,24 @@ public abstract class BaseFileHelper
     }
     
     /** 读取本地文件 */
-    public List<String> readMapDataFile(File file)
+    protected List<List<String>> readMapDataFile(File file)
     {
-        List<String> dataList = new ArrayList<String>();
+        List<List<String>> result = new ArrayList<List<String>>();
         
         if (null == file)
         {
-            return dataList;
+            return result;
         }
         
+        // 读取每一行的信息,并保存
+        List<String> lineList = new ArrayList<String>();
         Scanner scanner = null;
         try
         {
             scanner = new Scanner(file);
             while (scanner.hasNextLine())
             {
-                dataList.add(scanner.nextLine());
+                lineList.add(scanner.nextLine());
             }
         }
         catch (FileNotFoundException e)
@@ -75,11 +78,29 @@ public abstract class BaseFileHelper
                 scanner.close();
             }
         }
-        return dataList;
+        
+        // 解析每一行信息
+        for (int i = 0; i < lineList.size(); i++)
+        {
+            if (null == lineList.get(i) || "".equals(lineList.get(i)))
+            {
+                break;
+            }
+            result.add(parseLine(lineList.get(i)));
+        }
+        
+        return result;
+    }
+    
+    /** 解析每一行信息 */
+    private List<String> parseLine(String content)
+    {
+        String[] strs = content.split("\t");
+        return Arrays.asList(strs);
     }
     
     /** 写入本地文件 avg 中 */
-    public void writeAvgFile(File file, String content)
+    protected void writeAvgFile(File file, String content)
     {
         if (null == file)
         {
@@ -125,7 +146,7 @@ public abstract class BaseFileHelper
     }
     
     /** 写入本地文件 data 中 */
-    public void writeDataFile(File file, String content)
+    protected void writeDataFile(File file, String content)
     {
         if (null == file)
         {

@@ -37,13 +37,13 @@ public class FileHelper extends BaseFileHelper
         LogFileUtil.v("parentFileName = " + getParentFileName() + ",mapData = " + getMapDataFileName());
     }
     
-    public List<String> readMapData()
+    public List<List<String>> readMapData()
     {
         String fileName = getMapDataFileName();
         LogFileUtil.v("MapDataFileName = " + fileName);
         
         File file = new File(fileName);
-        List<String> dataList = readMapDataFile(file);
+        List<List<String>> dataList = readMapDataFile(file);
         LogFileUtil.v("dataList size = " + dataList.size());
         
         return dataList;

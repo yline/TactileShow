@@ -31,11 +31,6 @@
             android:name="com.tactileshow.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppBaseTheme" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.tactileshow.activity.MainTabActivity"
@@ -43,6 +38,14 @@
         </activity>
         <!-- 是一个独立的 Activity, 作为演示作用 -->
         <activity android:name="com.tactileshow.activity.XYChartActivity" >
+        </activity>
+        <!-- 是一个独立的Activity,作为短暂测试作用 -->
+        <activity android:name="com.tactileshow.activity.TestActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 
