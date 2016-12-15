@@ -33,6 +33,9 @@ public class IApplication extends Application
 	/** handler 吐丝 */
 	public static final int HANDLER_TOAST = -1;
 
+	/** 用于请求权限 */
+	public static final int REQUEST_CODE_PERMISSION = 1025;
+
 	/** TAG */
 	public static final String TAG = "Tactileshow";
 

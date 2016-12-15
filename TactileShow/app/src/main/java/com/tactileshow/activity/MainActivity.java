@@ -59,7 +59,7 @@ public class MainActivity extends BaseAppCompatActivity
 	private static final int MENU_ITEMID_EXIT = 21002;
 
 	private static final int MENU_ITEMID_DEBUG = 21003;
-
+	
 	// Handler
 	private final static int HANDLER_SERVICE_DISCOVERED = 20000;
 

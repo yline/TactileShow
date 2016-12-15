@@ -17,7 +17,7 @@ import android.widget.TabHost.OnTabChangeListener;
 import com.tactileshow.R;
 import com.tactileshow.adapter.ViewPagerAdapter;
 import com.tactileshow.application.IApplication;
-import com.tactileshow.base.BaseActivity;
+import com.tactileshow.base.BaseAppCompatActivity;
 import com.tactileshow.bean.BleReceiverBean;
 import com.tactileshow.util.DataFile;
 import com.tactileshow.util.StaticValue;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainTabActivity extends BaseActivity
+public class MainTabActivity extends BaseAppCompatActivity
 {
 	private static final String BLE_TAB_NAME = "蓝牙图像信息";
 

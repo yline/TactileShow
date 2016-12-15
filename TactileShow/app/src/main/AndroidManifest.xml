@@ -9,8 +9,8 @@
         android:name="android.hardware.bluetooth_le"
         android:required="true"/>
 
+    <!--读外部文件权限-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-
     <!-- 写外部文件 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
@@ -31,7 +31,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.tactileshow.activity.MainTabActivity">
+            android:name="com.tactileshow.activity.MainTabActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
         <!-- 是一个独立的 Activity, 作为演示作用 -->
         <activity android:name="com.tactileshow.activity.XYChartActivity">
