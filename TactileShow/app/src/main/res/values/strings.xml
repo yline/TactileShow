@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">电子皮肤</string>
+
+    <string name="label_history_area_str">点击查看历史信息</string>
+    <string name="label_realtime_area_str">返回查看实时信息</string>
+    <string name="button_history_area_one_hour">一小时内</string>
+    <string name="button_history_area_one_day">今天内</string>
+    <string name="button_history_area_one_month">这个月内</string>
+    <string name="label_history_area_detail_query_day_name">按天查询</string>
+    <string name="label_history_area_detail_query_hour_name">按小时查询</string>
+    <string name="button_query_str">查询</string>
+</resources>
