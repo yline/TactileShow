@@ -143,6 +143,7 @@ public class MainActivity extends BaseAppCompatActivity
 		@Override
 		public void handleMessage(Message msg)
 		{
+			LogFileUtil.v(TAG, "handleMessage -> " + msg.what);
 			if (msg.what == HANDLER_SCAN_STOPPED)
 			{
 				tvHello.setText(tvHello.getText() + "\n" + "扫描结束");
@@ -195,10 +196,10 @@ public class MainActivity extends BaseAppCompatActivity
 		// getActionBar().show();
 		setContentView(R.layout.activity_main);
 
-
 		mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = mBluetoothManager.getAdapter();
 
+		LogFileUtil.v(TAG, "mBluetoothAdapter = " + mBluetoothAdapter);
 		if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled())
 		{
 			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -233,6 +234,7 @@ public class MainActivity extends BaseAppCompatActivity
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3)
 			{
+				LogFileUtil.v(TAG, "lvDevice onItemClick position = " + position);
 				BluetoothDevice tmpBleDevice = mLeDevices.get(position);
 
 				IApplication.toast("连接" + tmpBleDevice.getName());
@@ -343,7 +345,7 @@ public class MainActivity extends BaseAppCompatActivity
 
 	private void updateDeviceList()
 	{
-		LogFileUtil.v(TAG, "更新数据");
+		LogFileUtil.v(TAG, "更新数据, mLeDevices size = " + mLeDevices.size());
 		deviceList.clear();
 		if (mLeDevices.size() == 0)
 		{
@@ -366,6 +368,7 @@ public class MainActivity extends BaseAppCompatActivity
 	@SuppressWarnings("deprecation")
 	private void scanLeDevice(final boolean enable)
 	{
+		LogFileUtil.v(TAG, "scanLeDevice enable = " + enable);
 		if (enable)
 		{
 			// 经过预定扫描期后停止扫描
@@ -406,6 +409,7 @@ public class MainActivity extends BaseAppCompatActivity
 		@Override
 		public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord)
 		{
+			LogFileUtil.v(TAG, "mLeScanCallback onLeScan device = " + device);
 			runOnUiThread(new Runnable()
 			{
 				@Override
@@ -418,7 +422,6 @@ public class MainActivity extends BaseAppCompatActivity
 
 					String out_info = device.getAddress() + " " + device.getBondState() + " " + device.getName();
 					tvHello.setText(tvHello.getText() + "\n" + out_info);
-
 				}
 			});
 		}
@@ -447,6 +450,7 @@ public class MainActivity extends BaseAppCompatActivity
 		@Override
 		public void onServicesDiscovered(BluetoothGatt gatt, int status)
 		{
+			LogFileUtil.v(TAG, "onServicesDiscovered status = " + status);
 			if (status == BluetoothGatt.GATT_SUCCESS)
 			{
 				mHandler.obtainMessage(HANDLER_SERVICE_DISCOVERED).sendToTarget();
@@ -474,8 +478,8 @@ public class MainActivity extends BaseAppCompatActivity
 		public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic)
 		{
 			super.onCharacteristicChanged(gatt, characteristic);
-
 			String uuid = characteristic.getUuid().toString();
+			LogFileUtil.v(TAG, "onCharacteristicChanged uuid = " + uuid);
 
 			if (uuid.equals(UUID_BLE_DAT))
 			{

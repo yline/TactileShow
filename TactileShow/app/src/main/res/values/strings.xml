@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">电子皮肤</string>
+    <string name="app_name">电子皮肤New</string>
 
     <string name="label_history_area_str">点击查看历史信息</string>
     <string name="label_realtime_area_str">返回查看实时信息</string>
