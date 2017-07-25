@@ -1,7 +1,6 @@
 package com.tactileshow.util;
 
 import com.tactileshow.application.IApplication;
-import com.tactileshow.log.FileUtil;
 import com.yline.log.LogFileUtil;
 
 import java.io.File;
@@ -35,14 +34,14 @@ public abstract class BaseFileHelper
     
     protected BaseFileHelper()
     {
-        String path = FileUtil.getPath();
-        if (null == path)
+        File topFile = com.yline.utils.FileUtil.getFileTop();
+        if (null == topFile)
         {
             IApplication.toast("储存卡不可用");
             return;
         }
         
-        parentFileName = path + TACTILE + File.separator + BLE + File.separator;
+        parentFileName = topFile.getAbsolutePath() + File.separator + TACTILE + File.separator + BLE + File.separator;
         mapDataFileName = parentFileName + MAP_DATA_NAME;
     }
     

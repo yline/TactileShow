@@ -3,28 +3,23 @@ package com.tactileshow.activity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.tactileshow.R;
 import com.tactileshow.util.FileHelper;
-import com.yline.base.BaseActivity;
 import com.yline.log.LogFileUtil;
+import com.yline.test.BaseTestActivity;
 
 import java.util.List;
 
-public class TestActivity extends BaseActivity
+public class TestActivity extends BaseTestActivity
 {
 	private static final String TAG = "test";
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	public void testStart(View view, Bundle savedInstanceState)
 	{
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_test);
-
-		findViewById(R.id.btn_read).setOnClickListener(new View.OnClickListener()
+		addButton("Read File", new View.OnClickListener()
 		{
-
 			@Override
-			public void onClick(View v)
+			public void onClick(View view)
 			{
 				LogFileUtil.v(TAG, "btn_read onClick");
 				List<List<String>> result = FileHelper.getInstance().readMapData();
