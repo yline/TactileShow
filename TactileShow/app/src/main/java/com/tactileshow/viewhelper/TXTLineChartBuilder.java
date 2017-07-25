@@ -13,9 +13,9 @@ import android.widget.TextView;
 import com.tactileshow.R;
 import com.tactileshow.application.IApplication;
 import com.tactileshow.util.FileHelper;
-import com.tactileshow.util.ScreenUtil;
 import com.tactileshow.view.DefinedScrollView;
 import com.tactileshow.view.DefinedViewPager;
+import com.yline.utils.UIScreenUtil;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -168,8 +168,8 @@ public class TXTLineChartBuilder
 
 			containerLayout.addView(tvTitle);
 			containerLayout.addView(chartView,
-					ScreenUtil.getScreenWidth(context) - 5,
-					ScreenUtil.getScreenHeight(context) / 2);
+					UIScreenUtil.getScreenWidth(context) - 5,
+					UIScreenUtil.getScreenHeight(context) / 2);
 		}
 		else
 		{

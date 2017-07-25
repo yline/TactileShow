@@ -17,13 +17,13 @@ import android.widget.TabHost.OnTabChangeListener;
 import com.tactileshow.R;
 import com.tactileshow.adapter.ViewPagerAdapter;
 import com.tactileshow.application.IApplication;
-import com.tactileshow.base.BaseAppCompatActivity;
 import com.tactileshow.bean.BleReceiverBean;
 import com.tactileshow.util.DataFile;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.view.DefinedViewPager;
 import com.tactileshow.viewhelper.BleViewHelper;
 import com.tactileshow.viewhelper.TXTViewHelper;
+import com.yline.base.BaseAppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Date;

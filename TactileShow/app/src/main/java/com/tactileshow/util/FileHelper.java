@@ -1,7 +1,7 @@
 package com.tactileshow.util;
 
 import com.tactileshow.bean.BleReceiverBean;
-import com.tactileshow.log.LogFileUtil;
+import com.yline.log.LogFileUtil;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

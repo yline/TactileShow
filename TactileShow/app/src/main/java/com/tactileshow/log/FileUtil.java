@@ -1,13 +1,13 @@
 package com.tactileshow.log;
 
+import android.os.Environment;
+import android.text.TextUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import android.os.Environment;
-import android.text.TextUtils;
 
 /**
  * 目前提供给 LogFileUtil准备

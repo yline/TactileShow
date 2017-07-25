@@ -4,9 +4,9 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.tactileshow.R;
-import com.tactileshow.base.BaseActivity;
-import com.tactileshow.log.LogFileUtil;
 import com.tactileshow.util.FileHelper;
+import com.yline.base.BaseActivity;
+import com.yline.log.LogFileUtil;
 
 import java.util.List;
 

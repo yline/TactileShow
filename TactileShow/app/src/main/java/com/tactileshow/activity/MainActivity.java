@@ -32,8 +32,8 @@ import android.widget.TextView;
 
 import com.tactileshow.R;
 import com.tactileshow.application.IApplication;
-import com.tactileshow.base.BaseAppCompatActivity;
-import com.tactileshow.log.LogFileUtil;
+import com.yline.base.BaseAppCompatActivity;
+import com.yline.log.LogFileUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;

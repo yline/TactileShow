@@ -1,5 +1,9 @@
 package com.tactileshow.util;
 
+import com.tactileshow.application.IApplication;
+import com.tactileshow.log.FileUtil;
+import com.yline.log.LogFileUtil;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,10 +16,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
-
-import com.tactileshow.application.IApplication;
-import com.tactileshow.log.FileUtil;
-import com.tactileshow.log.LogFileUtil;
 
 public abstract class BaseFileHelper
 {
