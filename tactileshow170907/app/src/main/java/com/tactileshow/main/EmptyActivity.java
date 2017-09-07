@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 public class EmptyActivity extends Activity
 {
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
