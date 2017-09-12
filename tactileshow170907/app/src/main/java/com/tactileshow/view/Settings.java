@@ -31,7 +31,6 @@ import java.util.Map;
 
 public class Settings
 {
-	
 	private Activity context;
 	
 	private View view;
@@ -90,7 +89,6 @@ public class Settings
 	
 	private EditText et_di_th_max_germ;
 	
-	
 	//for BroadCast
 	boolean isRange_temp = false;
 	
@@ -141,7 +139,6 @@ public class Settings
 	
 	AlertDialog dl_exit;
 	
-	
 	public Settings(Activity activity)
 	{
 		context = activity;
@@ -149,8 +146,6 @@ public class Settings
 		
 		MyAdapter adapter = new MyAdapter(context);
 		lv_set = (ListView) view.findViewById(R.id.settings_listview);
-		if (lv_set == null)
-			Log.e("TAG", "NULL");
 		lv_set.setAdapter(adapter);
 		lv_set.setClickable(true);
 		lv_set.setOnItemClickListener(new OnItemClickListener()
@@ -159,13 +154,12 @@ public class Settings
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 			                        long arg3)
 			{
-				// TODO Auto-generated method stub
-				if (arg2 == 3) //set broadcast
+				if (arg2 == 3) // set broadcast，设定数据广播
 				{
 					BCDialog_SetValue();
 					di_setbc.show();
 				}
-				else if (arg2 == 4)
+				else if (arg2 == 4) // 设置阈值
 				{
 					THDialog_SetValue();
 					di_setth.show();
@@ -180,8 +174,6 @@ public class Settings
 		BCDialog_Init();
 		THDialog_Init();
 		ExDialog_Init();
-		
-		
 	}
 	
 	public View getView()
@@ -210,7 +202,6 @@ public class Settings
 					@Override
 					public void onClick(DialogInterface arg0, int arg1)
 					{
-						// TODO Auto-generated method stub
 						context.finish();
 					}
 				});
@@ -221,12 +212,10 @@ public class Settings
 					@Override
 					public void onClick(DialogInterface arg0, int arg1)
 					{
-						// TODO Auto-generated method stub
 						macro.SETTING_EXIT_DIRECTLY = true;
 						context.finish();
 					}
 				});
-		
 	}
 	
 	public void ExDialog_Show()
@@ -275,7 +264,6 @@ public class Settings
 		
 		et_di_th_min_germ.setText("" + th_min_germ);
 		et_di_th_max_germ.setText("" + th_max_germ);
-		
 	}
 	
 	private void THDialog_GetValue()
@@ -292,7 +280,6 @@ public class Settings
 		macro.SETTING_GERM_RANGE[1] = th_max_germ = Double.parseDouble(et_di_th_max_germ.getText().toString());
 	}
 	
-	
 	private void BCDialog_Init()
 	{
 		di_setbc = new Dialog(context);
@@ -304,7 +291,6 @@ public class Settings
 			@Override
 			public void onClick(View arg0)
 			{
-				// TODO Auto-generated method stub
 				BCDialog_GetValue();
 				di_setbc.dismiss();
 			}
@@ -352,7 +338,6 @@ public class Settings
 		cb_di_enable_press.setChecked(enable_press);
 	}
 	
-	
 	private void broadcastUpdate(String str_intent)
 	{
 		Log.w("TAG", "发送广播中");
@@ -360,7 +345,6 @@ public class Settings
 		intent.putExtra("msg", str_intent);
 		context.sendBroadcast(intent);
 	}
-	
 	
 	public class SendTempBroadCast extends Thread
 	{
@@ -376,9 +360,13 @@ public class Settings
 				t.setToNow();
 				String str_time = t.format2445();
 				if (isRange_temp == true)
+				{
 					temp_value = (double) (min_temp + Math.random() * (max_temp - min_temp + 1));
+				}
 				else
+				{
 					temp_value = min_temp;
+				}
 				
 				broadcastUpdate("#" + "TEMP" + "#" + str_time + "#" + temp_value);
 				
@@ -388,7 +376,6 @@ public class Settings
 				}
 				catch (InterruptedException e)
 				{
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
@@ -409,9 +396,13 @@ public class Settings
 				t.setToNow();
 				String str_time = t.format2445();
 				if (isRange_press == true)
+				{
 					press_value = (double) (min_press + Math.random() * (max_press - min_press + 1));
+				}
 				else
+				{
 					press_value = min_press;
+				}
 				
 				broadcastUpdate("#" + "PRESS" + "#" + str_time + "#" + press_value);
 				
@@ -421,14 +412,12 @@ public class Settings
 				}
 				catch (InterruptedException e)
 				{
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
 			}
 		}
 	}
-	
 	
 	public class MyAdapter extends BaseAdapter
 	{
@@ -442,21 +431,18 @@ public class Settings
 		@Override
 		public int getCount()
 		{
-			// TODO Auto-generated method stub
 			return 6;
 		}
 		
 		@Override
 		public Object getItem(int arg0)
 		{
-			// TODO Auto-generated method stub
 			return null;
 		}
 		
 		@Override
 		public long getItemId(int arg0)
 		{
-			// TODO Auto-generated method stub
 			return 0;
 		}
 		
@@ -480,7 +466,6 @@ public class Settings
 							@Override
 							public void onCheckedChanged(CompoundButton arg0, boolean arg1)
 							{
-								// TODO Auto-generated method stub
 								if (macro.SETTINGS_SOUND == true)
 								{
 									macro.SETTINGS_SOUND = false;
@@ -511,7 +496,6 @@ public class Settings
 							@Override
 							public void onCheckedChanged(CompoundButton arg0, boolean arg1)
 							{
-								// TODO Auto-generated method stub
 								if (macro.SETTINGS_VIBRA == true)
 								{
 									macro.SETTINGS_VIBRA = false;
@@ -527,7 +511,7 @@ public class Settings
 					}
 				}
 			}
-			else if (position == 2) //broadcast open
+			else if (position == 2) // broadcast open
 			{
 				if (convertView == null)
 				{

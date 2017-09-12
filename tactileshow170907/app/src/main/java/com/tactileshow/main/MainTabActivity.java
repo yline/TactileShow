@@ -26,6 +26,7 @@ import com.tactileshow.view.DetailInfo;
 import com.tactileshow.view.GeneralInfo;
 import com.tactileshow.view.Settings;
 import com.tactileshow.view.VisualTabInfo;
+import com.yline.log.LogFileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,14 +41,19 @@ public class MainTabActivity extends Activity
 	
 	private List<View> listViews;
 	
+	// 图像信息
 	private VisualTabInfo visual;
 	
+	// 原始数据；温度、湿度
 	private DetailInfo detail;
 	
+	// 一般信息
 	private GeneralInfo general;
 	
+	// 设置
 	private Settings set;
 	
+	// 人体图
 	private BodyMap bodymap;
 	
 	@Override
@@ -60,6 +66,7 @@ public class MainTabActivity extends Activity
 		tabHost = (TabHost) findViewById(R.id.tabhost);
 		viewPager = (DefinedViewPager) findViewById(R.id.view_pager);
 		listViews = new ArrayList<View>();
+		
 		visual = new VisualTabInfo(this, viewPager);
 		detail = new DetailInfo(this);
 		general = new GeneralInfo(this);
@@ -107,14 +114,12 @@ public class MainTabActivity extends Activity
 			@Override
 			public void onTabChanged(String tabId)
 			{
-				
 				if (StaticValue.general_info_tab_name.equals(tabId))
 				{
 					viewPager.setCurrentItem(1);
 				}
 				else if (StaticValue.visual_info_tab_name.equals(tabId))
 				{
-					
 					viewPager.setCurrentItem(2);
 				}
 				else if (StaticValue.detail_info_tab_name.equals(tabId))
@@ -142,7 +147,6 @@ public class MainTabActivity extends Activity
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)
 	{
-		// TODO Auto-generated method stub
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0)
 		{
 			set.ExDialog_Show();
@@ -181,7 +185,6 @@ public class MainTabActivity extends Activity
 		StaticValue.height = dm.heightPixels;
 	}
 	
-	
 	@Override
 	protected void onDestroy()
 	{
@@ -189,6 +192,11 @@ public class MainTabActivity extends Activity
 		unregisterReceiver(mGattUpdateReceiver);
 	}
 	
+	/**
+	 * 接收到广播后，改变UI
+	 * @param t
+	 * @param str
+	 */
 	public void setTemp(Time t, String str)
 	{
 		try
@@ -205,6 +213,11 @@ public class MainTabActivity extends Activity
 		}
 	}
 	
+	/**
+	 * 接收到广播后，改变UI
+	 * @param t
+	 * @param str
+	 */
 	public void setPress(Time t, String str)
 	{
 		try
@@ -220,6 +233,8 @@ public class MainTabActivity extends Activity
 		}
 	}
 	
+	private static final String TAG = "MainTabActivity";
+	
 	private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver()
 	{
 		
@@ -227,6 +242,8 @@ public class MainTabActivity extends Activity
 		public void onReceive(Context arg0, Intent arg1)
 		{
 			final String action = arg1.getStringExtra("msg");
+			LogFileUtil.i(TAG, "onReceive: action = " + action);
+			
 			if (action == null)
 			{
 				return;

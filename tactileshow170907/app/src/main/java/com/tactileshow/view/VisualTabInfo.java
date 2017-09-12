@@ -43,7 +43,7 @@ public class VisualTabInfo
 		this.tabHost = (TabHost) view.findViewById(R.id.visual_tab_host);
 		this.viewPager = (DefinedViewPager) view.findViewById(R.id.visual_paper);
 		
-		listViews = new ArrayList<View>();
+		listViews = new ArrayList<>();
 		tempVisual = new TempVisualInfo(context, pager);
 		pressVisual = new PressVisualInfo(context, pager);
 		listViews.add(tempVisual.getView());
