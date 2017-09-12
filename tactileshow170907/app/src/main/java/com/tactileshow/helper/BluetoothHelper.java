@@ -1,4 +1,4 @@
-package com.tactileshow.bluetooth;
+package com.tactileshow.helper;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -20,6 +20,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 为了蓝牙连接
+ *
+ * @author yline 2017/9/12 -- 19:18
+ * @version 1.0.0
+ */
 public class BluetoothHelper
 {
 	private static final String TAG = "xxx-BluetoothHelper";

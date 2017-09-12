@@ -130,8 +130,9 @@ public class DataFile
 		BufferedReader in = getTimeBufferedReader(StaticValue.record_time, sensor, "data");
 		if (in == null)
 		{
-			
+			return -1;
 		}
+		
 		try
 		{
 			double all = 0;

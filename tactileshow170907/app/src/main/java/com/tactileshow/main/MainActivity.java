@@ -1,8 +1,8 @@
 package com.tactileshow.main;
 
+import android.Manifest;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -22,7 +22,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,12 +32,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.tactileshow.bluetooth.BluetoothHelper;
+import com.tactileshow.helper.BluetoothHelper;
+import com.tactileshow.helper.DialogHelper;
 import com.tactileshow.util.DataFile;
 import com.tactileshow.util.Point3D;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
+import com.yline.application.SDKConstant;
 import com.yline.application.SDKManager;
+import com.yline.log.LogFileUtil;
+import com.yline.utils.PermissionUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -53,6 +56,10 @@ public class MainActivity extends Activity
 {
 	private BluetoothHelper mBluetoothHelper;
 	
+	private DialogHelper mDialogHelper;
+	
+	private final static String TAG = "测试TAG";
+	
 	private boolean mIsScanning;
 	
 	private Handler mHandler = new Handler();
@@ -63,47 +70,29 @@ public class MainActivity extends Activity
 	
 	ListView lv_device;
 	
-	TextView tv_connect_info;
-	
-	Menu me_globle;
-	
-	MenuItem mi_fresh;
-	
-	MenuItem mi_exit;
-	
-	MenuItem mi_debug;
-	
-	AlertDialog.Builder builder_dl_connect;
-	
-	AlertDialog dl_connect;
+	MenuItem freshMenuItem;
 	
 	ArrayAdapter<String> lvaa_device;
 	
-	List<String> mLeDevices_lvdata = new ArrayList<String>();
-	
-	private final static String TAG = "测试TAG";
-	
-	private int mConnectionState = STATE_DISCONNECTED;
-	
-	private static final int STATE_DISCONNECTED = 0; //设备无法连接
-	
-	private static final int STATE_CONNECTING = 1;  //设备正在连接状态
-	
-	private static final int STATE_CONNECTED = 2;   //设备连接完毕
+	List<String> mLeDevices_lvdata = new ArrayList<>();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		PermissionUtil.request(this, SDKConstant.REQUEST_CODE_PERMISSION, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION}); // 权限申请
+		
 		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
 		setContentView(R.layout.activity_ble);
 		
-		Log.e("wshg", "Starting...");
+		Log.i(TAG, "MainActivity onCreate: ");
 		ActionBar actionBar = getActionBar();
 		actionBar.show();
 		
 		mBluetoothHelper = new BluetoothHelper(this);
 		mBluetoothHelper.enableBluetoothForResult(this);
+		
+		mDialogHelper = new DialogHelper(this);
 		
 		initView();
 		
@@ -136,39 +125,38 @@ public class MainActivity extends Activity
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
 			{
 				String deviceName = mBluetoothHelper.connectGatt(MainActivity.this, mGattCallback, i);
+				Log.i(TAG, "onItemClick: deviceName = " + deviceName);
 				if (!TextUtils.isEmpty(deviceName))
 				{
 					SDKManager.toast("连接" + deviceName);
 					
 					scanLeDevice(false);
-					showConnectDialog();
+					mDialogHelper.show();
+					mDialogHelper.setOnNegativeClickListener(new DialogInterface.OnClickListener()
+					{
+						@Override
+						public void onClick(DialogInterface dialog, int which)
+						{
+							mBluetoothHelper.closeBluetooth();
+						}
+					});
 				}
 			}
 		});
 	}
 	
 	@Override
-	protected void onDestroy()
-	{
-		super.onDestroy();
-		
-		unregisterReceiver(mGattUpdateReceiver);
-		mBluetoothHelper.closeBluetooth();
-	}
-	
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		// TODO Auto-generated method stub
-		me_globle = menu;
-		mi_debug = menu.add(macro.MENU_GROUPID_BLE, macro.MENU_ITEMID_DEBUG, 0, "测试");
-		mi_fresh = menu.add(macro.MENU_GROUPID_BLE, macro.MENU_ITEMID_FRESH, 1, "搜索");
-		mi_exit = menu.add(macro.MENU_GROUPID_BLE, macro.MENU_ITEMID_EXIT, 2, "退出");
-		mi_fresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		mi_exit.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		MenuItem debugMenuItem = menu.add(macro.MENU_GROUPID_BLE, macro.MENU_ITEMID_DEBUG, 0, "测试");
+		freshMenuItem = menu.add(macro.MENU_GROUPID_BLE, macro.MENU_ITEMID_FRESH, 1, "搜索");
+		freshMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		
+		MenuItem exitMenuItem = menu.add(macro.MENU_GROUPID_BLE, macro.MENU_ITEMID_EXIT, 2, "退出");
+		exitMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		
 		return true;
-		//return super.onCreateOptionsMenu(menu);
+		// return super.onCreateOptionsMenu(menu);
 	}
 	
 	@Override
@@ -202,28 +190,7 @@ public class MainActivity extends Activity
 	
 	private void showConnectDialog()
 	{
-		LayoutInflater layoutInflater = LayoutInflater.from(this);
-		View view = layoutInflater.inflate(R.layout.activity_ble_connect, null);
 		
-		builder_dl_connect = new AlertDialog.Builder(this);
-		builder_dl_connect.setTitle("连接状态");
-		builder_dl_connect.setView(view);
-		builder_dl_connect.setNegativeButton("取消连接",
-				new DialogInterface.OnClickListener()
-				{
-					@Override
-					public void onClick(DialogInterface dialog, int which)
-					{
-						mBluetoothHelper.closeBluetooth();
-						dialog.dismiss();
-					}
-				});
-		tv_connect_info = (TextView) view.findViewById(R.id.tv_ble_connect_info);
-		if (tv_connect_info == null)
-			Log.w(TAG, "NULL");
-		tv_connect_info.setText("正在连接中");
-		
-		dl_connect = builder_dl_connect.show();
 	}
 	
 	private void updateDeviceList()
@@ -264,7 +231,7 @@ public class MainActivity extends Activity
 						return; //已经终止扫描
 					}
 					mIsScanning = false;
-					MenuItemCompat.setActionView(mi_fresh, null);
+					MenuItemCompat.setActionView(freshMenuItem, null);
 					
 					mBluetoothHelper.stopAdapterScan(mLeScanCallback);
 					Log.i(TAG, "扫描结束");
@@ -274,14 +241,14 @@ public class MainActivity extends Activity
 			
 			mIsScanning = true;
 			Log.i(TAG, "setActionView: mIsScanning = " + mIsScanning);
-			MenuItemCompat.setActionView(mi_fresh, R.layout.activity_ble_progressbar);
+			MenuItemCompat.setActionView(freshMenuItem, R.layout.activity_ble_progressbar);
 			
 			mBluetoothHelper.startAdapterScan(mLeScanCallback);
 		}
 		else
 		{
 			mIsScanning = false;
-			MenuItemCompat.setActionView(mi_fresh, null);
+			MenuItemCompat.setActionView(freshMenuItem, null);
 			
 			Log.i(TAG, "终止扫描");
 			mBluetoothHelper.stopAdapterScan(mLeScanCallback);
@@ -329,23 +296,20 @@ public class MainActivity extends Activity
 			if (newState == BluetoothProfile.STATE_CONNECTED)
 			{
 				intentAction = macro.ACTION_GATT_CONNECTED;
-				mConnectionState = STATE_CONNECTED;
 				
 				sendHandleMsg("Device", macro.HANDLER_CONNECT_SUCCESS);
 				Log.i(TAG, "Connected to GATT server.");
 				mBluetoothHelper.discoverServices();
 			}
-			else if (newState == BluetoothProfile.STATE_DISCONNECTED)
-			{//当设备无法连接
+			else if (newState == BluetoothProfile.STATE_DISCONNECTED) // 当设备无法连接
+			{
 				intentAction = macro.ACTION_GATT_DISCONNECTED;
-				mConnectionState = STATE_DISCONNECTED;
 				sendHandleMsg("Device", macro.HANDLER_CONNECT_FAILED);
 				Log.i(TAG, "Disconnected from GATT server.");
 			}
 		}
 		
-		@Override
-		// 发现新服务端
+		@Override // 发现新服务端
 		public void onServicesDiscovered(BluetoothGatt gatt, int status)
 		{
 			if (status == BluetoothGatt.GATT_SUCCESS)
@@ -358,8 +322,7 @@ public class MainActivity extends Activity
 			}
 		}
 		
-		@Override
-		// 读写特性
+		@Override // 读写特性
 		public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status)
 		{
 			Log.w("TAG", "READ!!");
@@ -444,17 +407,17 @@ public class MainActivity extends Activity
 			else if (msg.what == macro.HANDLER_CONNECT_SUCCESS)
 			{
 				//Toast.makeText(getApplicationContext(), "连接已经建立", Toast.LENGTH_SHORT).show();
-				tv_connect_info.setText("连接成功，开始寻找服务");
+				mDialogHelper.setText("连接成功，开始寻找服务");
 			}
 			else if (msg.what == macro.HANDLER_CONNECT_FAILED)
 			{
 				//Toast.makeText(getApplicationContext(), "连接建立失败", Toast.LENGTH_SHORT).show();
-				tv_connect_info.setText("连接失败，请返回重连");
+				mDialogHelper.setText("连接失败，请返回重连");
 			}
 			else if (msg.what == macro.HANDLER_SERVICE_DISCOVERED)
 			{
 				//Toast.makeText(getApplicationContext(), "服务发现完毕", Toast.LENGTH_SHORT).show();
-				tv_connect_info.setText("成功发现服务，开始启动服务");
+				mDialogHelper.setText("成功发现服务，开始启动服务");
 				boolean isHasValidData = false;
 				
 				mBluetoothHelper.logServiceInfo();
@@ -464,13 +427,13 @@ public class MainActivity extends Activity
 				if (enableConfig(macro.UUID_MAG_CON) && EnableData(macro.UUID_MAG_DAT))
 				{
 					//Toast.makeText(getApplicationContext(), "开始传输磁场数据", Toast.LENGTH_SHORT).show();
-					tv_connect_info.setText("温度数据激活成功");
+					mDialogHelper.setText("温度数据激活成功");
 					isHasValidData = true;
 				}
 				else
 				{
 					//Toast.makeText(getApplicationContext(), "磁场特征写入失败", Toast.LENGTH_SHORT).show();
-					tv_connect_info.setText("温度数据激活失败");
+					mDialogHelper.setText("温度数据激活失败");
 				}
 				
 				logCharacterList(macro.UUID_HUM_SER);
@@ -478,13 +441,13 @@ public class MainActivity extends Activity
 				if (enableConfig(macro.UUID_HUM_CON) && EnableData(macro.UUID_HUM_DAT))
 				{
 					//Toast.makeText(getApplicationContext(), "开始传输湿度数据", Toast.LENGTH_SHORT).show();
-					tv_connect_info.setText("湿度数据激活成功");
+					mDialogHelper.setText("湿度数据激活成功");
 					isHasValidData = true;
 				}
 				else
 				{
 					//Toast.makeText(getApplicationContext(), "湿度特征写入失败", Toast.LENGTH_SHORT).show();
-					tv_connect_info.setText("湿度数据激活失败");
+					mDialogHelper.setText("湿度数据激活失败");
 				}
 				
 				if (isHasValidData == true)
@@ -493,7 +456,7 @@ public class MainActivity extends Activity
 					intent.setClass(MainActivity.this, MainTabActivity.class);
 					intent.putExtra("str", "come from first activity");
 					startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
-					dl_connect.dismiss();
+					mDialogHelper.dismiss();
 				}
 			}
 		}
@@ -617,5 +580,22 @@ public class MainActivity extends Activity
 		Integer lowerByte = (int) c[offset] & 0xFF;
 		Integer upperByte = (int) c[offset + 1]; // // Interpret MSB as signed
 		return (upperByte << 8) + lowerByte;
+	}
+	
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+	{
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		List<String> result = PermissionUtil.requestHandle(SDKConstant.REQUEST_CODE_PERMISSION, requestCode, permissions, grantResults);
+		LogFileUtil.v(SDKConstant.TAG_HANDLE_PERMISSION, result.toString());
+	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		
+		unregisterReceiver(mGattUpdateReceiver);
+		mBluetoothHelper.closeBluetooth();
 	}
 }
