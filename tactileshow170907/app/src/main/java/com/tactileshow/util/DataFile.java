@@ -15,7 +15,6 @@ import java.io.RandomAccessFile;
 
 public class DataFile
 {
-	
 	private PrintWriter out_press, out_temp;
 	
 	private RandomAccessFile out_avg_press, out_avg_temp;
@@ -93,15 +92,15 @@ public class DataFile
 			return null;
 		}
 	}
-	
+	/*
 	public void writeAvgData(Time t, String sensor, String data)
 	{
 		PrintWriter print = getTimePrintWriter(t, sensor, "avg", false);
 		print.println(data);
 		print.flush();
 		print.close();
-	}
-	
+	}*/
+	/*
 	public String readAvgData(Time t, String sensor)
 	{
 		BufferedReader read = getTimeBufferedReader(t, sensor, "avg");
@@ -120,7 +119,7 @@ public class DataFile
 			return line;
 		}
 	}
-	
+	*/
 	/*
 	 * Return: the number of lines in data file.
 	 *         -1: error in compute average.
@@ -211,7 +210,6 @@ public class DataFile
 				out_avg_temp.writeUTF(Double.toString(((avg_temp * records_temp++) + Double.parseDouble(data)) / records_temp));
 				out_temp.println(t.format2445() + " " + data);
 				out_temp.flush();
-				
 			}
 			else if (sensor.equals(StaticValue.PRESS))
 			{

@@ -226,10 +226,12 @@ public class MainTabActivity extends Activity
 		@Override
 		public void onReceive(Context arg0, Intent arg1)
 		{
-			// TODO Auto-generated method stub
 			final String action = arg1.getStringExtra("msg");
 			if (action == null)
+			{
 				return;
+			}
+			
 			BroadcastMsg bm = new BroadcastMsg(action);
 			if (bm.getSensor() == null)
 			{

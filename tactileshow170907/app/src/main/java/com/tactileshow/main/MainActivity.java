@@ -188,11 +188,6 @@ public class MainActivity extends Activity
 		return super.onMenuItemSelected(featureId, item);
 	}
 	
-	private void showConnectDialog()
-	{
-		
-	}
-	
 	private void updateDeviceList()
 	{
 		Log.w(TAG, "更新数据");
