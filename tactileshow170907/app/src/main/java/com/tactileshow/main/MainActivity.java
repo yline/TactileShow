@@ -8,9 +8,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,6 +19,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.view.MenuItemCompat;
+import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,17 +32,17 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.tactileshow.bluetooth.BluetoothHelper;
 import com.tactileshow.util.DataFile;
 import com.tactileshow.util.Point3D;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
+import com.yline.application.SDKManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 /*
  * 主界面的Activity。
@@ -53,23 +51,13 @@ import java.util.UUID;
  */
 public class MainActivity extends Activity
 {
-	BluetoothManager mBluetoothManager;
-	
-	BluetoothAdapter mBluetoothAdapter;
-	
-	private ArrayList<BluetoothDevice> mLeDevices = new ArrayList<BluetoothDevice>();
-	
-	private List<BluetoothGattService> mLeServices;
+	private BluetoothHelper mBluetoothHelper;
 	
 	private boolean mIsScanning;
 	
 	private Handler mHandler = new Handler();
 	
 	private MyHandler myHandler;
-	
-	private BluetoothGatt mBluetoothGatt;
-	
-	private BluetoothGattService mGattService;
 	
 	TextView tv_hello;
 	
@@ -103,50 +91,24 @@ public class MainActivity extends Activity
 	
 	private static final int STATE_CONNECTED = 2;   //设备连接完毕
 	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
 		setContentView(R.layout.activity_ble);
+		
 		Log.e("wshg", "Starting...");
 		ActionBar actionBar = getActionBar();
 		actionBar.show();
 		
+		mBluetoothHelper = new BluetoothHelper(this);
+		mBluetoothHelper.enableBluetoothForResult(this);
 		
-		mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-		mBluetoothAdapter = mBluetoothManager.getAdapter();
+		initView();
 		
-		if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled())
-		{
-			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBtIntent, macro.INTENT_REQUEST_ENABLE_BT);
-		}
-		
-		Toast.makeText(getApplicationContext(), "蓝牙已开启", Toast.LENGTH_SHORT).show();
-		
-		tv_hello = (TextView) findViewById(R.id.layout_ble_hello);
-		
-		lv_device = (ListView) findViewById(R.id.lv_ble_device);
-		lvaa_device = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, mLeDevices_lvdata);
-		UpdateDeviceList();
-		
-		lv_device.setAdapter(lvaa_device);
-		lv_device.setOnItemClickListener(new OnItemClickListener()
-		{
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3)
-			{
-				// TODO Auto-generated method stub
-				BluetoothDevice tmpBleDevice = mLeDevices.get(arg2);
-				Toast.makeText(getApplicationContext(), "连接" + tmpBleDevice.getName(), Toast.LENGTH_SHORT).show();
-				scanLeDevice(false);
-				mBluetoothGatt = tmpBleDevice.connectGatt(MainActivity.this, false, mGattCallback);
-				ShowConnectDialog();
-			}
-		});
-		
+		// Problem
+		SDKManager.toast("蓝牙已开启");
 		
 		myHandler = new MyHandler(); //用于扫描时间设定
 		
@@ -157,19 +119,41 @@ public class MainActivity extends Activity
 		registerReceiver(mGattUpdateReceiver, filter);
 		
 		tv_hello.setText("请按刷新开始搜索");
-		
 	}
 	
+	private void initView()
+	{
+		tv_hello = (TextView) findViewById(R.id.layout_ble_hello);
+		lv_device = (ListView) findViewById(R.id.lv_ble_device);
+		
+		lvaa_device = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, mLeDevices_lvdata);
+		updateDeviceList();
+		
+		lv_device.setAdapter(lvaa_device);
+		lv_device.setOnItemClickListener(new OnItemClickListener()
+		{
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+			{
+				String deviceName = mBluetoothHelper.connectGatt(MainActivity.this, mGattCallback, i);
+				if (!TextUtils.isEmpty(deviceName))
+				{
+					SDKManager.toast("连接" + deviceName);
+					
+					scanLeDevice(false);
+					showConnectDialog();
+				}
+			}
+		});
+	}
 	
 	@Override
 	protected void onDestroy()
 	{
-		// TODO Auto-generated method stub
 		super.onDestroy();
 		
 		unregisterReceiver(mGattUpdateReceiver);
-		closeBle();
-		
+		mBluetoothHelper.closeBluetooth();
 	}
 	
 	@Override
@@ -190,12 +174,12 @@ public class MainActivity extends Activity
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item)
 	{
-		// TODO Auto-generated method stub
 		if (item.getItemId() == macro.MENU_ITEMID_FRESH)
 		{
-			closeBle();
-			mLeDevices.clear();
-			UpdateDeviceList();
+			mBluetoothHelper.closeBluetooth();
+			mBluetoothHelper.clearDevices();
+			
+			updateDeviceList();
 			tv_hello.setText("开始搜索");
 			scanLeDevice(true);
 		}
@@ -213,11 +197,10 @@ public class MainActivity extends Activity
 			startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
 		}
 		
-		
 		return super.onMenuItemSelected(featureId, item);
 	}
 	
-	void ShowConnectDialog()
+	private void showConnectDialog()
 	{
 		LayoutInflater layoutInflater = LayoutInflater.from(this);
 		View view = layoutInflater.inflate(R.layout.activity_ble_connect, null);
@@ -231,7 +214,7 @@ public class MainActivity extends Activity
 					@Override
 					public void onClick(DialogInterface dialog, int which)
 					{
-						closeBle();
+						mBluetoothHelper.closeBluetooth();
 						dialog.dismiss();
 					}
 				});
@@ -243,34 +226,11 @@ public class MainActivity extends Activity
 		dl_connect = builder_dl_connect.show();
 	}
 	
-	
-	public void closeBle()
-	{
-		if (mBluetoothGatt == null)
-		{
-			return;
-		}
-		mBluetoothGatt.close();
-		mBluetoothGatt = null;
-	}
-	
-	void beginScanUI()
-	{
-		//mi_fresh.setEnabled(false);
-		MenuItemCompat.setActionView(mi_fresh, R.layout.activity_ble_progressbar);
-	}
-	
-	void endScanUI()
-	{
-		//mi_fresh.setEnabled(true);
-		MenuItemCompat.setActionView(mi_fresh, null);
-	}
-	
-	void UpdateDeviceList()
+	private void updateDeviceList()
 	{
 		Log.w(TAG, "更新数据");
 		mLeDevices_lvdata.clear();
-		if (mLeDevices.size() == 0)
+		if (mBluetoothHelper.getDeviceSize() == 0)
 		{
 			mLeDevices_lvdata.add("暂时没有搜索到BLE设备");
 			lv_device.setEnabled(false);
@@ -278,7 +238,7 @@ public class MainActivity extends Activity
 		else
 		{
 			lv_device.setEnabled(true);
-			Iterator<BluetoothDevice> it = mLeDevices.iterator();
+			Iterator<BluetoothDevice> it = mBluetoothHelper.getDeviceIterator();
 			while (it.hasNext())
 			{
 				BluetoothDevice bd_it = it.next();
@@ -287,7 +247,6 @@ public class MainActivity extends Activity
 		}
 		lvaa_device.notifyDataSetChanged();
 	}
-	
 	
 	private void scanLeDevice(final boolean enable)
 	{
@@ -299,36 +258,42 @@ public class MainActivity extends Activity
 				@Override
 				public void run()
 				{
+					Log.i(TAG, "run: mIsScanning = " + mIsScanning);
 					if (mIsScanning == false)
+					{
 						return; //已经终止扫描
+					}
 					mIsScanning = false;
-					endScanUI();
-					mBluetoothAdapter.stopLeScan(mLeScanCallback);
+					MenuItemCompat.setActionView(mi_fresh, null);
+					
+					mBluetoothHelper.stopAdapterScan(mLeScanCallback);
 					Log.i(TAG, "扫描结束");
-					SendHandleMsg("Scan", macro.HANDLER_SCAN_STOPPED);
+					sendHandleMsg("Scan", macro.HANDLER_SCAN_STOPPED);
 				}
 			}, macro.BLE_SCAN_PERIOD);
 			
 			mIsScanning = true;
-			beginScanUI();
-			mBluetoothAdapter.startLeScan(mLeScanCallback);//蓝牙适配器开始进行扫描设备，回调mLeScanCallBack变量
+			Log.i(TAG, "setActionView: mIsScanning = " + mIsScanning);
+			MenuItemCompat.setActionView(mi_fresh, R.layout.activity_ble_progressbar);
+			
+			mBluetoothHelper.startAdapterScan(mLeScanCallback);
 		}
 		else
 		{
 			mIsScanning = false;
-			endScanUI();
+			MenuItemCompat.setActionView(mi_fresh, null);
+			
 			Log.i(TAG, "终止扫描");
-			mBluetoothAdapter.stopLeScan(mLeScanCallback);
+			mBluetoothHelper.stopAdapterScan(mLeScanCallback);
 		}
 	}
 	
-	void SendHandleMsg(String tag, int content)
+	private void sendHandleMsg(String tag, int content)
 	{
 		Message msg = new Message();
 		msg.what = content;
 		myHandler.sendMessage(msg);
 	}
-	
 	
 	private BluetoothAdapter.LeScanCallback mLeScanCallback =
 			new BluetoothAdapter.LeScanCallback()
@@ -341,13 +306,15 @@ public class MainActivity extends Activity
 						@Override
 						public void run()
 						{
-							mLeDevices.add(device);
-							UpdateDeviceList();
-							
-							Toast.makeText(getApplicationContext(), "扫描到新BLE设备 " + device.getName(), Toast.LENGTH_SHORT).show();
-							String out_info = device.getAddress() + " " + device.getBondState() + " " + device.getName();
-							tv_hello.setText(tv_hello.getText() + "\n" + out_info);
-							
+							boolean isContain = mBluetoothHelper.addDevices(device);
+							if (isContain) // 去重效果，否则界面卡死
+							{
+								updateDeviceList();
+								
+								SDKManager.toast("扫描到新BLE设备 " + device.getName());
+								String out_info = device.getAddress() + " " + device.getBondState() + " " + device.getName();
+								tv_hello.setText(tv_hello.getText() + "\n" + out_info);
+							}
 						}
 					});
 				}
@@ -364,17 +331,16 @@ public class MainActivity extends Activity
 				intentAction = macro.ACTION_GATT_CONNECTED;
 				mConnectionState = STATE_CONNECTED;
 				
-				SendHandleMsg("Device", macro.HANDLER_CONNECT_SUCCESS);
+				sendHandleMsg("Device", macro.HANDLER_CONNECT_SUCCESS);
 				Log.i(TAG, "Connected to GATT server.");
-				mBluetoothGatt.discoverServices(); //先去发现服务
+				mBluetoothHelper.discoverServices();
 			}
 			else if (newState == BluetoothProfile.STATE_DISCONNECTED)
 			{//当设备无法连接
 				intentAction = macro.ACTION_GATT_DISCONNECTED;
 				mConnectionState = STATE_DISCONNECTED;
-				SendHandleMsg("Device", macro.HANDLER_CONNECT_FAILED);
+				sendHandleMsg("Device", macro.HANDLER_CONNECT_FAILED);
 				Log.i(TAG, "Disconnected from GATT server.");
-				
 			}
 		}
 		
@@ -384,7 +350,7 @@ public class MainActivity extends Activity
 		{
 			if (status == BluetoothGatt.GATT_SUCCESS)
 			{
-				SendHandleMsg("service", macro.HANDLER_SERVICE_DISCOVERED);
+				sendHandleMsg("service", macro.HANDLER_SERVICE_DISCOVERED);
 			}
 			else
 			{
@@ -399,14 +365,13 @@ public class MainActivity extends Activity
 			Log.w("TAG", "READ!!");
 			if (status == BluetoothGatt.GATT_SUCCESS)
 			{
-				//broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
+				//updateBroadcast(ACTION_DATA_AVAILABLE, characteristic);
 			}
 		}
 		
 		@Override
 		public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic)
 		{
-			// TODO Auto-generated method stub
 			super.onCharacteristicChanged(gatt, characteristic);
 			Log.w(TAG, "改变");
 			Time t = new Time();
@@ -419,12 +384,12 @@ public class MainActivity extends Activity
 			{
 				Point3D p3d_hum = convertHum(characteristic.getValue());
 				//Log.w(TAG, "改变是 " + p3d.x + " " + p3d.y + " " + p3d.z);
-				broadcastUpdate("#" + "PRESS" + "#" + str_time + "#" + p3d_hum.x);
+				updateBroadcast("#" + "PRESS" + "#" + str_time + "#" + p3d_hum.x);
 				
 				Point3D p3d_temp = convertTemp(characteristic.getValue());
 				//Log.w(TAG, "改变是 " + p3d.x + " " + p3d.y + " " + p3d.z);
 				
-				broadcastUpdate("#" + "TEMP" + "#" + str_time + "#" + p3d_temp.x);
+				updateBroadcast("#" + "TEMP" + "#" + str_time + "#" + p3d_temp.x);
 			}
 			/*
 			if(uuid.equals(macro.UUID_MAG_DAT))
@@ -432,19 +397,14 @@ public class MainActivity extends Activity
 				Point3D p3d = convertMag(characteristic.getValue());
 				//Log.w(TAG, "改变是 " + p3d.x + " " + p3d.y + " " + p3d.z);
 				
-				broadcastUpdate("#" + "TEMP" + "#" + str_time + "#" + p3d.x);
+				updateBroadcast("#" + "TEMP" + "#" + str_time + "#" + p3d.x);
 			}
 			*/
-			
-			
 		}
-		
 	};
 	
-	
-	void broadcastUpdate(String str_intent)
+	private void updateBroadcast(String str_intent)
 	{
-		
 		Intent intent = new Intent(macro.BROADCAST_ADDRESS);
 		intent.putExtra("msg", str_intent);
 		sendBroadcast(intent);
@@ -452,128 +412,16 @@ public class MainActivity extends Activity
 	
 	private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver()
 	{
-		
 		@Override
-		public void onReceive(Context arg0, Intent arg1)
+		public void onReceive(Context context, Intent intent)
 		{
-			// TODO Auto-generated method stub
-			final String action = arg1.getStringExtra("msg");
-			Log.w(TAG, "广播来了 " + action);
+			final String action = intent.getStringExtra("msg");
+			Log.i(TAG, "广播来了 " + action);
 			tv_hello.setText(action);
 		}
-		
 	};
 	
-	String ListServices()
-	{
-		String ser_str = "";
-		if (mBluetoothGatt != null)
-		{
-			mLeServices = mBluetoothGatt.getServices();
-			for (int i = 0; i < mLeServices.size(); i++)
-			{
-				Log.w(TAG, "找到的服务为: " + i + mLeServices.get(i).getUuid());
-				ser_str += "\n" + mLeServices.get(i).getUuid();
-			}
-			return ser_str;
-		}
-		else
-		{
-			return "Error Gatt";
-		}
-	}
-	
-	String ListCharacters(String uuid)
-	{
-		String ser_str = "";
-		mGattService = mBluetoothGatt.getService(UUID.fromString(uuid));
-		List<BluetoothGattCharacteristic> tmp_listcha;
-		if (mGattService == null)
-		{
-			Toast.makeText(getApplicationContext(), "服务获取失败", Toast.LENGTH_SHORT).show();
-			return "Error Service";
-		}
-		else
-		{
-			Toast.makeText(getApplicationContext(), "服务获取成功", Toast.LENGTH_SHORT).show();
-			
-			tmp_listcha = mGattService.getCharacteristics();
-			ser_str = "";
-			for (int i = 0; i < tmp_listcha.size(); i++)
-			{
-				Log.w(TAG, "找到的特征为: " + i + tmp_listcha.get(i).getUuid() + " " + tmp_listcha.get(i).getValue());
-				ser_str += "\n" + tmp_listcha.get(i).getUuid() + " " + tmp_listcha.get(i).getValue();
-			}
-			
-			return ser_str;
-		}
-	}
-	
-	boolean EnableConfig(String uuid)
-	{
-		//此处开始按照协议对内容进行获取
-		byte[] val = new byte[1];
-		val[0] = 1;
-		
-		if (mGattService == null)
-			return false;
-		
-		BluetoothGattCharacteristic charac = mGattService.getCharacteristic(UUID.fromString(uuid));
-		
-		if (charac == null)
-			return false;
-		
-		charac.setValue(val); //conf
-		mBluetoothGatt.writeCharacteristic(charac);
-		
-		try
-		{
-			Thread.sleep(200);
-		}
-		catch (InterruptedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return true;
-		
-	}
-	
-	/*
-	 * 读取数据前的配置工作，温度和湿度传感器的读取都要执行这个方法
-	 */
-	boolean EnableData(String uuid)
-	{
-		if (mGattService == null)
-			return false;
-		
-		BluetoothGattCharacteristic charac = mGattService.getCharacteristic(UUID.fromString(uuid));
-		
-		if (charac == null)
-			return false;
-		
-		boolean noti = mBluetoothGatt.setCharacteristicNotification(charac, true);
-		Log.w(TAG, "noti " + noti);
-		BluetoothGattDescriptor clientConfig = charac.getDescriptor(UUID.fromString(macro.UUID_CLIENT_CONFIG));
-		clientConfig.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-		mBluetoothGatt.writeDescriptor(clientConfig);
-		
-		try
-		{
-			Thread.sleep(200);
-		}
-		catch (InterruptedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return true;
-	}
-	
-	
-	class MyHandler extends Handler
+	private class MyHandler extends Handler
 	{
 		public MyHandler() {}
 		
@@ -588,7 +436,6 @@ public class MainActivity extends Activity
 		{
 			super.handleMessage(msg);
 			// 此处可以更新UI
-			
 			
 			if (msg.what == macro.HANDLER_SCAN_STOPPED)
 			{
@@ -609,12 +456,12 @@ public class MainActivity extends Activity
 				//Toast.makeText(getApplicationContext(), "服务发现完毕", Toast.LENGTH_SHORT).show();
 				tv_connect_info.setText("成功发现服务，开始启动服务");
 				boolean isHasValidData = false;
-				ListServices();
 				
+				mBluetoothHelper.logServiceInfo();
 				
-				ListCharacters(macro.UUID_MAG_SER);
+				logCharacterList(macro.UUID_MAG_SER);
 				
-				if (EnableConfig(macro.UUID_MAG_CON) && EnableData(macro.UUID_MAG_DAT))
+				if (enableConfig(macro.UUID_MAG_CON) && EnableData(macro.UUID_MAG_DAT))
 				{
 					//Toast.makeText(getApplicationContext(), "开始传输磁场数据", Toast.LENGTH_SHORT).show();
 					tv_connect_info.setText("温度数据激活成功");
@@ -626,9 +473,9 @@ public class MainActivity extends Activity
 					tv_connect_info.setText("温度数据激活失败");
 				}
 				
-				ListCharacters(macro.UUID_HUM_SER);
+				logCharacterList(macro.UUID_HUM_SER);
 				
-				if (EnableConfig(macro.UUID_HUM_CON) && EnableData(macro.UUID_HUM_DAT))
+				if (enableConfig(macro.UUID_HUM_CON) && EnableData(macro.UUID_HUM_DAT))
 				{
 					//Toast.makeText(getApplicationContext(), "开始传输湿度数据", Toast.LENGTH_SHORT).show();
 					tv_connect_info.setText("湿度数据激活成功");
@@ -648,31 +495,79 @@ public class MainActivity extends Activity
 					startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
 					dl_connect.dismiss();
 				}
-				
-				
 			}
-			
 		}
+	}
+	
+	private void logCharacterList(String uuid)
+	{
+		String ser_str = mBluetoothHelper.logService(uuid);
+		if (TextUtils.isEmpty(ser_str))
+		{
+			SDKManager.toast("服务获取失败");
+		}
+		else
+		{
+			SDKManager.toast("服务获取成功");
+		}
+	}
+	
+	
+	/*
+	 * 读取数据前的配置工作，温度和湿度传感器的读取都要执行这个方法
+	 */
+	boolean EnableData(String uuid)
+	{
+		mBluetoothHelper.enableData(uuid);
+		
+		try
+		{
+			Thread.sleep(200);
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
+	
+	private boolean enableConfig(String uuid)
+	{
+		// 此处开始按照协议对内容进行获取
+		byte[] val = new byte[1];
+		val[0] = 1;
+		
+		mBluetoothHelper.enableConfig(uuid, val);
+		
+		try
+		{
+			Thread.sleep(200);
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return true;
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
-		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		Log.w("TAG", "sssssssssssss" + macro.INTENT_BLEACTIVITY_TESTSHOW);
 		
 		if (requestCode == macro.INTENT_BLEACTIVITY_TESTSHOW)
 		{
-			closeBle();
-			if (macro.SETTING_EXIT_DIRECTLY == true) //上一个activity要求直接退出。
+			mBluetoothHelper.closeBluetooth();
+			if (macro.SETTING_EXIT_DIRECTLY == true) // 上一个activity要求直接退出。
+			{
 				finish();
+			}
 		}
-		
-		
 	}
-	
 	
 	public Point3D convertHum(final byte[] value)
 	{
