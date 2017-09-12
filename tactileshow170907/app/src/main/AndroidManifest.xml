@@ -29,6 +29,7 @@
         <activity
             android:name="com.tactileshow.main.MainActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTask"
             android:theme="@style/AppBaseTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -38,6 +39,7 @@
         </activity>
         <activity
             android:name="com.tactileshow.main.MainTabActivity"
+            android:launchMode="singleTop"
             android:theme="@style/TabTheme">
         </activity>
         <activity android:name="com.tactileshow.main.EmptyActivity"></activity>
