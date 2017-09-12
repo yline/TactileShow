@@ -17,8 +17,8 @@
     <string name="label_hum_name_str">湿度</string>
     <string name="label_temp_unit_str">℃</string>
     <string name="label_hum_unit_str">%rH</string>
-    <string name="label_detail_temp_name_str">温度传感器</string>
-    <string name="label_detail_hum_name_str">湿度传感器</string>
+    <string name="label_detail_temp_name_str">温度</string>
+    <string name="label_detail_hum_name_str">湿度</string>
     <string name="label_set_wel">设置页面，将来可以进行相关控制和传感器接收设置。</string>
     <string name="label_history_area_str">点击查看历史信息</string>
     <string name="label_realtime_area_str">返回查看实时信息</string>

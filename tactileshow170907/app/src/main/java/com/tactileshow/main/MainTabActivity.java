@@ -32,8 +32,6 @@ import java.util.List;
 
 public class MainTabActivity extends Activity
 {
-	private Context context;
-	
 	private TabHost tabHost;
 	
 	private DefinedViewPager viewPager;
@@ -58,7 +56,6 @@ public class MainTabActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tab);
 		getScreenMetrics();
-		context = this;
 		
 		tabHost = (TabHost) findViewById(R.id.tabhost);
 		viewPager = (DefinedViewPager) findViewById(R.id.view_pager);
