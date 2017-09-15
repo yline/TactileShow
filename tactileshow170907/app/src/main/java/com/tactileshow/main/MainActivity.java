@@ -341,23 +341,11 @@ public class MainActivity extends Activity
 			if (uuid.equals(macro.UUID_HUM_DAT))
 			{
 				Point3D p3d_hum = convertHum(characteristic.getValue());
-				//Log.w(TAG, "改变是 " + p3d.x + " " + p3d.y + " " + p3d.z);
 				updateBroadcast("#" + "PRESS" + "#" + str_time + "#" + p3d_hum.x);
 				
 				Point3D p3d_temp = convertTemp(characteristic.getValue());
-				//Log.w(TAG, "改变是 " + p3d.x + " " + p3d.y + " " + p3d.z);
-				
 				updateBroadcast("#" + "TEMP" + "#" + str_time + "#" + p3d_temp.x);
 			}
-			/*
-			if(uuid.equals(macro.UUID_MAG_DAT))
-			{
-				Point3D p3d = convertMag(characteristic.getValue());
-				//Log.w(TAG, "改变是 " + p3d.x + " " + p3d.y + " " + p3d.z);
-				
-				updateBroadcast("#" + "TEMP" + "#" + str_time + "#" + p3d.x);
-			}
-			*/
 		}
 	};
 	
@@ -401,17 +389,14 @@ public class MainActivity extends Activity
 			}
 			else if (msg.what == macro.HANDLER_CONNECT_SUCCESS)
 			{
-				//Toast.makeText(getApplicationContext(), "连接已经建立", Toast.LENGTH_SHORT).show();
 				mDialogHelper.setText("连接成功，开始寻找服务");
 			}
 			else if (msg.what == macro.HANDLER_CONNECT_FAILED)
 			{
-				//Toast.makeText(getApplicationContext(), "连接建立失败", Toast.LENGTH_SHORT).show();
 				mDialogHelper.setText("连接失败，请返回重连");
 			}
 			else if (msg.what == macro.HANDLER_SERVICE_DISCOVERED)
 			{
-				//Toast.makeText(getApplicationContext(), "服务发现完毕", Toast.LENGTH_SHORT).show();
 				mDialogHelper.setText("成功发现服务，开始启动服务");
 				boolean isHasValidData = false;
 				
@@ -421,13 +406,11 @@ public class MainActivity extends Activity
 				
 				if (enableConfig(macro.UUID_MAG_CON) && EnableData(macro.UUID_MAG_DAT))
 				{
-					//Toast.makeText(getApplicationContext(), "开始传输磁场数据", Toast.LENGTH_SHORT).show();
 					mDialogHelper.setText("温度数据激活成功");
 					isHasValidData = true;
 				}
 				else
 				{
-					//Toast.makeText(getApplicationContext(), "磁场特征写入失败", Toast.LENGTH_SHORT).show();
 					mDialogHelper.setText("温度数据激活失败");
 				}
 				
@@ -435,13 +418,11 @@ public class MainActivity extends Activity
 				
 				if (enableConfig(macro.UUID_HUM_CON) && EnableData(macro.UUID_HUM_DAT))
 				{
-					//Toast.makeText(getApplicationContext(), "开始传输湿度数据", Toast.LENGTH_SHORT).show();
 					mDialogHelper.setText("湿度数据激活成功");
 					isHasValidData = true;
 				}
 				else
 				{
-					//Toast.makeText(getApplicationContext(), "湿度特征写入失败", Toast.LENGTH_SHORT).show();
 					mDialogHelper.setText("湿度数据激活失败");
 				}
 				

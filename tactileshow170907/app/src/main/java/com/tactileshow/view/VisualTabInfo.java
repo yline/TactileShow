@@ -96,7 +96,12 @@ public class VisualTabInfo
 		});
 		
 	}
-	
+
+	/**
+	 * 改变界面，时间、数值
+	 * @param t
+	 * @param data
+	 */
 	public void setTemp(Time t, double data)
 	{
 		tempVisual.setTemp(t, data);

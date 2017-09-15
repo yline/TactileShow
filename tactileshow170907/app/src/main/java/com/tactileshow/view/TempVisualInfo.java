@@ -259,7 +259,12 @@ public class TempVisualInfo
 	{
 		tempMap.init();
 	}
-	
+
+	/**
+	 * 向界面上显示  添加 数据
+	 * @param t
+	 * @param data
+	 */
 	public void setTemp(Time t, double data)
 	{
 		tempMap.addData(t, data);//Log.e("wshg", "set temp visual. data = " + data);
