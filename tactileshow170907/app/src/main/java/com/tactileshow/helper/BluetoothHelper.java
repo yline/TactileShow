@@ -9,12 +9,14 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
 import com.tactileshow.util.macro;
 import com.yline.application.SDKManager;
+import com.yline.log.LogFileUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -110,9 +112,19 @@ public class BluetoothHelper {
                 public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int newState) {
                     super.onConnectionStateChange(gatt, status, newState);
 
-                    if (null != onConnectCallback){
-                        onConnectCallback.onConnectionStateChange(gatt, status, newState);
+                    LogFileUtil.v("status = " + status + ", newState = " + newState);
+                    if (newState == BluetoothProfile.STATE_CONNECTED) {
+                        discoverServices();
                     }
+
+                    SDKManager.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (null != onConnectCallback) {
+                                onConnectCallback.onConnectionStateChangeHandler(gatt, status, newState);
+                            }
+                        }
+                    });
                 }
 
                 // 发现新的服务端
@@ -120,9 +132,16 @@ public class BluetoothHelper {
                 public void onServicesDiscovered(final BluetoothGatt gatt, final int status) {
                     super.onServicesDiscovered(gatt, status);
 
-                    if (null != onConnectCallback){
-                        onConnectCallback.onServicesDiscovered(gatt, status);
-                    }
+                    LogFileUtil.v("status = " + status);
+
+                    SDKManager.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (null != onConnectCallback) {
+                                onConnectCallback.onServicesDiscoveredHandler(gatt, status);
+                            }
+                        }
+                    });
                 }
 
                 // 读入数据
@@ -130,7 +149,9 @@ public class BluetoothHelper {
                 public void onCharacteristicRead(final BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic, final int status) {
                     super.onCharacteristicRead(gatt, characteristic, status);
 
-                    if (null != onConnectCallback){
+                    LogFileUtil.v("characteristic = " + characteristic + ", status = " + status);
+
+                    if (null != onConnectCallback) {
                         onConnectCallback.onCharacteristicRead(gatt, characteristic, status);
                     }
                 }
@@ -140,7 +161,9 @@ public class BluetoothHelper {
                 public void onCharacteristicChanged(final BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
                     super.onCharacteristicChanged(gatt, characteristic);
 
-                    if (null != onConnectCallback){
+                    LogFileUtil.v("characteristic = " + characteristic);
+
+                    if (null != onConnectCallback) {
                         onConnectCallback.onCharacteristicChanged(gatt, characteristic);
                     }
                 }
@@ -172,16 +195,19 @@ public class BluetoothHelper {
         }
     }
 
-    public void enableConfig(String uuid, byte[] value) {
+    public boolean enableConfig(String uuid, byte[] value) {
         if (null != mGattService) {
             BluetoothGattCharacteristic characteristic = mGattService.getCharacteristic(UUID.fromString(uuid));
             if (null != characteristic) {
                 characteristic.setValue(value);
                 if (null != mBluetoothGatt) {
                     mBluetoothGatt.writeCharacteristic(characteristic);
+
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     public boolean enableData(String uuid) {
@@ -282,6 +308,7 @@ public class BluetoothHelper {
 
                         mBluetoothAdapter.stopLeScan(leScanCallback);
                         if (null != onScanCallback) {
+                            LogFileUtil.v("onScanCallback onFinish");
                             onScanCallback.onFinish();
                         }
                     }
@@ -291,6 +318,7 @@ public class BluetoothHelper {
             isScan = true;
             mBluetoothAdapter.startLeScan(leScanCallback);
             if (null != onScanCallback) {
+                LogFileUtil.v("onScanCallback onStart");
                 onScanCallback.onStart();
             }
         } else {
@@ -298,6 +326,7 @@ public class BluetoothHelper {
 
             mBluetoothAdapter.stopLeScan(leScanCallback);
             if (null != onScanCallback) {
+                LogFileUtil.v("onScanCallback onBreak");
                 onScanCallback.onBreak();
             }
         }
@@ -310,6 +339,7 @@ public class BluetoothHelper {
                 @Override
                 public void run() {
                     if (null != onScanCallback) {
+                        LogFileUtil.v("onScanCallback onScanning device = " + device + ", rssi = " + rssi + ", scanRecord = " + scanRecord);
                         onScanCallback.onScanning(device, rssi, scanRecord);
                     }
                 }
@@ -352,7 +382,7 @@ public class BluetoothHelper {
          * @param status
          * @param newState
          */
-        void onConnectionStateChange(BluetoothGatt gatt, int status, int newState);
+        void onConnectionStateChangeHandler(BluetoothGatt gatt, int status, int newState);
 
         /**
          * 发现 服务端
@@ -360,7 +390,7 @@ public class BluetoothHelper {
          * @param gatt
          * @param status
          */
-        void onServicesDiscovered(BluetoothGatt gatt, int status);
+        void onServicesDiscoveredHandler(BluetoothGatt gatt, int status);
 
         /**
          * 读取 字节
