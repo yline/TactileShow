@@ -58,17 +58,16 @@ public class MainActivity extends Activity {
     private ListView deviceListView;
     private ListViewAdapter viewAdapter;
 
-    private static String generateTag(int location)
-    {
-            StackTraceElement caller = new Throwable().getStackTrace()[location];
-            String clazzName = caller.getClassName();
-            clazzName = clazzName.substring(clazzName.lastIndexOf(".") + 1);
+    private static String generateTag(int location) {
+        StackTraceElement caller = new Throwable().getStackTrace()[location];
+        String clazzName = caller.getClassName();
+        clazzName = clazzName.substring(clazzName.lastIndexOf(".") + 1);
 
-            return String.format(Locale.CHINA,
-                    "xxx->%s.%s(L:%d): ",
-                    clazzName,
-                    caller.getMethodName(),
-                    caller.getLineNumber());
+        return String.format(Locale.CHINA,
+                "xxx->%s.%s(L:%d): ",
+                clazzName,
+                caller.getMethodName(),
+                caller.getLineNumber());
     }
 
     @Override
@@ -224,11 +223,16 @@ public class MainActivity extends Activity {
 
                     LogFileUtil.i(TAG, "isMAGValid = " + isMAGValid + ", isMAGValid = " + isMAGValid);
                     if (isMAGValid || isHUMValid) {
-                        Intent intent = new Intent();
-                        intent.setClass(MainActivity.this, MainTabActivity.class);
-                        intent.putExtra("str", "come from first activity");
-                        startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
-                        mDialogHelper.dismiss();
+                        SDKManager.getHandler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intent = new Intent();
+                                intent.setClass(MainActivity.this, MainTabActivity.class);
+                                intent.putExtra("str", "come from first activity");
+                                startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
+                                mDialogHelper.dismiss();
+                            }
+                        }, 1 * 1000);
                     }
                 }
             }
@@ -303,7 +307,16 @@ public class MainActivity extends Activity {
      * 读取数据前的配置工作，温度和湿度传感器的读取都要执行这个方法
      */
     private boolean enableData(String uuid) {
-        return mBluetoothHelper.enableData(uuid);
+        boolean result = mBluetoothHelper.enableData(uuid);
+
+        // 传输协议，需要一定的时间
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     private boolean enableConfig(String uuid) {
@@ -311,7 +324,16 @@ public class MainActivity extends Activity {
         byte[] val = new byte[1];
         val[0] = 1;
 
-        return mBluetoothHelper.enableConfig(uuid, val);
+        boolean result = mBluetoothHelper.enableConfig(uuid, val);
+
+        // 传输协议，需要一定的时间
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     @Override

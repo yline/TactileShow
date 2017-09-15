@@ -3,6 +3,7 @@ package com.tactileshow.helper;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -56,6 +57,8 @@ public class DialogHelper
 	
 	public void show()
 	{
+		boolean result = (null != dialog && !dialog.isShowing());
+		Log.i("xxx-", "show: result = " + result);
 		if (null != dialog && !dialog.isShowing())
 		{
 			dialog.show();

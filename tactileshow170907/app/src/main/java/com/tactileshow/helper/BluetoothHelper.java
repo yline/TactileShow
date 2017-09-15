@@ -144,6 +144,7 @@ public class BluetoothHelper {
                     }
                 }
             });
+            return bluetoothDevice.getName();
         }
         return null;
     }
