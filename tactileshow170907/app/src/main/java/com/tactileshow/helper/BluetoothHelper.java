@@ -36,8 +36,6 @@ public class BluetoothHelper {
 
     private BluetoothGattService mGattService;
 
-    // private List<BluetoothDevice> mLeDevices;
-
     private boolean isScan;
 
     // 扫描时，回调
@@ -48,8 +46,6 @@ public class BluetoothHelper {
     public BluetoothHelper(Context context) {
         BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        // mLeDevices = new ArrayList<>();
     }
 
     public void enableBluetoothForResult(Activity activity) {
@@ -62,7 +58,7 @@ public class BluetoothHelper {
     /**
      * 开始扫描
      *
-     * @param milliSecond
+     * @param milliSecond 单位 毫秒
      */
     public void startScanDevice(long milliSecond) {
         scanDevice(true, milliSecond);
@@ -84,7 +80,6 @@ public class BluetoothHelper {
      * @return
      */
     public String connectGatt(Context context, final BluetoothDevice bluetoothDevice, boolean autoConnect) {
-        // final BluetoothDevice bluetoothDevice = mLeDevices.get(position);
         if (null != bluetoothDevice) {
             mBluetoothGatt = bluetoothDevice.connectGatt(context, autoConnect, new BluetoothGattCallback() {
 
@@ -93,10 +88,10 @@ public class BluetoothHelper {
                 public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int newState) {
                     super.onConnectionStateChange(gatt, status, newState);
 
-                    LogFileUtil.v("status = " + status + ", newState = " + newState);
+                    LogFileUtil.i(TAG, "status = " + status + ", newState = " + newState);
                     if (newState == BluetoothProfile.STATE_CONNECTED) {
                         discoverServices();
-                    }
+                    }// 断掉重连，就在这里了
 
                     SDKManager.getHandler().post(new Runnable() {
                         @Override
@@ -113,7 +108,7 @@ public class BluetoothHelper {
                 public void onServicesDiscovered(final BluetoothGatt gatt, final int status) {
                     super.onServicesDiscovered(gatt, status);
 
-                    LogFileUtil.v("status = " + status);
+                    LogFileUtil.i(TAG, "status = " + status);
 
                     SDKManager.getHandler().post(new Runnable() {
                         @Override
@@ -130,7 +125,7 @@ public class BluetoothHelper {
                 public void onCharacteristicRead(final BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic, final int status) {
                     super.onCharacteristicRead(gatt, characteristic, status);
 
-                    LogFileUtil.v("characteristic = " + characteristic + ", status = " + status);
+                    LogFileUtil.i(TAG, "characteristic = " + characteristic + ", status = " + status);
 
                     if (null != onConnectCallback) {
                         onConnectCallback.onCharacteristicRead(gatt, characteristic, status);
@@ -142,7 +137,7 @@ public class BluetoothHelper {
                 public void onCharacteristicChanged(final BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
                     super.onCharacteristicChanged(gatt, characteristic);
 
-                    LogFileUtil.v("characteristic = " + characteristic);
+                    LogFileUtil.i(TAG, "characteristic = " + characteristic);
 
                     if (null != onConnectCallback) {
                         onConnectCallback.onCharacteristicChanged(gatt, characteristic);
@@ -152,22 +147,6 @@ public class BluetoothHelper {
         }
         return null;
     }
-/*
-    public boolean addDevices(BluetoothDevice device) {
-        if (!mLeDevices.contains(device)) {
-            mLeDevices.add(device);
-            return true;
-        }
-        return false;
-    }
-
-    public int getDeviceSize() {
-        return mLeDevices.size();
-    }
-
-    public Iterator<BluetoothDevice> getDeviceIterator() {
-        return mLeDevices.iterator();
-    }*/
 
     /* 发现服务 */
     public void discoverServices() {
@@ -208,10 +187,6 @@ public class BluetoothHelper {
 
         return false;
     }
-/*
-    public void clearDevices() {
-        mLeDevices.clear();
-    }*/
 
     public void closeBluetooth() {
         if (null == mBluetoothGatt) {
@@ -289,7 +264,7 @@ public class BluetoothHelper {
 
                         mBluetoothAdapter.stopLeScan(leScanCallback);
                         if (null != onScanCallback) {
-                            LogFileUtil.v("onScanCallback onFinish");
+                            LogFileUtil.i(TAG, "onScanCallback onFinish");
                             onScanCallback.onFinish();
                         }
                     }
@@ -299,7 +274,7 @@ public class BluetoothHelper {
             isScan = true;
             mBluetoothAdapter.startLeScan(leScanCallback);
             if (null != onScanCallback) {
-                LogFileUtil.v("onScanCallback onStart");
+                LogFileUtil.i(TAG, "onScanCallback onStart");
                 onScanCallback.onStart();
             }
         } else {
@@ -307,7 +282,7 @@ public class BluetoothHelper {
 
             mBluetoothAdapter.stopLeScan(leScanCallback);
             if (null != onScanCallback) {
-                LogFileUtil.v("onScanCallback onBreak");
+                LogFileUtil.i(TAG, "onScanCallback onBreak");
                 onScanCallback.onBreak();
             }
         }
@@ -320,7 +295,7 @@ public class BluetoothHelper {
                 @Override
                 public void run() {
                     if (null != onScanCallback) {
-                        LogFileUtil.v("onScanCallback onScanning device = " + device + ", rssi = " + rssi + ", scanRecord = " + scanRecord);
+                        LogFileUtil.i(TAG, "onScanCallback onScanning device = " + device + ", rssi = " + rssi + ", scanRecord = " + scanRecord);
                         onScanCallback.onScanning(device, rssi, scanRecord);
                     }
                 }

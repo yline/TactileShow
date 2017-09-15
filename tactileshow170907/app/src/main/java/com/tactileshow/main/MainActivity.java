@@ -39,6 +39,7 @@ import com.yline.log.LogFileUtil;
 import com.yline.utils.PermissionUtil;
 
 import java.util.List;
+import java.util.Locale;
 
 /*
  * 主界面的Activity。
@@ -57,11 +58,26 @@ public class MainActivity extends Activity {
     private ListView deviceListView;
     private ListViewAdapter viewAdapter;
 
+    private static String generateTag(int location)
+    {
+            StackTraceElement caller = new Throwable().getStackTrace()[location];
+            String clazzName = caller.getClassName();
+            clazzName = clazzName.substring(clazzName.lastIndexOf(".") + 1);
+
+            return String.format(Locale.CHINA,
+                    "xxx->%s.%s(L:%d): ",
+                    clazzName,
+                    caller.getMethodName(),
+                    caller.getLineNumber());
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         BaseApplication.addActivity(this);
         PermissionUtil.request(this, SDKConstant.REQUEST_CODE_PERMISSION, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION}); // 权限申请
+
+        LogFileUtil.i(TAG, "Fuck");
 
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_ble);
@@ -105,6 +121,7 @@ public class MainActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 BluetoothDevice bluetoothDevice = viewAdapter.getItem(i);
 
+                LogFileUtil.i(TAG, "bluetoothDevice = " + bluetoothDevice);
                 if (null != bluetoothDevice) {
                     String deviceName = mBluetoothHelper.connectGatt(MainActivity.this, bluetoothDevice, false);
 
@@ -205,6 +222,7 @@ public class MainActivity extends Activity {
                         mDialogHelper.setText("湿度数据激活失败");
                     }
 
+                    LogFileUtil.i(TAG, "isMAGValid = " + isMAGValid + ", isMAGValid = " + isMAGValid);
                     if (isMAGValid || isHUMValid) {
                         Intent intent = new Intent();
                         intent.setClass(MainActivity.this, MainTabActivity.class);
@@ -227,6 +245,8 @@ public class MainActivity extends Activity {
                 String str_time = t.format2445();
 
                 String uuid = characteristic.getUuid().toString();
+
+                Log.i(TAG, "onCharacteristicChanged: onCharacteristicChanged");
 
                 if (uuid.equals(macro.UUID_HUM_DAT)) {
                     Point3D p3d_hum = convertHum(characteristic.getValue());
@@ -355,7 +375,7 @@ public class MainActivity extends Activity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         List<String> result = PermissionUtil.requestHandle(SDKConstant.REQUEST_CODE_PERMISSION, requestCode, permissions, grantResults);
-        LogFileUtil.v(SDKConstant.TAG_HANDLE_PERMISSION, result.toString());
+        LogFileUtil.i(SDKConstant.TAG_HANDLE_PERMISSION, result.toString());
     }
 
     @Override
