@@ -22,13 +22,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.tactileshow.helper.BluetoothHelper;
 import com.tactileshow.helper.DialogHelper;
+import com.tactileshow.helper.ListViewAdapter;
 import com.tactileshow.util.DataFile;
 import com.tactileshow.util.Point3D;
 import com.tactileshow.util.StaticValue;
@@ -39,31 +38,24 @@ import com.yline.application.SDKManager;
 import com.yline.log.LogFileUtil;
 import com.yline.utils.PermissionUtil;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /*
  * 主界面的Activity。
  * 整个连接执行过程为：onMenuItemSelected里的macro.MENU_ITEMID_FRESH情况（当点击刷新时，进行设备扫描），scanLeDevice（真正开始扫描）
- * lv_device.setOnItemClickListener（当点击设备时，进行连接）
+ * deviceListView.setOnItemClickListener（当点击设备时，进行连接）
  */
 public class MainActivity extends Activity {
-    private BluetoothHelper mBluetoothHelper;
-
-    private DialogHelper mDialogHelper;
-
     private final static String TAG = "xxx-Main";
 
-    TextView tv_hello;
+    private BluetoothHelper mBluetoothHelper;
+    private DialogHelper mDialogHelper;
 
-    ListView lv_device;
+    private TextView helloTextView;
+    private MenuItem freshMenuItem;
 
-    MenuItem freshMenuItem;
-
-    ArrayAdapter<String> lvaa_device;
-
-    List<String> mLeDevices_lvdata = new ArrayList<>();
+    private ListView deviceListView;
+    private ListViewAdapter viewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,39 +86,44 @@ public class MainActivity extends Activity {
         filter.addAction(macro.BROADCAST_ADDRESS);
         registerReceiver(mGattUpdateReceiver, filter);
 
-        tv_hello.setText("请按刷新开始搜索");
+        helloTextView.setText("请按刷新开始搜索");
 
         // 蓝牙 所有事件 触发点
         initListener();
     }
 
     private void initView() {
-        tv_hello = (TextView) findViewById(R.id.layout_ble_hello);
-        lv_device = (ListView) findViewById(R.id.lv_ble_device);
+        helloTextView = findViewById(R.id.layout_ble_hello);
 
-        lvaa_device = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, mLeDevices_lvdata);
-        lv_device.setAdapter(lvaa_device);
-        lv_device.setOnItemClickListener(new OnItemClickListener() {
+        deviceListView = findViewById(R.id.lv_ble_device);
+
+        viewAdapter = new ListViewAdapter(this);
+        deviceListView.setAdapter(viewAdapter);
+        deviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String deviceName = mBluetoothHelper.connectGatt(MainActivity.this, i, false);
-                if (!TextUtils.isEmpty(deviceName)) {
-                    SDKManager.toast("连接" + deviceName);
+                BluetoothDevice bluetoothDevice = viewAdapter.getItem(i);
 
-                    mBluetoothHelper.stopScanDevice();
+                if (null != bluetoothDevice) {
+                    String deviceName = mBluetoothHelper.connectGatt(MainActivity.this, bluetoothDevice, false);
 
-                    mDialogHelper.show();
-                    mDialogHelper.setOnNegativeClickListener(new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mBluetoothHelper.closeBluetooth();
-                        }
-                    });
+                    if (!TextUtils.isEmpty(deviceName)) {
+                        SDKManager.toast("连接" + deviceName);
+
+                        mBluetoothHelper.stopScanDevice();
+
+                        mDialogHelper.show();
+                        mDialogHelper.setOnNegativeClickListener(new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mBluetoothHelper.closeBluetooth();
+                            }
+                        });
+                    }
                 }
             }
         });
-
-        updateDeviceList();
     }
 
     private void initListener() {
@@ -139,14 +136,11 @@ public class MainActivity extends Activity {
 
             @Override
             public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
-                boolean isContain = mBluetoothHelper.addDevices(device);
-                if (isContain) // 去重效果，否则界面卡死
-                {
-                    updateDeviceList();
-
+                boolean isSuccess = viewAdapter.addData(device); // 这里做了 去重复的操作
+                if (isSuccess) {
                     SDKManager.toast("扫描到新BLE设备 " + device.getName());
-                    String out_info = device.getAddress() + " " + device.getBondState() + " " + device.getName();
-                    tv_hello.setText(tv_hello.getText() + "\n" + out_info);
+                    String out_info = device.getAddress() + " " + device.getName() + " " + device.getBondState();
+                    helloTextView.setText(helloTextView.getText() + "\n" + out_info);
                 }
             }
 
@@ -158,7 +152,7 @@ public class MainActivity extends Activity {
             @Override
             public void onFinish() {
                 MenuItemCompat.setActionView(freshMenuItem, null);
-                tv_hello.setText(tv_hello.getText() + "\n" + "扫描结束");
+                helloTextView.setText(helloTextView.getText() + "\n" + "扫描结束");
             }
         });
 
@@ -261,10 +255,9 @@ public class MainActivity extends Activity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         if (item.getItemId() == macro.MENU_ITEMID_FRESH) {
             mBluetoothHelper.closeBluetooth();
-            mBluetoothHelper.clearDevices();
+            viewAdapter.clear();
 
-            updateDeviceList();
-            tv_hello.setText("开始搜索");
+            helloTextView.setText("开始搜索");
             mBluetoothHelper.startScanDevice(macro.BLE_SCAN_PERIOD);
         } else if (item.getItemId() == macro.MENU_ITEMID_EXIT) {
             Log.w(TAG, "滚");
@@ -278,23 +271,6 @@ public class MainActivity extends Activity {
         }
 
         return super.onMenuItemSelected(featureId, item);
-    }
-
-    private void updateDeviceList() {
-        Log.w(TAG, "更新数据");
-        mLeDevices_lvdata.clear();
-        if (mBluetoothHelper.getDeviceSize() == 0) {
-            mLeDevices_lvdata.add("暂时没有搜索到BLE设备");
-            lv_device.setEnabled(false);
-        } else {
-            lv_device.setEnabled(true);
-            Iterator<BluetoothDevice> it = mBluetoothHelper.getDeviceIterator();
-            while (it.hasNext()) {
-                BluetoothDevice bd_it = it.next();
-                mLeDevices_lvdata.add(bd_it.getName() + " " + bd_it.getAddress());
-            }
-        }
-        lvaa_device.notifyDataSetChanged();
     }
 
     private void updateBroadcast(String str_intent) {
@@ -397,7 +373,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getStringExtra("msg");
             Log.i(TAG, "广播来了 " + action);
-            tv_hello.setText(action);
+            helloTextView.setText(action);
         }
     };
 }

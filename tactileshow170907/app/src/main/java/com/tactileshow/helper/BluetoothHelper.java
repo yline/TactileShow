@@ -18,8 +18,6 @@ import com.tactileshow.util.macro;
 import com.yline.application.SDKManager;
 import com.yline.log.LogFileUtil;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,7 +36,7 @@ public class BluetoothHelper {
 
     private BluetoothGattService mGattService;
 
-    private List<BluetoothDevice> mLeDevices;
+    // private List<BluetoothDevice> mLeDevices;
 
     private boolean isScan;
 
@@ -51,7 +49,7 @@ public class BluetoothHelper {
         BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
 
-        mLeDevices = new ArrayList<>();
+        // mLeDevices = new ArrayList<>();
     }
 
     public void enableBluetoothForResult(Activity activity) {
@@ -78,32 +76,15 @@ public class BluetoothHelper {
     }
 
     /**
-     * 链接蓝牙
-     *
-     * @param context  上下文
-     * @param callback 链接状态回调
-     * @param position 链接的设备
-     * @return
-     */
-    public String connectGatt(Context context, BluetoothGattCallback callback, int position) {
-        BluetoothDevice tempBleDevice = mLeDevices.get(position);
-        if (null != tempBleDevice) {
-            mBluetoothGatt = tempBleDevice.connectGatt(context, false, callback);
-            return tempBleDevice.getName();
-        }
-        return null;
-    }
-
-    /**
      * 连接蓝牙
      *
-     * @param context     上下文
-     * @param position    连接的设备
-     * @param autoConnect 是否自动连接
+     * @param context         上下文
+     * @param bluetoothDevice 连接的设备
+     * @param autoConnect     是否自动连接
      * @return
      */
-    public String connectGatt(Context context, int position, boolean autoConnect) {
-        final BluetoothDevice bluetoothDevice = mLeDevices.get(position);
+    public String connectGatt(Context context, final BluetoothDevice bluetoothDevice, boolean autoConnect) {
+        // final BluetoothDevice bluetoothDevice = mLeDevices.get(position);
         if (null != bluetoothDevice) {
             mBluetoothGatt = bluetoothDevice.connectGatt(context, autoConnect, new BluetoothGattCallback() {
 
@@ -171,7 +152,7 @@ public class BluetoothHelper {
         }
         return null;
     }
-
+/*
     public boolean addDevices(BluetoothDevice device) {
         if (!mLeDevices.contains(device)) {
             mLeDevices.add(device);
@@ -186,7 +167,7 @@ public class BluetoothHelper {
 
     public Iterator<BluetoothDevice> getDeviceIterator() {
         return mLeDevices.iterator();
-    }
+    }*/
 
     /* 发现服务 */
     public void discoverServices() {
@@ -227,10 +208,10 @@ public class BluetoothHelper {
 
         return false;
     }
-
+/*
     public void clearDevices() {
         mLeDevices.clear();
-    }
+    }*/
 
     public void closeBluetooth() {
         if (null == mBluetoothGatt) {

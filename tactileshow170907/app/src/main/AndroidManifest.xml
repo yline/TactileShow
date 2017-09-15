@@ -40,9 +40,8 @@
         <activity
             android:name="com.tactileshow.main.MainTabActivity"
             android:launchMode="singleTop"
-            android:theme="@style/TabTheme"></activity>
-        <activity android:name="com.tactileshow.main.EmptyActivity"></activity>
-        <activity android:name="com.tactileshow.view.XYChartBuilder"></activity>
+            android:theme="@style/TabTheme"/>
+        <activity android:name="com.tactileshow.view.XYChartBuilder"/>
     </application>
 
 </manifest>
