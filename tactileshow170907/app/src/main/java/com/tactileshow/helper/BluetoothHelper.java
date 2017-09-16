@@ -90,8 +90,11 @@ public class BluetoothHelper {
 
                     LogFileUtil.i(TAG, "status = " + status + ", newState = " + newState);
                     if (newState == BluetoothProfile.STATE_CONNECTED) {
+                        // 发现服务
                         discoverServices();
-                    }// 断掉重连，就在这里了
+                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) { // 断掉重连，就在这里了
+                        mBluetoothGatt.connect();
+                    }
 
                     SDKManager.getHandler().post(new Runnable() {
                         @Override

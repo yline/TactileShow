@@ -122,7 +122,7 @@ public class MainActivity extends Activity {
 
                 LogFileUtil.i(TAG, "bluetoothDevice = " + bluetoothDevice);
                 if (null != bluetoothDevice) {
-                    String deviceName = mBluetoothHelper.connectGatt(MainActivity.this, bluetoothDevice, false);
+                    String deviceName = mBluetoothHelper.connectGatt(MainActivity.this, bluetoothDevice, true);
 
                     if (!TextUtils.isEmpty(deviceName)) {
                         SDKManager.toast("连接" + deviceName);
