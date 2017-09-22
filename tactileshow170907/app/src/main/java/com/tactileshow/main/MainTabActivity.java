@@ -24,8 +24,8 @@ import com.tactileshow.view.DefinedPagerAdapter;
 import com.tactileshow.view.DefinedViewPager;
 import com.tactileshow.view.DetailInfo;
 import com.tactileshow.view.GeneralInfo;
-import com.tactileshow.view.Settings;
 import com.tactileshow.view.VisualTabInfo;
+import com.tactileshow.view.main.SettingView;
 import com.yline.log.LogFileUtil;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class MainTabActivity extends Activity
 	private GeneralInfo general;
 	
 	// 设置
-	private Settings set;
+	private SettingView set;
 	
 	// 人体图
 	private BodyMap bodymap;
@@ -70,7 +70,7 @@ public class MainTabActivity extends Activity
 		visual = new VisualTabInfo(this, viewPager);
 		detail = new DetailInfo(this);
 		general = new GeneralInfo(this);
-		set = new Settings(this);
+		set = new SettingView(this);
 		bodymap = new BodyMap(this, viewPager);
 		
 		listViews.add(bodymap.getView());
@@ -149,7 +149,7 @@ public class MainTabActivity extends Activity
 	{
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0)
 		{
-			set.ExDialog_Show();
+			set.showExitDialog();
 			return true;
 		}
 		else

@@ -148,8 +148,7 @@ public class Settings {
         lv_set.setClickable(true);
         lv_set.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-                                    long arg3) {
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 if (arg2 == 3) // set broadcast，设定数据广播
                 {
                     BCDialog_SetValue();

@@ -2,15 +2,13 @@ package com.tactileshow.helper;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.support.v4.util.SparseArrayCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.yline.view.recycler.adapter.CommonListAdapter;
+import com.yline.view.recycler.holder.ViewHolder;
 
 /**
  * 仅仅 展示 数据作用，没有其他作用
@@ -18,16 +16,11 @@ import java.util.List;
  * @author yline 2017/9/15 -- 20:01
  * @version 1.0.0
  */
-public class ListViewAdapter extends BaseAdapter {
+public class ListViewAdapter extends CommonListAdapter<BluetoothDevice> {
     private static final int Empty = -1024;
 
-    private Context sContext;
-
-    private List<BluetoothDevice> sList;
-
     public ListViewAdapter(Context context) {
-        this.sContext = context;
-        this.sList = new ArrayList<>();
+        super(context);
     }
 
     @Override
@@ -43,7 +36,7 @@ public class ListViewAdapter extends BaseAdapter {
         if (sList.size() == 0) {
             return 1;
         }
-        return sList.size();
+        return super.getCount();
     }
 
     @Override
@@ -55,14 +48,11 @@ public class ListViewAdapter extends BaseAdapter {
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (getItemViewType(position) == Empty) {
-            View view = LayoutInflater.from(sContext).inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
+        if (getItemViewType(position) != Empty) {
+            return super.getView(position, convertView, parent);
+        } else {
+            View view = LayoutInflater.from(sContext).inflate(getItemRes(position), parent, false);
             TextView textView = view.findViewById(android.R.id.text1);
             textView.setText("暂时没有搜索到BLE设备");
             textView.setOnClickListener(new View.OnClickListener() {
@@ -72,23 +62,16 @@ public class ListViewAdapter extends BaseAdapter {
                 }
             });
             return view;
-        } else {
-            ViewHolder holder;
-            if (convertView == null) {
-                convertView = LayoutInflater.from(sContext).inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
-                holder = new ViewHolder(convertView);
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            onBindViewHolder(parent, holder, position);
-
-            return convertView;
         }
     }
 
-    private void onBindViewHolder(ViewGroup parent, final ViewHolder viewHolder, final int position) {
+    @Override
+    protected int getItemRes(int position) {
+        return android.R.layout.simple_expandable_list_item_1;
+    }
+
+    @Override
+    protected void onBindViewHolder(ViewGroup parent, ViewHolder viewHolder, int position) {
         BluetoothDevice bluetoothDevice = sList.get(position);
         String itemStr = bluetoothDevice.getAddress() + " " + bluetoothDevice.getName();
         viewHolder.setText(android.R.id.text1, itemStr);
@@ -115,34 +98,5 @@ public class ListViewAdapter extends BaseAdapter {
     public void clear() {
         this.sList.clear();
         this.notifyDataSetChanged();
-    }
-
-    private class ViewHolder {
-        private SparseArrayCompat<View> sArray;
-
-        private View sView;
-
-        public ViewHolder(View view) {
-            this.sView = view;
-            sArray = new SparseArrayCompat<>();
-        }
-
-        public <T extends View> T get(int viewId) {
-            if (sArray.get(viewId) == null) {
-                View view = sView.findViewById(viewId);
-                sArray.put(viewId, view);
-            }
-            return (T) sArray.get(viewId);
-        }
-
-        public TextView setText(int viewId, String content) {
-            TextView textView = this.get(viewId);
-            textView.setText(content);
-            return textView;
-        }
-
-        public void setOnClickListener(int viewId, View.OnClickListener listener) {
-            this.get(viewId).setOnClickListener(listener);
-        }
     }
 }
