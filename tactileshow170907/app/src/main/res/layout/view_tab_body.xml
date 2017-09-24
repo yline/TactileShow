@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center_vertical|center_horizontal"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/bodymap_iv_head"
@@ -70,5 +70,4 @@
         android:text="请点击已部署电子皮肤的明亮处"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#0000ff" />
-
 </RelativeLayout>

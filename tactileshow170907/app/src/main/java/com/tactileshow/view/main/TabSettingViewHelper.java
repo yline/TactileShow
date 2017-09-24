@@ -24,7 +24,7 @@ import com.yline.view.recycler.holder.ViewHolder;
  * @author yline 2017/9/21 -- 20:07
  * @version 1.0.0
  */
-public class SettingViewHelper {
+public class TabSettingViewHelper {
     private ViewHolder mViewHolder;
 
     private ExitDialogHelper exitDialogHelper;
@@ -35,7 +35,7 @@ public class SettingViewHelper {
 
     private BroadcastHandler mHandler;
 
-    public SettingViewHelper(Context context) {
+    public TabSettingViewHelper(Context context) {
         mHandler = new BroadcastHandler(context);
 
         View view = LayoutInflater.from(context).inflate(R.layout.view_tab_setting, null);

@@ -19,12 +19,12 @@ import android.view.WindowManager;
 import com.tactileshow.helper.BroadcastModel;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
-import com.tactileshow.view.BodyMap;
 import com.tactileshow.view.DefinedViewPager;
 import com.tactileshow.view.GeneralInfo;
 import com.tactileshow.view.VisualTabInfo;
-import com.tactileshow.view.main.OriginViewHelper;
-import com.tactileshow.view.main.SettingViewHelper;
+import com.tactileshow.view.main.TabBodyViewHelper;
+import com.tactileshow.view.main.TabOriginViewHelper;
+import com.tactileshow.view.main.TabSettingViewHelper;
 import com.yline.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -37,10 +37,10 @@ public class TabActivity extends Activity {
 
     private VisualTabInfo visual; // 图像信息
     private GeneralInfo general; // 一般信息
-    private BodyMap bodymap; // 人体图
 
-    private OriginViewHelper detail; // 原始数据；温度、湿度
-    private SettingViewHelper set;  // 设置
+    private TabBodyViewHelper bodyViewHelper; // 人体图
+    private TabOriginViewHelper originViewHelper; // 原始数据；温度、湿度
+    private TabSettingViewHelper settingViewHelper;  // 设置
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,23 +52,24 @@ public class TabActivity extends Activity {
         viewPager.setOffscreenPageLimit(5);
 
         visual = new VisualTabInfo(this, viewPager);
-        detail = new OriginViewHelper(this);
+        originViewHelper = new TabOriginViewHelper(this);
         general = new GeneralInfo(this);
-        set = new SettingViewHelper(this);
-        bodymap = new BodyMap(this, viewPager);
+        settingViewHelper = new TabSettingViewHelper(this);
+        bodyViewHelper = new TabBodyViewHelper(this);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(macro.BROADCAST_ADDRESS);
         registerReceiver(mGattUpdateReceiver, filter);
 
         initView();
+        initViewClick();
     }
 
     private void initView() {
         final List<View> viewList = new ArrayList<>();
         final List<String> titleList = new ArrayList<>();
 
-        viewList.add(bodymap.getView());
+        viewList.add(bodyViewHelper.getView());
         titleList.add(StaticValue.bodymap_info_tab_name);
 
         viewList.add(general.getView());
@@ -77,10 +78,10 @@ public class TabActivity extends Activity {
         viewList.add(visual.getView());
         titleList.add(StaticValue.visual_info_tab_name);
 
-        viewList.add(detail.getView());
+        viewList.add(originViewHelper.getView());
         titleList.add(StaticValue.detail_info_tab_name);
 
-        viewList.add(set.getView());
+        viewList.add(settingViewHelper.getView());
         titleList.add(StaticValue.set_tab_name);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_tab_layout);
@@ -117,10 +118,22 @@ public class TabActivity extends Activity {
         tabLayout.setupWithViewPager(viewPager);
     }
 
+    private void initViewClick() {
+        // 点击身体
+        bodyViewHelper.setOnBodyClickListener(new TabBodyViewHelper.OnBodyClickListener() {
+            @Override
+            public void onBodyClick(TabBodyViewHelper.BodyType bodyType) {
+                if (bodyType == TabBodyViewHelper.BodyType.LeftArm) {
+                    viewPager.setCurrentItem(1);
+                }
+            }
+        });
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            set.showExitDialog();
+            settingViewHelper.showExitDialog();
             return true;
         } else
             return super.onKeyDown(keyCode, event);
@@ -157,34 +170,22 @@ public class TabActivity extends Activity {
         unregisterReceiver(mGattUpdateReceiver);
     }
 
-    /**
-     * 接收到广播后，改变UI
-     *
-     * @param t
-     * @param data
-     */
     public void setTemp(Time t, double data) {
         try {
             general.setTemp(data);
             general.setGerm(data);
             visual.setTemp(t, data);
-            detail.setTemp(data);
+            originViewHelper.setTemp(data);
         } catch (NumberFormatException e) {
             Log.e("wshg", "Received an error format data!");
         }
     }
 
-    /**
-     * 接收到广播后，改变UI
-     *
-     * @param t
-     * @param data
-     */
     public void setPress(Time t, double data) {
         try {
             general.setPress(data);
             visual.setPress(t, data);
-            detail.setHum(data);
+            originViewHelper.setHum(data);
         } catch (NumberFormatException e) {
             Log.e("wshg", "Received an error format data!");
         }
