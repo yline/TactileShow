@@ -63,7 +63,7 @@ public class macro
 	
 	public static int INTENT_BLEACTIVITY_TESTSHOW = 22000;
 	
-	public static long[] VIBRATION_MODE = {100, 400, 100, 400};   // 用于手机振动的参数
+	public final static long[] VIBRATION_MODE = {100, 400, 100, 400};   // 用于手机振动的参数
 	
 	public static boolean SETTINGS_SOUND = false;
 	

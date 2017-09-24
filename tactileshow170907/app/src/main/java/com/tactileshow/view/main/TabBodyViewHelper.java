@@ -8,6 +8,11 @@ import android.widget.ImageView;
 
 import com.tactileshow.main.R;
 
+/**
+ * 人体图
+ * @author yline 2017/9/24 -- 20:05
+ * @version 1.0.0
+ */
 public class TabBodyViewHelper {
     private View view;
 

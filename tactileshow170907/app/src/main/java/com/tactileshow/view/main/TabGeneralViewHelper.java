@@ -1,4 +1,4 @@
-package com.tactileshow.view;
+package com.tactileshow.view.main;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -17,7 +17,12 @@ import com.tactileshow.util.macro;
 
 import java.io.IOException;
 
-public class GeneralInfo {
+/**
+ * 一般信息
+ * @author yline 2017/9/24 -- 20:05
+ * @version 1.0.0
+ */
+public class TabGeneralViewHelper {
     private Context context;
 
     private View view;
@@ -32,7 +37,7 @@ public class GeneralInfo {
 
     private ImageView iv_hand, iv_needle, iv_alert, iv_germ, iv_fire;
 
-    public GeneralInfo(Context context) {
+    public TabGeneralViewHelper(Context context) {
         this.context = context;
         this.view = LayoutInflater.from(context).inflate(R.layout.view_tab_general, null);
 
