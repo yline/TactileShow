@@ -20,9 +20,9 @@ import com.tactileshow.helper.BroadcastModel;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
 import com.tactileshow.view.DefinedViewPager;
-import com.tactileshow.view.GeneralInfo;
 import com.tactileshow.view.VisualTabInfo;
 import com.tactileshow.view.main.TabBodyViewHelper;
+import com.tactileshow.view.main.TabGeneralViewHelper;
 import com.tactileshow.view.main.TabOriginViewHelper;
 import com.tactileshow.view.main.TabSettingViewHelper;
 import com.yline.utils.LogUtil;
@@ -36,7 +36,7 @@ public class TabActivity extends Activity {
     private DefinedViewPager viewPager;
 
     private VisualTabInfo visual; // 图像信息
-    private GeneralInfo general; // 一般信息
+    private TabGeneralViewHelper generalViewHelper; // 一般信息
 
     private TabBodyViewHelper bodyViewHelper; // 人体图
     private TabOriginViewHelper originViewHelper; // 原始数据；温度、湿度
@@ -53,7 +53,7 @@ public class TabActivity extends Activity {
 
         visual = new VisualTabInfo(this, viewPager);
         originViewHelper = new TabOriginViewHelper(this);
-        general = new GeneralInfo(this);
+        generalViewHelper = new TabGeneralViewHelper(this);
         settingViewHelper = new TabSettingViewHelper(this);
         bodyViewHelper = new TabBodyViewHelper(this);
 
@@ -72,7 +72,7 @@ public class TabActivity extends Activity {
         viewList.add(bodyViewHelper.getView());
         titleList.add(StaticValue.bodymap_info_tab_name);
 
-        viewList.add(general.getView());
+        viewList.add(generalViewHelper.getView());
         titleList.add(StaticValue.general_info_tab_name);
 
         viewList.add(visual.getView());
@@ -172,8 +172,8 @@ public class TabActivity extends Activity {
 
     public void setTemp(Time t, double data) {
         try {
-            general.setTemp(data);
-            general.setGerm(data);
+            generalViewHelper.setTemp(data);
+            generalViewHelper.setGerm(data);
             visual.setTemp(t, data);
             originViewHelper.setTemp(data);
         } catch (NumberFormatException e) {
@@ -183,7 +183,7 @@ public class TabActivity extends Activity {
 
     public void setPress(Time t, double data) {
         try {
-            general.setPress(data);
+            generalViewHelper.setPress(data);
             visual.setPress(t, data);
             originViewHelper.setHum(data);
         } catch (NumberFormatException e) {

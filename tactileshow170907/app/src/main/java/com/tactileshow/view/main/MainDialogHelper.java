@@ -1,4 +1,4 @@
-package com.tactileshow.helper;
+package com.tactileshow.view.main;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -17,15 +17,15 @@ import com.tactileshow.main.R;
  * @author yline 2017/9/12 -- 19:35
  * @version 1.0.0
  */
-public class DialogHelper
+public class MainDialogHelper
 {
 	private AlertDialog dialog;
-	
+
 	private TextView tvConnectInfo;
-	
+
 	private DialogInterface.OnClickListener listener;
-	
-	public DialogHelper(Context context)
+
+	public MainDialogHelper(Context context)
 	{
 		View dialogView = LayoutInflater.from(context).inflate(R.layout.activity_main_dialog_connect, null);
 		

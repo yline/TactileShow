@@ -1,4 +1,4 @@
-package com.tactileshow.helper;
+package com.tactileshow.view.main;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -16,10 +16,10 @@ import com.yline.view.recycler.holder.ViewHolder;
  * @author yline 2017/9/15 -- 20:01
  * @version 1.0.0
  */
-public class ListViewAdapter extends CommonListAdapter<BluetoothDevice> {
+public class MainListViewAdapter extends CommonListAdapter<BluetoothDevice> {
     private static final int Empty = -1024;
 
-    public ListViewAdapter(Context context) {
+    public MainListViewAdapter(Context context) {
         super(context);
     }
 

@@ -1,7 +1,6 @@
 package com.tactileshow.main;
 
 import android.Manifest;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -13,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -26,12 +26,12 @@ import android.widget.TextView;
 
 import com.tactileshow.helper.BluetoothHelper;
 import com.tactileshow.helper.BroadcastModel;
-import com.tactileshow.helper.DialogHelper;
-import com.tactileshow.helper.ListViewAdapter;
 import com.tactileshow.util.DataFile;
 import com.tactileshow.util.Point3D;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
+import com.tactileshow.view.main.MainDialogHelper;
+import com.tactileshow.view.main.MainListViewAdapter;
 import com.yline.application.BaseApplication;
 import com.yline.application.SDKConstant;
 import com.yline.application.SDKManager;
@@ -39,7 +39,6 @@ import com.yline.log.LogFileUtil;
 import com.yline.utils.PermissionUtil;
 
 import java.util.List;
-import java.util.Locale;
 
 /*
  * 主界面的Activity。
@@ -50,44 +49,30 @@ public class MainActivity extends Activity {
     private final static String TAG = "xxx-Main";
 
     private BluetoothHelper mBluetoothHelper;
-    private DialogHelper mDialogHelper;
+    private MainDialogHelper mDialogHelper;
 
     private TextView helloTextView;
     private MenuItem freshMenuItem;
 
-    private ListView deviceListView;
-    private ListViewAdapter viewAdapter;
-
-    private static String generateTag(int location) {
-        StackTraceElement caller = new Throwable().getStackTrace()[location];
-        String clazzName = caller.getClassName();
-        clazzName = clazzName.substring(clazzName.lastIndexOf(".") + 1);
-
-        return String.format(Locale.CHINA,
-                "xxx->%s.%s(L:%d): ",
-                clazzName,
-                caller.getMethodName(),
-                caller.getLineNumber());
-    }
+    private MainListViewAdapter viewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         BaseApplication.addActivity(this);
-        PermissionUtil.request(this, SDKConstant.REQUEST_CODE_PERMISSION, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION}); // 权限申请
+
+        String[] strings = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION};
+        PermissionUtil.request(this, SDKConstant.REQUEST_CODE_PERMISSION, strings); // 权限申请
 
         LogFileUtil.i(TAG, "Fuck");
 
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
 
-        ActionBar actionBar = getActionBar();
-        actionBar.show();
-
         mBluetoothHelper = new BluetoothHelper(this);
         mBluetoothHelper.enableBluetoothForResult(this);
 
-        mDialogHelper = new DialogHelper(this);
+        mDialogHelper = new MainDialogHelper(this);
 
         // 初始化 控件
         initView();
@@ -110,9 +95,9 @@ public class MainActivity extends Activity {
     private void initView() {
         helloTextView = findViewById(R.id.layout_ble_hello);
 
-        deviceListView = findViewById(R.id.lv_ble_device);
+        ListView deviceListView = findViewById(R.id.lv_ble_device);
 
-        viewAdapter = new ListViewAdapter(this);
+        viewAdapter = new MainListViewAdapter(this);
         deviceListView.setAdapter(viewAdapter);
         deviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -232,7 +217,7 @@ public class MainActivity extends Activity {
                                 startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
                                 mDialogHelper.dismiss();
                             }
-                        }, 1 * 1000);
+                        }, 1000);
                     }
                 }
             }
@@ -308,12 +293,6 @@ public class MainActivity extends Activity {
         return super.onMenuItemSelected(featureId, item);
     }
 
-    private void updateBroadcast(String str_intent) {
-        Intent intent = new Intent(macro.BROADCAST_ADDRESS);
-        intent.putExtra("msg", str_intent);
-        sendBroadcast(intent);
-    }
-
     /*
      * 读取数据前的配置工作，温度和湿度传感器的读取都要执行这个方法
      */
@@ -353,7 +332,7 @@ public class MainActivity extends Activity {
         Log.i(TAG, "onActivityResult: requestCode = " + requestCode + ", resultCode = " + ", data = " + data);
         if (requestCode == macro.INTENT_BLEACTIVITY_TESTSHOW) {
             mBluetoothHelper.closeBluetooth();
-            if (macro.SETTING_EXIT_DIRECTLY == true) // 上一个activity要求直接退出。
+            if (macro.SETTING_EXIT_DIRECTLY) // 上一个activity要求直接退出。
             {
                 finish();
             }
@@ -386,7 +365,7 @@ public class MainActivity extends Activity {
         return new Point3D(x - mcal.x, y - mcal.y, z - mcal.z);
     }
 
-    public enum MagnetometerCalibrationCoefficients {
+    private enum MagnetometerCalibrationCoefficients {
         INSTANCE;
 
         Point3D val = new Point3D(0.0, 0.0, 0.0);
@@ -405,7 +384,7 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         List<String> result = PermissionUtil.requestHandle(SDKConstant.REQUEST_CODE_PERMISSION, requestCode, permissions, grantResults);
         LogFileUtil.i(SDKConstant.TAG_HANDLE_PERMISSION, result.toString());
