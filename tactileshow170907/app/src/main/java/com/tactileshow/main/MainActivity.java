@@ -79,7 +79,7 @@ public class MainActivity extends Activity {
         LogFileUtil.i(TAG, "Fuck");
 
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-        setContentView(R.layout.activity_ble);
+        setContentView(R.layout.activity_main);
 
         ActionBar actionBar = getActionBar();
         actionBar.show();
@@ -147,7 +147,7 @@ public class MainActivity extends Activity {
         mBluetoothHelper.setOnScanCallback(new BluetoothHelper.OnScanCallback() {
             @Override
             public void onStart() {
-                MenuItemCompat.setActionView(freshMenuItem, R.layout.activity_ble_progressbar);
+                MenuItemCompat.setActionView(freshMenuItem, R.layout.activity_main_dialog_progressbar);
             }
 
             @Override
@@ -227,7 +227,7 @@ public class MainActivity extends Activity {
                             @Override
                             public void run() {
                                 Intent intent = new Intent();
-                                intent.setClass(MainActivity.this, MainTabActivity.class);
+                                intent.setClass(MainActivity.this, TabActivity.class);
                                 intent.putExtra("str", "come from first activity");
                                 startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
                                 mDialogHelper.dismiss();
@@ -300,7 +300,7 @@ public class MainActivity extends Activity {
         } else if (item.getItemId() == macro.MENU_ITEMID_DEBUG) {
             Log.w(TAG, "测试模式");
             Intent intent = new Intent();
-            intent.setClass(MainActivity.this, MainTabActivity.class);
+            intent.setClass(MainActivity.this, TabActivity.class);
             intent.putExtra("str", "come from first activity TEST");
             startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
         }

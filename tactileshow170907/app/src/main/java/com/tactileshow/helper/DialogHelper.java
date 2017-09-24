@@ -27,7 +27,7 @@ public class DialogHelper
 	
 	public DialogHelper(Context context)
 	{
-		View dialogView = LayoutInflater.from(context).inflate(R.layout.activity_ble_connect, null);
+		View dialogView = LayoutInflater.from(context).inflate(R.layout.activity_main_dialog_connect, null);
 		
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
 		dialogBuilder.setTitle("连接状态");

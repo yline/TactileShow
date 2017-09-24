@@ -7,14 +7,14 @@ import android.view.View;
 
 import java.util.List;
 
-public class DefinedPagerAdapter extends PagerAdapter{
-	private List<View> list;
+public class DefinedPagerAdapter extends PagerAdapter {
+    private List<View> list;
 
-	public DefinedPagerAdapter(List<View> list) {
-		this.list = list;
-	}
+    public DefinedPagerAdapter(List<View> list) {
+        this.list = list;
+    }
 
-	@Override
+    @Override
     public void destroyItem(View view, int position, Object arg2) {
         ViewPager pViewPager = ((ViewPager) view);
         pViewPager.removeView(list.get(position));
@@ -53,5 +53,4 @@ public class DefinedPagerAdapter extends PagerAdapter{
     @Override
     public void startUpdate(View arg0) {
     }
-
 }

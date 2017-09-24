@@ -38,9 +38,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.tactileshow.main.MainTabActivity"
+            android:name="com.tactileshow.main.TabActivity"
             android:launchMode="singleInstance"
-            android:theme="@style/TabTheme" />
+            android:theme="@style/AppTheme" />
         <activity android:name="com.tactileshow.view.XYChartBuilder" />
     </application>
 

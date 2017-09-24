@@ -6,54 +6,40 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.PagerAdapter;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.TabHost;
-import android.widget.TabHost.OnTabChangeListener;
 
 import com.tactileshow.helper.BroadcastModel;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
 import com.tactileshow.view.BodyMap;
-import com.tactileshow.view.DefinedPagerAdapter;
 import com.tactileshow.view.DefinedViewPager;
 import com.tactileshow.view.DetailInfo;
 import com.tactileshow.view.GeneralInfo;
 import com.tactileshow.view.VisualTabInfo;
-import com.tactileshow.view.main.SettingView;
+import com.tactileshow.view.main.SettingViewHelper;
 import com.yline.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainTabActivity extends Activity {
-    private TabHost tabHost;
+public class TabActivity extends Activity {
+    private static final String TAG = "TabActivity";
 
     private DefinedViewPager viewPager;
 
-    private DefinedPagerAdapter pagerAdapter;
-
-    private List<View> listViews;
-
-    // 图像信息
-    private VisualTabInfo visual;
-
-    // 原始数据；温度、湿度
-    private DetailInfo detail;
-
-    // 一般信息
-    private GeneralInfo general;
-
-    // 设置
-    private SettingView set;
-
-    // 人体图
-    private BodyMap bodymap;
+    private VisualTabInfo visual; // 图像信息
+    private DetailInfo detail; // 原始数据；温度、湿度
+    private GeneralInfo general; // 一般信息
+    private SettingViewHelper set;  // 设置
+    private BodyMap bodymap; // 人体图
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,70 +47,73 @@ public class MainTabActivity extends Activity {
         setContentView(R.layout.activity_tab);
         getScreenMetrics();
 
-        tabHost = (TabHost) findViewById(R.id.tabhost);
-        viewPager = (DefinedViewPager) findViewById(R.id.view_pager);
-        listViews = new ArrayList<View>();
+        viewPager = (DefinedViewPager) findViewById(R.id.tab_view_pager);
+        viewPager.setOffscreenPageLimit(5);
 
         visual = new VisualTabInfo(this, viewPager);
         detail = new DetailInfo(this);
         general = new GeneralInfo(this);
-        set = new SettingView(this);
+        set = new SettingViewHelper(this);
         bodymap = new BodyMap(this, viewPager);
-
-        listViews.add(bodymap.getView());
-        listViews.add(general.getView());
-        listViews.add(visual.getView());
-        listViews.add(detail.getView());
-        listViews.add(set.getView());
-
-        pagerAdapter = new DefinedPagerAdapter(listViews);
-        viewPager.setAdapter(pagerAdapter);
-
-        tabHost.setup();
-
-        tabHost.addTab(tabHost.newTabSpec(StaticValue.bodymap_info_tab_name).setIndicator(StaticValue.bodymap_info_tab_name).setContent(R.id.view1));
-        tabHost.addTab(tabHost.newTabSpec(StaticValue.general_info_tab_name).setIndicator(StaticValue.general_info_tab_name).setContent(R.id.view1));
-        tabHost.addTab(tabHost.newTabSpec(StaticValue.visual_info_tab_name).setIndicator(StaticValue.visual_info_tab_name).setContent(R.id.view1));
-        tabHost.addTab(tabHost.newTabSpec(StaticValue.detail_info_tab_name).setIndicator(StaticValue.detail_info_tab_name).setContent(R.id.view1));
-        tabHost.addTab(tabHost.newTabSpec(StaticValue.set_tab_name).setIndicator(StaticValue.set_tab_name).setContent(R.id.view1));
-
-        viewPager.setOnPageChangeListener(new OnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                tabHost.setCurrentTab(position);
-            }
-
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int arg0) {
-            }
-        });
-
-        tabHost.setOnTabChangedListener(new OnTabChangeListener() {
-            @Override
-            public void onTabChanged(String tabId) {
-                if (StaticValue.general_info_tab_name.equals(tabId)) {
-                    viewPager.setCurrentItem(1);
-                } else if (StaticValue.visual_info_tab_name.equals(tabId)) {
-                    viewPager.setCurrentItem(2);
-                } else if (StaticValue.detail_info_tab_name.equals(tabId)) {
-                    viewPager.setCurrentItem(3);
-                } else if (StaticValue.bodymap_info_tab_name.equals(tabId)) {
-
-                    viewPager.setCurrentItem(0);
-                } else {
-                    viewPager.setCurrentItem(4);
-                }
-
-            }
-        });
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(macro.BROADCAST_ADDRESS);
         registerReceiver(mGattUpdateReceiver, filter);
+
+        initView();
+    }
+
+    private void initView() {
+        final List<View> viewList = new ArrayList<>();
+        final List<String> titleList = new ArrayList<>();
+
+        viewList.add(bodymap.getView());
+        titleList.add(StaticValue.bodymap_info_tab_name);
+
+        viewList.add(general.getView());
+        titleList.add(StaticValue.general_info_tab_name);
+
+        viewList.add(visual.getView());
+        titleList.add(StaticValue.visual_info_tab_name);
+
+        viewList.add(detail.getView());
+        titleList.add(StaticValue.detail_info_tab_name);
+
+        viewList.add(set.getView());
+        titleList.add(StaticValue.set_tab_name);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_tab_layout);
+
+        viewPager.setAdapter(new PagerAdapter() {
+            @Override
+            public int getCount() {
+                return viewList.size();
+            }
+
+            @Override
+            public boolean isViewFromObject(View view, Object object) {
+                return (view == object);
+            }
+
+            @Override
+            public Object instantiateItem(ViewGroup container, int position) {
+                View view = viewList.get(position);
+                container.addView(view);
+                return view;
+            }
+
+            @Override
+            public void destroyItem(ViewGroup container, int position, Object object) {
+                container.removeView((View) object);
+            }
+
+            @Override
+            public CharSequence getPageTitle(int position) {
+                return titleList.get(position);
+            }
+        });
+
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -199,8 +188,6 @@ public class MainTabActivity extends Activity {
             Log.e("wshg", "Received an error format data!");
         }
     }
-
-    private static final String TAG = "MainTabActivity";
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
