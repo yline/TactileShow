@@ -185,8 +185,6 @@ public class SettingView {
 
         private int per;
 
-        private View.OnClickListener listener;
-
         public BroadcastDialogHelper(Context context) {
             dialog = new Dialog(context);
             View view = LayoutInflater.from(context).inflate(R.layout.view_main_setting_dialog_broadcast, null);

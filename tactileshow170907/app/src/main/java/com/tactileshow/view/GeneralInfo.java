@@ -18,7 +18,6 @@ import java.io.IOException;
 
 public class GeneralInfo
 {
-	
 	private Activity context;
 	
 	private View view;

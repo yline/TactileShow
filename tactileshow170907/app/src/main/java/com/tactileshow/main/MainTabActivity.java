@@ -175,7 +175,6 @@ public class MainTabActivity extends Activity {
      */
     public void setTemp(Time t, double data) {
         try {
-            // double data = Double.parseDouble(str);
             general.setTemp(data);
             general.setGerm(data);
             visual.setTemp(t, data);
@@ -193,7 +192,6 @@ public class MainTabActivity extends Activity {
      */
     public void setPress(Time t, double data) {
         try {
-            // double data = Double.parseDouble(str);
             general.setPress(data);
             visual.setPress(t, data);
             detail.setHum(data);
@@ -231,19 +229,6 @@ public class MainTabActivity extends Activity {
                     setTemp(time, temp);
                 }
             }
-/*
-            BroadcastMsg bm = new BroadcastMsg(action);
-            if (bm.getSensor() == null) {
-                Log.e("wshg", "Receive error msg format or msg is null");
-            } else {
-                if (bm.getSensor().equals(StaticValue.PRESS)) {
-                    setPress(bm.getTime(), bm.getData());
-                    StaticValue.data_file.writeData(bm.getTime(), StaticValue.PRESS, bm.getData());
-                } else if (bm.getSensor().equals(StaticValue.TEMP)) {
-                    setTemp(bm.getTime(), bm.getData());
-                    StaticValue.data_file.writeData(bm.getTime(), StaticValue.TEMP, bm.getData());
-                }
-            }*/
         }
     };
 }

@@ -15,7 +15,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.tactileshow.helper.BluetoothHelper;
+import com.tactileshow.helper.BroadcastModel;
 import com.tactileshow.helper.DialogHelper;
 import com.tactileshow.helper.ListViewAdapter;
 import com.tactileshow.util.DataFile;
@@ -244,9 +244,10 @@ public class MainActivity extends Activity {
 
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+                /*
                 Time t = new Time();
                 t.setToNow();
-                String str_time = t.format2445();
+                String str_time = t.format2445();*/
 
                 String uuid = characteristic.getUuid().toString();
 
@@ -254,10 +255,20 @@ public class MainActivity extends Activity {
 
                 if (uuid.equals(macro.UUID_HUM_DAT)) {
                     Point3D p3d_hum = convertHum(characteristic.getValue());
-                    updateBroadcast("#" + "PRESS" + "#" + str_time + "#" + p3d_hum.x);
+                    float hum = (float) p3d_hum.x;
 
                     Point3D p3d_temp = convertTemp(characteristic.getValue());
-                    updateBroadcast("#" + "TEMP" + "#" + str_time + "#" + p3d_temp.x);
+                    float temp = (float) p3d_temp.x;
+
+                    BroadcastModel model = new BroadcastModel(System.currentTimeMillis(), hum, temp);
+
+                    String actionMsg = BroadcastModel.toJson(model);
+                    Intent broadIntent = new Intent(macro.BROADCAST_ADDRESS);
+                    broadIntent.putExtra("msg", actionMsg);
+                    sendBroadcast(broadIntent);
+
+                    // updateBroadcast("#" + "TEMP" + "#" + str_time + "#" + p3d_temp.x);
+                    // updateBroadcast("#" + "PRESS" + "#" + str_time + "#" + p3d_hum.x);
                 }
             }
         });
