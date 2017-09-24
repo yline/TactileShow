@@ -7,24 +7,23 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.PagerAdapter;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.tactileshow.helper.BroadcastModel;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
 import com.tactileshow.view.DefinedViewPager;
-import com.tactileshow.view.VisualTabInfo;
 import com.tactileshow.view.main.TabBodyViewHelper;
 import com.tactileshow.view.main.TabGeneralViewHelper;
 import com.tactileshow.view.main.TabOriginViewHelper;
 import com.tactileshow.view.main.TabSettingViewHelper;
+import com.tactileshow.view.main.TabVisualViewHelper;
+import com.tactileshow.view.main.ViewPagerAdapter;
 import com.yline.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -35,10 +34,9 @@ public class TabActivity extends Activity {
 
     private DefinedViewPager viewPager;
 
-    private VisualTabInfo visual; // 图像信息
-    private TabGeneralViewHelper generalViewHelper; // 一般信息
-
     private TabBodyViewHelper bodyViewHelper; // 人体图
+    private TabGeneralViewHelper generalViewHelper; // 一般信息
+    private TabVisualViewHelper visualViewHelper; // 图像信息
     private TabOriginViewHelper originViewHelper; // 原始数据；温度、湿度
     private TabSettingViewHelper settingViewHelper;  // 设置
 
@@ -51,11 +49,11 @@ public class TabActivity extends Activity {
         viewPager = (DefinedViewPager) findViewById(R.id.tab_view_pager);
         viewPager.setOffscreenPageLimit(5);
 
-        visual = new VisualTabInfo(this, viewPager);
-        originViewHelper = new TabOriginViewHelper(this);
-        generalViewHelper = new TabGeneralViewHelper(this);
-        settingViewHelper = new TabSettingViewHelper(this);
         bodyViewHelper = new TabBodyViewHelper(this);
+        generalViewHelper = new TabGeneralViewHelper(this);
+        visualViewHelper = new TabVisualViewHelper(this, viewPager);
+        originViewHelper = new TabOriginViewHelper(this);
+        settingViewHelper = new TabSettingViewHelper(this);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(macro.BROADCAST_ADDRESS);
@@ -75,7 +73,7 @@ public class TabActivity extends Activity {
         viewList.add(generalViewHelper.getView());
         titleList.add(StaticValue.general_info_tab_name);
 
-        viewList.add(visual.getView());
+        viewList.add(visualViewHelper.getView());
         titleList.add(StaticValue.visual_info_tab_name);
 
         viewList.add(originViewHelper.getView());
@@ -86,34 +84,9 @@ public class TabActivity extends Activity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_tab_layout);
 
-        viewPager.setAdapter(new PagerAdapter() {
-            @Override
-            public int getCount() {
-                return viewList.size();
-            }
-
-            @Override
-            public boolean isViewFromObject(View view, Object object) {
-                return (view == object);
-            }
-
-            @Override
-            public Object instantiateItem(ViewGroup container, int position) {
-                View view = viewList.get(position);
-                container.addView(view);
-                return view;
-            }
-
-            @Override
-            public void destroyItem(ViewGroup container, int position, Object object) {
-                container.removeView((View) object);
-            }
-
-            @Override
-            public CharSequence getPageTitle(int position) {
-                return titleList.get(position);
-            }
-        });
+        ViewPagerAdapter pagerAdapter = new ViewPagerAdapter();
+        pagerAdapter.setViews(viewList, titleList);
+        viewPager.setAdapter(pagerAdapter);
 
         tabLayout.setupWithViewPager(viewPager);
     }
@@ -147,13 +120,13 @@ public class TabActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        visual.onSaveInstanceState(outState);
+        visualViewHelper.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedState) {
         super.onRestoreInstanceState(savedState);
-        visual.onRestoreInstanceState(savedState);
+        visualViewHelper.onRestoreInstanceState(savedState);
     }
 
     private void getScreenMetrics() {
@@ -174,7 +147,7 @@ public class TabActivity extends Activity {
         try {
             generalViewHelper.setTemp(data);
             generalViewHelper.setGerm(data);
-            visual.setTemp(t, data);
+            visualViewHelper.setTemp(t, data);
             originViewHelper.setTemp(data);
         } catch (NumberFormatException e) {
             Log.e("wshg", "Received an error format data!");
@@ -184,7 +157,7 @@ public class TabActivity extends Activity {
     public void setPress(Time t, double data) {
         try {
             generalViewHelper.setPress(data);
-            visual.setPress(t, data);
+            visualViewHelper.setPress(t, data);
             originViewHelper.setHum(data);
         } catch (NumberFormatException e) {
             Log.e("wshg", "Received an error format data!");

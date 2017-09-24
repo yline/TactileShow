@@ -7,15 +7,15 @@ import java.util.Date;
 public class StaticValue
 {
 	
-	public static String general_info_tab_name = "一般\n信息";
+	public final static String general_info_tab_name = "一般\n信息";
 	
-	public static String visual_info_tab_name = "图像\n信息";
+	public final static String visual_info_tab_name = "图像\n信息";
 	
-	public static String detail_info_tab_name = "原始\n信息";
+	public final static String detail_info_tab_name = "原始\n信息";
 	
-	public static String bodymap_info_tab_name = "人体\n地图";  //by yzy
+	public final static String bodymap_info_tab_name = "人体\n地图";  //by yzy
 	
-	public static String set_tab_name = "设置";
+	public final static String set_tab_name = "设置";
 	
 	public static int width, height;
 	
@@ -41,9 +41,9 @@ public class StaticValue
 	
 	public static int max_points = 100;
 	
-	public static String temp_visual_info_name = "温度信息";
+	public final static String temp_visual_info_name = "温度信息";
 	
-	public static String press_visual_info_name = "湿度信息";
+	public final static String press_visual_info_name = "湿度信息";
 	
 	//	public static String time_formart = "yyy-mm-dd HH:MM:ss";
 	

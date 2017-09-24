@@ -7,23 +7,18 @@ import android.view.MotionEvent;
 
 public class DefinedViewPager extends ViewPager
 {
-	private Context context;
-	
 	private boolean willIntercept = true;
 	
 	public DefinedViewPager(Context context)
 	{
 		super(context);
-		this.context = context;
 	}
 	
 	public DefinedViewPager(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		this.context = context;
 	}
-	
-	
+
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent arg0)
 	{
