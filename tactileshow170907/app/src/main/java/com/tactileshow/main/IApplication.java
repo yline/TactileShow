@@ -1,5 +1,6 @@
 package com.tactileshow.main;
 
+import com.tactileshow.helper.DataFileUtil;
 import com.yline.application.BaseApplication;
 
 /**
@@ -12,5 +13,7 @@ public class IApplication extends BaseApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        DataFileUtil.init(this);
     }
 }

@@ -165,7 +165,7 @@ public class SettingView {
                 }
 
                 try {
-                    Thread.sleep(300); // 最小的频率
+                    Thread.sleep(800); // 最小的频率
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
