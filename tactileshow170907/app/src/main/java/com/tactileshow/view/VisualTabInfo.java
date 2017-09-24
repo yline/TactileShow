@@ -1,9 +1,10 @@
 package com.tactileshow.view;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.format.Time;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
@@ -16,10 +17,6 @@ import java.util.List;
 
 public class VisualTabInfo
 {
-	public Activity context;
-	
-	private DefinedViewPager pager;
-	
 	private View view;
 	
 	private TabHost tabHost;
@@ -34,12 +31,9 @@ public class VisualTabInfo
 	
 	private PressVisualInfo pressVisual;
 	
-	public VisualTabInfo(Activity activity, DefinedViewPager pager)
+	public VisualTabInfo(Context context, DefinedViewPager pager)
 	{
-		this.context = activity;
-		this.pager = pager;
-		
-		this.view = context.getLayoutInflater().inflate(R.layout.visual_tab_info, null);
+		this.view = LayoutInflater.from(context).inflate(R.layout.visual_tab_info, null);
 		this.tabHost = (TabHost) view.findViewById(R.id.visual_tab_host);
 		this.viewPager = (DefinedViewPager) view.findViewById(R.id.visual_paper);
 		
@@ -94,7 +88,6 @@ public class VisualTabInfo
 				}
 			}
 		});
-		
 	}
 
 	/**

@@ -1,10 +1,11 @@
 package com.tactileshow.view;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -21,15 +22,11 @@ public class PressVisualInfo
 	
 	private LineChartBuilder pressMap;
 	
-	private Activity context;
-	
 	private View view;
 	
 	private LinearLayout layout;
 	
 	private DefinedScrollView scroll;
-	
-	private DefinedViewPager pager;
 	
 	private RelativeLayout history_layout;
 	
@@ -40,13 +37,10 @@ public class PressVisualInfo
 	private String sensor;
 	
 	@SuppressLint("InflateParams")
-	public PressVisualInfo(Activity activity, DefinedViewPager pager)
+	public PressVisualInfo(Context context, DefinedViewPager pager)
 	{
-		this.context = activity;
-		this.pager = pager;
-		
 		sensor = StaticValue.PRESS;
-		view = context.getLayoutInflater().inflate(R.layout.activity_visual_press_info, null);
+		view = LayoutInflater.from(context).inflate(R.layout.activity_visual_press_info, null);
 		scroll = (DefinedScrollView) view.findViewById(R.id.scroll_press);
 		layout = (LinearLayout) view.findViewById(R.id.visual_press_chart_layout);
 		if (layout == null)
@@ -55,7 +49,7 @@ public class PressVisualInfo
 			return;
 		}
 		
-		pressMap = new LineChartBuilder(context, layout, "湿度变化趋势", this.pager, scroll, sensor);
+		pressMap = new LineChartBuilder(context, layout, "湿度变化趋势", pager, scroll, sensor);
 		pressMap.setYRange(StaticValue.temp_min_axis, StaticValue.temp_max_axis);
 		
 		history_layout = (RelativeLayout) view.findViewById(R.id.visual_press_history_layout);
