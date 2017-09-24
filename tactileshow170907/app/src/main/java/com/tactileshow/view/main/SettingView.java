@@ -159,7 +159,7 @@ public class SettingView {
                     float temp = broadcastDialogHelper.getMockTemp();
                     float hum = broadcastDialogHelper.getMockHum();
                     LogUtil.i("Mock:" + "temp = " + temp + ", hum = " + hum);
-                    BroadcastModel model = new BroadcastModel(System.currentTimeMillis(), temp, hum);
+                    BroadcastModel model = new BroadcastModel(System.currentTimeMillis(), hum, temp);
 
                     mHandler.setBroadcastModel(model);
                 }
