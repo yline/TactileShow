@@ -38,7 +38,7 @@ public class SettingViewHelper {
     public SettingViewHelper(Context context) {
         mHandler = new BroadcastHandler(context);
 
-        View view = LayoutInflater.from(context).inflate(R.layout.view_main_setting, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.view_tab_setting, null);
         this.mViewHolder = new ViewHolder(view);
 
         this.exitDialogHelper = new ExitDialogHelper(context);
@@ -187,7 +187,7 @@ public class SettingViewHelper {
 
         public BroadcastDialogHelper(Context context) {
             dialog = new Dialog(context);
-            View view = LayoutInflater.from(context).inflate(R.layout.view_main_setting_dialog_broadcast, null);
+            View view = LayoutInflater.from(context).inflate(R.layout.view_tab_setting_dialog_broadcast, null);
             dialog.setTitle("设定数据广播");
             dialog.setContentView(view);
             sViewHolder = new ViewHolder(view);
@@ -303,7 +303,7 @@ public class SettingViewHelper {
 
         public ThresholdDialogHelper(Context context) {
             dialog = new Dialog(context);
-            View view = LayoutInflater.from(context).inflate(R.layout.view_main_setting_dialog_threshold, null);
+            View view = LayoutInflater.from(context).inflate(R.layout.view_tab_setting_dialog_threshold, null);
             dialog.setTitle("设定阈值信息");
             dialog.setContentView(view);
             sViewHolder = new ViewHolder(view);

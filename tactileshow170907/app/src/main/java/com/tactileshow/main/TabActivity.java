@@ -21,9 +21,9 @@ import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
 import com.tactileshow.view.BodyMap;
 import com.tactileshow.view.DefinedViewPager;
-import com.tactileshow.view.DetailInfo;
 import com.tactileshow.view.GeneralInfo;
 import com.tactileshow.view.VisualTabInfo;
+import com.tactileshow.view.main.OriginViewHelper;
 import com.tactileshow.view.main.SettingViewHelper;
 import com.yline.utils.LogUtil;
 
@@ -36,10 +36,11 @@ public class TabActivity extends Activity {
     private DefinedViewPager viewPager;
 
     private VisualTabInfo visual; // 图像信息
-    private DetailInfo detail; // 原始数据；温度、湿度
     private GeneralInfo general; // 一般信息
-    private SettingViewHelper set;  // 设置
     private BodyMap bodymap; // 人体图
+
+    private OriginViewHelper detail; // 原始数据；温度、湿度
+    private SettingViewHelper set;  // 设置
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,7 @@ public class TabActivity extends Activity {
         viewPager.setOffscreenPageLimit(5);
 
         visual = new VisualTabInfo(this, viewPager);
-        detail = new DetailInfo(this);
+        detail = new OriginViewHelper(this);
         general = new GeneralInfo(this);
         set = new SettingViewHelper(this);
         bodymap = new BodyMap(this, viewPager);

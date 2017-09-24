@@ -1,5 +1,4 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,7 +16,7 @@
         android:layout_marginStart="0dp"
         android:layout_marginTop="148dp"
         android:text="@string/label_detail_temp_name_str"
-        android:textSize="@dimen/dimen_detail_text_size"/>
+        android:textSize="@dimen/dimen_detail_text_size" />
 
     <TextView
         android:id="@+id/label_detail_hum_name"
@@ -26,7 +25,7 @@
         android:layout_alignStart="@+id/label_detail_temp_name"
         android:layout_centerVertical="true"
         android:text="@string/label_detail_hum_name_str"
-        android:textSize="@dimen/dimen_detail_text_size"/>
+        android:textSize="@dimen/dimen_detail_text_size" />
 
     <TextView
         android:id="@+id/label_detail_hum"
@@ -35,7 +34,7 @@
         android:layout_alignStart="@+id/label_detail_temp"
         android:layout_centerVertical="true"
         android:text=""
-        android:textSize="@dimen/dimen_detail_text_size"/>
+        android:textSize="@dimen/dimen_detail_text_size" />
 
     <TextView
         android:id="@+id/label_detail_hum_unit"
@@ -44,7 +43,7 @@
         android:layout_alignBottom="@+id/label_detail_hum"
         android:layout_alignStart="@+id/label_detail_temp_unit"
         android:text="@string/label_hum_unit_str"
-        android:textSize="@dimen/dimen_detail_text_size"/>
+        android:textSize="@dimen/dimen_detail_text_size" />
 
     <TextView
         android:id="@+id/label_detail_temp"
@@ -56,7 +55,7 @@
         android:layout_marginStart="10dp"
         android:layout_toEndOf="@+id/label_detail_temp_name"
         android:text=""
-        android:textSize="@dimen/dimen_detail_text_size"/>
+        android:textSize="@dimen/dimen_detail_text_size" />
 
     <TextView
         android:id="@+id/label_detail_temp_unit"
@@ -67,6 +66,5 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="20dp"
         android:text="@string/label_temp_unit_str"
-        android:textSize="@dimen/dimen_detail_text_size"/>
-
+        android:textSize="@dimen/dimen_detail_text_size" />
 </RelativeLayout>
