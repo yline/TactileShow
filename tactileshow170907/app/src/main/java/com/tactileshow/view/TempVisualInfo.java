@@ -42,12 +42,7 @@ public class TempVisualInfo
 		view = LayoutInflater.from(context).inflate(R.layout.activity_visual_info, null);
 		scroll = (DefinedScrollView) view.findViewById(R.id.scroll);
 		layout = (LinearLayout) view.findViewById(R.id.visual_chart_layout);
-		if (layout == null)
-		{
-			Log.e("wshg", "Null");
-			return;
-		}
-		
+
 		tempMap = new LineChartBuilder(context, layout, "温度变化趋势", pager, scroll, sensor);
 		tempMap.setYRange(StaticValue.temp_min_axis, StaticValue.temp_max_axis);
 		
@@ -190,7 +185,9 @@ public class TempVisualInfo
 				pars = to_str.split(" : ");
 				tot.hour = Integer.parseInt(pars[0]);
 				tot.minute = Integer.parseInt(pars[1]);
+
 				history.getHoursHistory(from, tot, sensor);
+
 				StaticValue.temp_real_time = false;
 				tempMap.changeMode();
 				tempMap.setTitle("温度历史记录(" + from_str + " - " + to_str + ")");

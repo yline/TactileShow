@@ -7,9 +7,8 @@ import android.text.format.Time;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.DatePicker;
-import android.widget.EditText;
 
-public class DateEditor extends EditText
+public class DateEditor extends android.support.v7.widget.AppCompatEditText
 {
 	
 	private Time date;

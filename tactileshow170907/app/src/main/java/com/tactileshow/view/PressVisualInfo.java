@@ -19,7 +19,6 @@ import com.tactileshow.util.StaticValue;
 
 public class PressVisualInfo
 {
-	
 	private LineChartBuilder pressMap;
 	
 	private View view;
