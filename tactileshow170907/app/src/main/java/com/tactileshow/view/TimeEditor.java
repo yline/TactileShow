@@ -6,10 +6,9 @@ import android.content.DialogInterface;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TimePicker;
 
-public class TimeEditor extends EditText
+public class TimeEditor extends android.support.v7.widget.AppCompatEditText
 {
 	
 	private Context context;

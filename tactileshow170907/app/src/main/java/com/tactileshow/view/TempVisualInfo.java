@@ -16,6 +16,8 @@ import android.widget.TabHost;
 import com.tactileshow.main.R;
 import com.tactileshow.util.HistoryDataComputing;
 import com.tactileshow.util.StaticValue;
+import com.tactileshow.view.custom.DefinedScrollView;
+import com.tactileshow.view.custom.DefinedViewPager;
 
 public class TempVisualInfo
 {

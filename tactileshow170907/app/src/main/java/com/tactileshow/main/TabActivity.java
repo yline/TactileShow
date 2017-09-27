@@ -17,7 +17,7 @@ import android.view.WindowManager;
 import com.tactileshow.helper.BroadcastModel;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
-import com.tactileshow.view.DefinedViewPager;
+import com.tactileshow.view.custom.DefinedViewPager;
 import com.tactileshow.view.main.TabBodyViewHelper;
 import com.tactileshow.view.main.TabGeneralViewHelper;
 import com.tactileshow.view.main.TabOriginViewHelper;

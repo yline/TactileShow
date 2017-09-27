@@ -9,9 +9,9 @@ import android.view.View;
 
 import com.tactileshow.main.R;
 import com.tactileshow.util.StaticValue;
-import com.tactileshow.view.DefinedViewPager;
 import com.tactileshow.view.PressVisualInfo;
 import com.tactileshow.view.TempVisualInfo;
+import com.tactileshow.view.custom.DefinedViewPager;
 
 import java.util.ArrayList;
 import java.util.List;

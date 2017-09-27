@@ -9,7 +9,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="46dp"/>
 
-	<com.tactileshow.view.DefinedViewPager
+	<com.tactileshow.view.custom.DefinedViewPager
 		android:id="@+id/visual_view_pager"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tactileshow.view.DefinedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.tactileshow.view.custom.DefinedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scroll_press"
     android:layout_width="match_parent"
@@ -147,4 +147,4 @@
 
     </LinearLayout>
    
-</com.tactileshow.view.DefinedScrollView>
+</com.tactileshow.view.custom.DefinedScrollView>
