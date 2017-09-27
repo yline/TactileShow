@@ -26,7 +26,7 @@ import android.widget.TextView;
 
 import com.tactileshow.helper.BluetoothHelper;
 import com.tactileshow.helper.BroadcastModel;
-import com.tactileshow.helper.DataFileUtil;
+import com.tactileshow.helper.DataManager;
 import com.tactileshow.util.DataFile;
 import com.tactileshow.util.Point3D;
 import com.tactileshow.util.StaticValue;
@@ -254,7 +254,7 @@ public class MainActivity extends Activity {
                     sendBroadcast(broadIntent);
 
                     if (!model.isDataEmpty()) {
-                        DataFileUtil.append(model);
+                        DataManager.getInstance().insert(model);
                     }
                     // updateBroadcast("#" + "TEMP" + "#" + str_time + "#" + p3d_temp.x);
                     // updateBroadcast("#" + "PRESS" + "#" + str_time + "#" + p3d_hum.x);

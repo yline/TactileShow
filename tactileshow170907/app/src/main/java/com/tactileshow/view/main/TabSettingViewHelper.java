@@ -12,6 +12,7 @@ import android.widget.CompoundButton;
 
 import com.tactileshow.helper.BroadcastHandler;
 import com.tactileshow.helper.BroadcastModel;
+import com.tactileshow.helper.DataManager;
 import com.tactileshow.main.R;
 import com.tactileshow.util.macro;
 import com.yline.application.SDKManager;
@@ -120,6 +121,15 @@ public class TabSettingViewHelper {
             }
         });
 
+        // 数据条数
+        mViewHolder.setText(R.id.setting_tv_data_count, DataManager.getInstance().count() + "");
+        mViewHolder.setOnClickListener(R.id.setting_rl_data, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewHolder.setText(R.id.setting_tv_data_count, DataManager.getInstance().count() + "");
+            }
+        });
+
         // 退出
         mViewHolder.setOnClickListener(R.id.setting_rl_exit, new View.OnClickListener() {
             @Override
@@ -162,6 +172,9 @@ public class TabSettingViewHelper {
                     BroadcastModel model = new BroadcastModel(System.currentTimeMillis(), hum, temp);
 
                     mHandler.setBroadcastModel(model);
+                    if (!model.isDataEmpty()) {
+                        DataManager.getInstance().insert(model);
+                    }
                 }
 
                 try {

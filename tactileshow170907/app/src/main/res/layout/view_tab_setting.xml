@@ -139,6 +139,38 @@
             android:layout_marginRight="15dp"
             android:background="#888888" />
 
+
+        <RelativeLayout
+            android:id="@+id/setting_rl_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="    更新数据总条数"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/setting_tv_data_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="30dp"
+                android:text="0"
+                android:textSize="20dp" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:background="#888888" />
+
+
         <RelativeLayout
             android:id="@+id/setting_rl_exit"
             android:layout_width="match_parent"
