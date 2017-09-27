@@ -122,7 +122,7 @@ public class DataManager {
     }
 
     private List<BroadcastModel> load(long fromStamp, long toStamp) {
-        String sql = String.format(Locale.CHINA, "select * from %s where %s between %d and %d", DataOpenHelper.DefaultSQLiteName, DataOpenHelper.Table.stamp.name, fromStamp, toStamp);
+        String sql = String.format(Locale.CHINA, "select * from %s where %s between %d and %d order by %s", DataOpenHelper.DefaultSQLiteName, DataOpenHelper.Table.stamp.name, fromStamp, toStamp, DataOpenHelper.Table.stamp.name);
         Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
         return loadAndCloseCursor(cursor);
     }

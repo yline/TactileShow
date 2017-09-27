@@ -54,11 +54,6 @@ public class SQLiteAsyncSimpleTest {
             @Override
             public void onSuccess(List<BroadcastModel> modelList) {
                 Log.i(TAG, "onSuccess: size = " + modelList.size());
-                for (BroadcastModel model : modelList) {
-                    Log.i(TAG, "onSuccess: model = " + model.toString());
-                }
-
-                Assert.assertEquals(20, DataManager.getInstance().count());
             }
         });
     }
