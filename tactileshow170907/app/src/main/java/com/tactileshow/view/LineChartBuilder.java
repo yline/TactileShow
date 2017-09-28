@@ -79,6 +79,7 @@ public class LineChartBuilder
 		series = new TimeSeries("实时信息");
 		history_series = new TimeSeries("历史记录");
 		mDataset.addSeries(series);
+
 		renderer = new XYSeriesRenderer();
 		
 		renderer.setColor(Color.RED);
@@ -97,7 +98,6 @@ public class LineChartBuilder
 	
 	public void init()
 	{
-		
 		if (mChartView == null)
 		{
 			//mChartView = ChartFactory.getCubeLineChartView(context, mDataset, mRenderer, 0.33f);

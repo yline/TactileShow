@@ -67,10 +67,4 @@
         android:layout_marginEnd="20dp"
         android:text="@string/label_temp_unit_str"
         android:textSize="@dimen/dimen_detail_text_size" />
-
-    <com.tactileshow.view.main.TabVisualQueryView
-        android:id="@+id/query_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/label_detail_hum_unit"/>
 </RelativeLayout>
