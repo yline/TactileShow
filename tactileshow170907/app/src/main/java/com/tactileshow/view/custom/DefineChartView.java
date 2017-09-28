@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,7 +34,8 @@ import java.util.Date;
  * @version 1.0.0
  */
 public class DefineChartView extends LinearLayout {
-    private XYSeriesRenderer renderer;
+    private static final int OffsetOfXRange = 1000;
+
     private XYMultipleSeriesRenderer seriesRenderer;
 
     private TimeSeries nowSeries, historySeries;
@@ -43,6 +45,7 @@ public class DefineChartView extends LinearLayout {
     private GraphicalView graphicalView;
 
     private OnTouchChartCallback onTouchChartCallback;
+    private int maxPoints;
 
     public DefineChartView(Context context) {
         super(context);
@@ -64,6 +67,8 @@ public class DefineChartView extends LinearLayout {
         initDataSet();
 
         initGraphicalView(context);
+
+        maxPoints = 50;
     }
 
     private void initGraphicalView(Context context) {
@@ -72,6 +77,8 @@ public class DefineChartView extends LinearLayout {
 
         if (null == graphicalView) {
             graphicalView = ChartFactory.getTimeChartView(context, seriesDataset, seriesRenderer, null);
+            // graphicalView = ChartFactory.getCubeLineChartView(context, seriesDataset, seriesRenderer, 0f); // 0不弯曲，1完全弯曲；0.33f 够用
+
             seriesRenderer.setClickEnabled(true);
             seriesRenderer.setSelectableBuffer(10);
 
@@ -86,12 +93,12 @@ public class DefineChartView extends LinearLayout {
                 public boolean onTouch(View v, MotionEvent event) {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_UP:
-                            if (null != onTouchChartCallback){
+                            if (null != onTouchChartCallback) {
                                 onTouchChartCallback.onActionUp();
                             }
                             break;
                         case MotionEvent.ACTION_DOWN:
-                            if (null != onTouchChartCallback){
+                            if (null != onTouchChartCallback) {
                                 onTouchChartCallback.onActionDown();
                             }
                             break;
@@ -115,16 +122,22 @@ public class DefineChartView extends LinearLayout {
         seriesRenderer.setAxisTitleTextSize(30);
         seriesRenderer.setChartTitleTextSize(30);
         seriesRenderer.setLabelsTextSize(30);
-        seriesRenderer.setLegendTextSize(30);
+        seriesRenderer.setLegendTextSize(22);
         seriesRenderer.setMargins(new int[]{5, 5, 0, 5});
         seriesRenderer.setZoomButtonsVisible(true);
         seriesRenderer.setPointSize(5);
         seriesRenderer.setApplyBackgroundColor(true);
         seriesRenderer.setBackgroundColor(Color.argb(0, 50, 50, 50));
-        seriesRenderer.setShowGridX(true);
+        // seriesRenderer.setShowGridX(true);
+        // seriesRenderer.setShowGridY(true);
+        seriesRenderer.setShowGrid(true);
+
+        seriesRenderer.setShowAxes(true);
+        seriesRenderer.setAxesColor(Color.GREEN);
+
         seriesRenderer.setGridColor(Color.BLACK);
 
-        renderer = new XYSeriesRenderer();
+        XYSeriesRenderer renderer = new XYSeriesRenderer();
         renderer.setColor(Color.RED);
         renderer.setPointStyle(PointStyle.POINT);
 
@@ -134,9 +147,12 @@ public class DefineChartView extends LinearLayout {
         renderer.setFillPoints(true);
         renderer.setLineWidth(4);
 
+        seriesRenderer.setXLabels(4);
         seriesRenderer.setYLabels(10);
-        seriesRenderer.setYLabelsPadding(-15);
-        seriesRenderer.setYLabelsColor(0, Color.BLACK);
+        seriesRenderer.setYLabelsPadding(-40);
+
+        seriesRenderer.setXLabelsColor(Color.RED);
+        seriesRenderer.setYLabelsColor(0,Color.BLACK);
     }
 
     private void initDataSet() {
@@ -179,9 +195,27 @@ public class DefineChartView extends LinearLayout {
         }
     }
 
+    public void setMaxPoint(int maxPoint) {
+        this.maxPoints = maxPoint;
+    }
+
     public void addNowData(long stamp, double y) {
         if (null != nowSeries) {
             nowSeries.add(new Date(stamp), y);
+        }
+    }
+
+    public void updateXRange(long maxStamp) {
+        maxStamp += OffsetOfXRange;
+
+        if (null != nowSeries && null != seriesRenderer) {
+            seriesRenderer.setXAxisMax(maxStamp);
+            if (nowSeries.getItemCount() > maxPoints) {
+                seriesRenderer.setXAxisMin(nowSeries.getX(nowSeries.getItemCount() - maxPoints));
+            } else {
+                Log.i("xxxx-", "updateXRange: nowSeries.getX(0) = " + nowSeries.getX(0));
+                seriesRenderer.setXAxisMin(nowSeries.getX(0));
+            }
         }
     }
 

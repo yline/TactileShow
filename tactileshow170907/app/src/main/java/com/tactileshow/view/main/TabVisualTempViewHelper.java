@@ -51,6 +51,7 @@ public class TabVisualTempViewHelper {
 
     public void addData(long stamp, double tempNum) {
         defineChartView.addNowData(stamp, tempNum);
+        defineChartView.updateXRange(stamp);
         defineChartView.notifyDataChanged();
     }
 

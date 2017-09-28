@@ -27,7 +27,7 @@ public class TabVisualViewHelper {
         this.viewPager = (DefinedViewPager) view.findViewById(R.id.visual_view_pager);
         viewPager.setOffscreenPageLimit(2);
 
-        tempViewHelper = new TabVisualTempViewHelper(context,pager);
+        tempViewHelper = new TabVisualTempViewHelper(context, pager);
         humViewHelper = new TabVisualHumViewHelper(context, pager);
         // tempVisual = new TempVisualInfo(context, pager);
         // pressVisual = new PressVisualInfo(context, pager);

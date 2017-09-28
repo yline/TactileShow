@@ -33,7 +33,7 @@ public class TabVisualHumViewHelper {
         queryView = parentView.findViewById(R.id.visual_hum_query);
 
         defineChartView = parentView.findViewById(R.id.visual_hum_chart);
-        defineChartView.setYRange(StaticValue.temp_min_axis, StaticValue.temp_max_axis);
+        defineChartView.setYRange(StaticValue.press_min_axis, StaticValue.press_max_axis);
         defineChartView.setOnTouchChartCallback(new DefineChartView.OnTouchChartCallback() {
             @Override
             public void onActionUp() {
@@ -51,6 +51,7 @@ public class TabVisualHumViewHelper {
 
     public void addData(long stamp, double humData) {
         defineChartView.addNowData(stamp, humData);
+        defineChartView.updateXRange(stamp);
         defineChartView.notifyDataChanged();
     }
 
