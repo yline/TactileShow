@@ -152,7 +152,7 @@ public class DefineChartView extends LinearLayout {
         seriesRenderer.setYLabelsPadding(-40);
 
         seriesRenderer.setXLabelsColor(Color.RED);
-        seriesRenderer.setYLabelsColor(0,Color.BLACK);
+        seriesRenderer.setYLabelsColor(0, Color.BLACK);
     }
 
     private void initDataSet() {
@@ -161,6 +161,16 @@ public class DefineChartView extends LinearLayout {
         historySeries = new TimeSeries("历史记录");
 
         seriesDataset.addSeries(nowSeries);
+    }
+
+    public void changeMode(boolean isNow) {
+        if (isNow) {
+            seriesDataset.clear();
+            seriesDataset.addSeries(nowSeries);
+        } else {
+            seriesDataset.clear();
+            seriesDataset.addSeries(historySeries);
+        }
     }
 
     public void addHistoryData(long stamp, double y) {

@@ -279,7 +279,7 @@ public class TabVisualQueryView extends RelativeLayout {
         /**
          * 查看模式转换
          *
-         * @param isNow 是否展示当前信息
+         * @param isNow 新的状态，true --> 暂时当前信息
          */
         void onModeChange(boolean isNow);
 

@@ -51,7 +51,7 @@ public class DefinedDateEditText extends AppCompatEditText {
             public void onClick(DialogInterface dialog, int which) {
                 if (null != onDateSelectCallback) {
                     int year = datePicker.getYear();
-                    int month = datePicker.getMonth();
+                    int month = datePicker.getMonth() + 1;
                     int day = datePicker.getDayOfMonth();
                     setText(String.format(Locale.CHINA, FormatOfDate, year, month, day));
 

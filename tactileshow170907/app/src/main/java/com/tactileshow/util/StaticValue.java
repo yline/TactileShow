@@ -29,8 +29,6 @@ public class StaticValue
 	
 	public static Time record_time;
 	
-	public static DataFile data_file;
-	
 	public static double temp_max_axis = 60;
 	
 	public static double temp_min_axis = 10;

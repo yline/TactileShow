@@ -4,11 +4,16 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.tactileshow.helper.BroadcastModel;
+import com.tactileshow.helper.DataManager;
 import com.tactileshow.main.R;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.view.custom.DefineChartView;
 import com.tactileshow.view.custom.DefinedScrollView;
 import com.tactileshow.view.custom.DefinedViewPager;
+import com.yline.application.SDKManager;
+
+import java.util.List;
 
 /**
  * 湿度
@@ -45,6 +50,161 @@ public class TabVisualHumViewHelper {
             public void onActionDown() {
                 definedScrollView.setTouchIntercept(false);
                 viewPager.setTouchIntercept(false);
+            }
+        });
+
+        queryView.setOnVisualQueryCallback(new TabVisualQueryView.OnVisualQueryCallback() {
+            @Override
+            public void onModeChange(boolean isNow) {
+                defineChartView.changeMode(isNow);
+            }
+
+            @Override
+            public void onQueryHour(final View view, long currentStamp) {
+                view.setClickable(false);
+                DataManager.getInstance().loadAsync(currentStamp - 360_1000, currentStamp, new DataManager.OnReadCallback() {
+                    @Override
+                    public void onFailure(String errorMsg) {
+                        view.setClickable(true);
+                        SDKManager.toast(errorMsg);
+                    }
+
+                    @Override
+                    public void onSuccess(List<BroadcastModel> modelList) {
+                        view.setClickable(true);
+                        if (modelList.size() == 0) {
+                            SDKManager.toast("该时间段内没有数据");
+                        } else {
+                            BroadcastModel model;
+                            for (int i = 0; i < modelList.size(); i++) {
+                                model = modelList.get(i);
+                                defineChartView.addHistoryData(model.getTime(), model.getHum());
+                            }
+                            defineChartView.notifyDataChanged();
+                            SDKManager.toast("加载成功");
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onQueryDay(final View view, long currentStamp) {
+                view.setClickable(false);
+                DataManager.getInstance().loadAsync(currentStamp - 8640_1000, currentStamp, new DataManager.OnReadCallback() {
+                    @Override
+                    public void onFailure(String errorMsg) {
+                        view.setClickable(true);
+                        SDKManager.toast(errorMsg);
+                    }
+
+                    @Override
+                    public void onSuccess(List<BroadcastModel> modelList) {
+                        view.setClickable(true);
+                        if (modelList.size() == 0) {
+                            SDKManager.toast("该时间段内没有数据");
+                        } else {
+                            BroadcastModel model;
+                            for (int i = 0; i < modelList.size(); i++) {
+                                model = modelList.get(i);
+                                defineChartView.addHistoryData(model.getTime(), model.getHum());
+                            }
+                            defineChartView.notifyDataChanged();
+                            SDKManager.toast("加载成功");
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onQueryMonth(final View view, long currentStamp) {
+                view.setClickable(false);
+                DataManager.getInstance().loadAsync((currentStamp - 2_592_000_000L), currentStamp, new DataManager.OnReadCallback() {
+                    @Override
+                    public void onFailure(String errorMsg) {
+                        view.setClickable(true);
+                        SDKManager.toast(errorMsg);
+                    }
+
+                    @Override
+                    public void onSuccess(List<BroadcastModel> modelList) {
+                        view.setClickable(true);
+                        if (modelList.size() == 0) {
+                            SDKManager.toast("该时间段内没有数据");
+                        } else {
+                            BroadcastModel model;
+                            for (int i = 0; i < modelList.size(); i++) {
+                                model = modelList.get(i);
+                                defineChartView.addHistoryData(model.getTime(), model.getHum());
+                            }
+                            defineChartView.notifyDataChanged();
+                            SDKManager.toast("加载成功");
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onQueryTimeSelect(final View view, long fromStamp, long toStamp) {
+                if (fromStamp >= toStamp) {
+                    SDKManager.toast("查询的时间输入不合法");
+                } else {
+                    view.setClickable(false);
+                    DataManager.getInstance().loadAsync(fromStamp, toStamp, new DataManager.OnReadCallback() {
+                        @Override
+                        public void onFailure(String errorMsg) {
+                            view.setClickable(true);
+                            SDKManager.toast(errorMsg);
+                        }
+
+                        @Override
+                        public void onSuccess(List<BroadcastModel> modelList) {
+                            view.setClickable(true);
+                            if (modelList.size() == 0) {
+                                SDKManager.toast("该时间段内没有数据");
+                            } else {
+                                BroadcastModel model;
+                                for (int i = 0; i < modelList.size(); i++) {
+                                    model = modelList.get(i);
+                                    defineChartView.addHistoryData(model.getTime(), model.getHum());
+                                }
+                                defineChartView.notifyDataChanged();
+                                SDKManager.toast("加载成功");
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onQueryDateSelect(final View view, long fromStamp, long toStamp) {
+                if (fromStamp >= toStamp) {
+                    SDKManager.toast("查询的时间输入不合法");
+                } else {
+                    view.setClickable(false);
+                    DataManager.getInstance().loadAsync(fromStamp, toStamp, new DataManager.OnReadCallback() {
+                        @Override
+                        public void onFailure(String errorMsg) {
+                            view.setClickable(true);
+                            SDKManager.toast(errorMsg);
+                        }
+
+                        @Override
+                        public void onSuccess(List<BroadcastModel> modelList) {
+                            view.setClickable(true);
+                            if (modelList.size() == 0) {
+                                SDKManager.toast("该时间段内没有数据");
+                            } else {
+                                BroadcastModel model;
+                                for (int i = 0; i < modelList.size(); i++) {
+                                    model = modelList.get(i);
+                                    defineChartView.addHistoryData(model.getTime(), model.getHum());
+                                }
+                                defineChartView.notifyDataChanged();
+                                SDKManager.toast("加载成功");
+                            }
+                        }
+                    });
+                }
             }
         });
     }

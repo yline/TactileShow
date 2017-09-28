@@ -27,9 +27,7 @@ import android.widget.TextView;
 import com.tactileshow.helper.BluetoothHelper;
 import com.tactileshow.helper.BroadcastModel;
 import com.tactileshow.helper.DataManager;
-import com.tactileshow.util.DataFile;
 import com.tactileshow.util.Point3D;
-import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
 import com.tactileshow.view.main.MainDialogHelper;
 import com.tactileshow.view.main.MainListViewAdapter;
@@ -80,8 +78,6 @@ public class MainActivity extends Activity {
 
         // Problem
         SDKManager.toast("蓝牙已开启");
-
-        StaticValue.data_file = new DataFile();
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(macro.BROADCAST_ADDRESS);
