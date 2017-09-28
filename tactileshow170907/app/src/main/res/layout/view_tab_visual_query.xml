@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/visual_query_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:drawableRight="@drawable/history_area_unvisible"
+        android:paddingRight="15dp"
+        android:text="@string/label_history_area_str"
+        android:textSize="20dp" />
+
+    <LinearLayout
+        android:id="@+id/visual_query_ll_duration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/visual_query_switch"
+        android:orientation="horizontal"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
+
+        <Button
+            android:id="@+id/visual_query_hour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="@string/button_history_area_one_hour" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/visual_query_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_history_area_one_day" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/visual_query_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:text="@string/button_history_area_one_month" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/visual_query_rl_slot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/visual_query_ll_duration"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/visual_query_ll_slot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/visual_query_btn_hour"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:text="@string/label_history_area_detail_query_hour_name"
+                android:textColor="@android:color/holo_red_light" />
+
+            <Button
+                android:id="@+id/visual_query_btn_day"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:text="@string/label_history_area_detail_query_day_name"
+                android:textColor="@android:color/darker_gray" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/visual_query_ll_hour"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@id/visual_query_ll_slot"
+            android:layout_toRightOf="@id/visual_query_ll_slot"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <com.tactileshow.view.custom.DefinedTimeEditText
+                android:id="@+id/visual_query_time_et_from"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="  —  " />
+
+            <com.tactileshow.view.custom.DefinedTimeEditText
+                android:id="@+id/visual_query_time_et_to"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal" />
+
+            <Button
+                android:id="@+id/visual_query_hour_query"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="查询" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/visual_query_ll_day"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@id/visual_query_ll_slot"
+            android:layout_toRightOf="@id/visual_query_ll_slot"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="invisible">
+
+            <com.tactileshow.view.custom.DefinedDateEditText
+                android:id="@+id/visual_query_date_et_from"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="  —  " />
+
+            <com.tactileshow.view.custom.DefinedDateEditText
+                android:id="@+id/visual_query_date_et_to"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal" />
+
+            <Button
+                android:id="@+id/visual_query_day_query"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="查询" />
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

@@ -25,10 +25,6 @@ public class TempVisualInfo
 	
 	private View view;
 	
-	private LinearLayout layout;
-	
-	private DefinedScrollView scroll;
-	
 	private RelativeLayout history_layout;
 	
 	private TabHost queryHost;
@@ -42,8 +38,8 @@ public class TempVisualInfo
 	{
 		sensor = StaticValue.TEMP;
 		view = LayoutInflater.from(context).inflate(R.layout.activity_visual_info, null);
-		scroll = (DefinedScrollView) view.findViewById(R.id.scroll);
-		layout = (LinearLayout) view.findViewById(R.id.visual_chart_layout);
+		DefinedScrollView scroll = (DefinedScrollView) view.findViewById(R.id.scroll);
+		LinearLayout layout = (LinearLayout) view.findViewById(R.id.visual_chart_layout);
 
 		tempMap = new LineChartBuilder(context, layout, "温度变化趋势", pager, scroll, sensor);
 		tempMap.setYRange(StaticValue.temp_min_axis, StaticValue.temp_max_axis);

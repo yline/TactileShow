@@ -164,7 +164,7 @@ public class TabSettingViewHelper {
             super.run();
 
             while (true) {
-                if (null != mHandler) {
+                if (null != mHandler && macro.SETTINGS_BCAST) {
                     // temp
                     float temp = broadcastDialogHelper.getMockTemp();
                     float hum = broadcastDialogHelper.getMockHum();

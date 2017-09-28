@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.tactileshow.view.custom.DefinedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:orientation="vertical"></LinearLayout>
+            android:orientation="vertical" />
 
         <Button
             android:id="@+id/button_history_area"
@@ -41,8 +40,8 @@
                 android:id="@+id/button_one_hour"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
                 android:text="@string/button_history_area_one_hour" />
 
             <Button
@@ -50,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:text="@string/button_history_area_one_day" />
 
             <Button
@@ -58,9 +57,35 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_marginEnd="24dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="10dp"
                 android:text="@string/button_history_area_one_month" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/button_one_hour"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/visual_temp_query_hour"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/visual_temp_query_day"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+                </LinearLayout>
+            </LinearLayout>
 
             <TabHost
                 android:id="@+id/history_query_host"
@@ -78,7 +103,7 @@
                     <com.tactileshow.view.DefinedTabWidget
                         android:id="@android:id/tabs"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"></com.tactileshow.view.DefinedTabWidget>
+                        android:layout_height="wrap_content" />
 
                     <!-- FrameLayout的id属性必须为 @android:id/tabcontent-->
                     <FrameLayout
