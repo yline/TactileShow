@@ -4,19 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.format.Time;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 
-import com.tactileshow.main.R;
 import com.tactileshow.util.HistoryDataComputing;
-import com.tactileshow.util.StaticValue;
-import com.tactileshow.view.custom.DefinedScrollView;
 import com.tactileshow.view.custom.DefinedViewPager;
 
 public class TempVisualInfo
@@ -36,7 +28,7 @@ public class TempVisualInfo
 	@SuppressLint("InflateParams")
 	public TempVisualInfo(Context context, DefinedViewPager pager)
 	{
-		sensor = StaticValue.TEMP;
+		/*sensor = StaticValue.TEMP;
 		view = LayoutInflater.from(context).inflate(R.layout.activity_visual_info, null);
 		DefinedScrollView scroll = (DefinedScrollView) view.findViewById(R.id.scroll);
 		LinearLayout layout = (LinearLayout) view.findViewById(R.id.visual_chart_layout);
@@ -74,7 +66,7 @@ public class TempVisualInfo
 				}
 			}
 			
-		});
+		});*/
 		
 		historyListen();
 		
@@ -90,7 +82,7 @@ public class TempVisualInfo
 	
 	private void historyListen()
 	{
-		
+		/*
 		Button query_one_hour = (Button) view.findViewById(R.id.button_one_hour);
 		query_one_hour.setOnClickListener(new OnClickListener()
 		{
@@ -226,16 +218,16 @@ public class TempVisualInfo
 				Log.e("wshg", "from: " + from_str + "; to: " + to_str);
 			}
 			
-		});
+		});*/
 	}
 	
 	private void initQueryHost()
 	{
-		queryHost = (TabHost) view.findViewById(R.id.history_query_host);
+		/*queryHost = (TabHost) view.findViewById(R.id.history_query_host);
 		queryHost.setup();
 		queryHost.addTab(queryHost.newTabSpec("按小时查询").setIndicator("按小时查询").setContent(R.id.one_hour_query_layout));
 		queryHost.addTab(queryHost.newTabSpec("按天查询").setIndicator("按天查询").setContent(R.id.one_day_query_layout));
-		queryHost.setCurrentTab(0);
+		queryHost.setCurrentTab(0);*/
 	}
 	
 	public View getView()

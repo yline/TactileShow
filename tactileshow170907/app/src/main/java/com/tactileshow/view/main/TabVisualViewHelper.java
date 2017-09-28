@@ -19,8 +19,6 @@ public class TabVisualViewHelper {
     private TabVisualTempViewHelper tempViewHelper;
     private TabVisualHumViewHelper humViewHelper;
 
-    // private TempVisualInfo tempVisual;
-    // private PressVisualInfo pressVisual;
 
     public TabVisualViewHelper(Context context, DefinedViewPager pager) {
         this.view = LayoutInflater.from(context).inflate(R.layout.view_tab_visual, null);
@@ -29,8 +27,6 @@ public class TabVisualViewHelper {
 
         tempViewHelper = new TabVisualTempViewHelper(context, pager);
         humViewHelper = new TabVisualHumViewHelper(context, pager);
-        // tempVisual = new TempVisualInfo(context, pager);
-        // pressVisual = new PressVisualInfo(context, pager);
 
         initView(view);
     }
@@ -46,7 +42,6 @@ public class TabVisualViewHelper {
         titleList.add(StaticValue.press_visual_info_name);
 
         TabLayout tabLayout = parentView.findViewById(R.id.visual_tab_layout);
-
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter();
         pagerAdapter.setViews(viewList, titleList);
 
@@ -57,24 +52,13 @@ public class TabVisualViewHelper {
 
     public void setTemp(long stamp, double tempNum) {
         tempViewHelper.addData(stamp, tempNum);
-        // tempVisual.setTemp(t, data);
-        // tempViewHelper.addData();
     }
 
     public void setHum(long stamp, double humNum) {
-        //pressVisual.setTemp(t, data);
         humViewHelper.addData(stamp, humNum);
     }
 
     public View getView() {
         return this.view;
     }
-/*
-    public void onSaveInstanceState(Bundle outState) {
-        tempVisual.onSaveInstanceState(outState);
-    }
-
-    public void onRestoreInstanceState(Bundle savedState) {
-        pressVisual.onRestoreInstanceState(savedState);
-    }*/
 }

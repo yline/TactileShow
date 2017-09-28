@@ -5,15 +5,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 
-import com.tactileshow.main.R;
 import com.tactileshow.util.HistoryDataComputing;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.view.custom.DefinedScrollView;
@@ -41,9 +37,9 @@ public class PressVisualInfo
 	public PressVisualInfo(Context context, DefinedViewPager pager)
 	{
 		sensor = StaticValue.PRESS;
-		view = LayoutInflater.from(context).inflate(R.layout.activity_visual_press_info, null);
+		/*view = LayoutInflater.from(context).inflate(R.layout.activity_visual_press_info, null);
 		scroll = (DefinedScrollView) view.findViewById(R.id.scroll_press);
-		layout = (LinearLayout) view.findViewById(R.id.visual_press_chart_layout);
+		layout = (LinearLayout) view.findViewById(R.id.visual_press_chart_layout);*/
 		if (layout == null)
 		{
 			Log.e("wshg", "Null");
@@ -53,13 +49,13 @@ public class PressVisualInfo
 		pressMap = new LineChartBuilder(context, layout, "湿度变化趋势", pager, scroll, sensor);
 		pressMap.setYRange(StaticValue.temp_min_axis, StaticValue.temp_max_axis);
 		
-		history_layout = (RelativeLayout) view.findViewById(R.id.visual_press_history_layout);
+		//history_layout = (RelativeLayout) view.findViewById(R.id.visual_press_history_layout);
 		
 		history = new HistoryDataComputing(pressMap);
 		initQueryHost();
 		
-		final Button btn = (Button) view.findViewById(R.id.button_press_history_area);
-		btn.setOnClickListener(new OnClickListener()
+		//final Button btn = (Button) view.findViewById(R.id.button_press_history_area);
+		/*btn.setOnClickListener(new OnClickListener()
 		{
 			
 			@Override
@@ -83,7 +79,7 @@ public class PressVisualInfo
 				}
 			}
 			
-		});
+		});*/
 		
 		historyListen();
 		
@@ -100,7 +96,7 @@ public class PressVisualInfo
 	private void historyListen()
 	{
 		
-		Button query_one_hour = (Button) view.findViewById(R.id.button_press_one_hour);
+		/*Button query_one_hour = (Button) view.findViewById(R.id.button_press_one_hour);
 		query_one_hour.setOnClickListener(new OnClickListener()
 		{
 			
@@ -180,9 +176,10 @@ public class PressVisualInfo
 			public void onClick(View v)
 			{
 				pressMap.clearHistory();
-				TimeEditor fr = (TimeEditor) view.findViewById(R.id.edit_press_from_hour);
+				*//*TimeEditor fr = (TimeEditor) view.findViewById(R.id.edit_press_from_hour);
 				TimeEditor to = (TimeEditor) view.findViewById(R.id.edit_press_to_hour);
-				String from_str = fr.getText().toString(), to_str = to.getText().toString();
+				= fr.getText().toString(), to_str = to.getText().toString();*//*
+				String from_str = "", to_str = "";
 				Time from = new Time(), tot = new Time();
 				from.setToNow();
 				tot.setToNow();
@@ -210,9 +207,11 @@ public class PressVisualInfo
 			public void onClick(View v)
 			{
 				pressMap.clearHistory();
-				DateEditor fr = (DateEditor) view.findViewById(R.id.edit_press_from_day);
+				*//*DateEditor fr = (DateEditor) view.findViewById(R.id.edit_press_from_day);
 				DateEditor to = (DateEditor) view.findViewById(R.id.edit_press_to_day);
-				String from_str = fr.getText().toString(), to_str = to.getText().toString();
+				String from_str = fr.getText().toString(), to_str = to.getText().toString();*//*
+				String from_str = "", to_str = "";
+
 				Time from = new Time(), tot = new Time();
 				from.setToNow();
 				tot.setToNow();
@@ -233,16 +232,16 @@ public class PressVisualInfo
 				Log.e("wshg", "from: " + from_str + "; to: " + to_str);
 			}
 			
-		});
+		});*/
 	}
 	
 	private void initQueryHost()
 	{
-		queryHost = (TabHost) view.findViewById(R.id.history_press_query_host);
+		/*queryHost = (TabHost) view.findViewById(R.id.history_press_query_host);
 		queryHost.setup();
 		queryHost.addTab(queryHost.newTabSpec("按小时查询").setIndicator("按小时查询").setContent(R.id.one_hour_query_press_layout));
 		queryHost.addTab(queryHost.newTabSpec("按天查询").setIndicator("按天查询").setContent(R.id.one_day_query_press_layout));
-		queryHost.setCurrentTab(0);
+		queryHost.setCurrentTab(0);*/
 	}
 	
 	public View getView()
