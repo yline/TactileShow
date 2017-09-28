@@ -101,7 +101,9 @@ public class DefineChartView extends LinearLayout {
             });
 
             FrameLayout frameLayout = view.findViewById(R.id.define_chart_graphic);
-            frameLayout.setLayoutParams(new ViewGroup.LayoutParams(UIScreenUtil.getScreenWidth(context) - 5, UIScreenUtil.getScreenHeight(context) / 2));
+            ViewGroup.LayoutParams layoutParams = frameLayout.getLayoutParams();
+            layoutParams.width = UIScreenUtil.getScreenWidth(context) - 5;
+            layoutParams.height = UIScreenUtil.getScreenHeight(context) / 2;
             frameLayout.addView(graphicalView);
         } else {
             graphicalView.repaint();

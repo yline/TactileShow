@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -47,7 +46,7 @@ public class TabActivity extends Activity {
         getScreenMetrics();
 
         viewPager = (DefinedViewPager) findViewById(R.id.tab_view_pager);
-        viewPager.setOffscreenPageLimit(5);
+        viewPager.setOffscreenPageLimit(6);
 
         bodyViewHelper = new TabBodyViewHelper(this);
         generalViewHelper = new TabGeneralViewHelper(this);
@@ -120,13 +119,13 @@ public class TabActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        visualViewHelper.onSaveInstanceState(outState);
+        //visualViewHelper.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedState) {
         super.onRestoreInstanceState(savedState);
-        visualViewHelper.onRestoreInstanceState(savedState);
+        //visualViewHelper.onRestoreInstanceState(savedState);
     }
 
     private void getScreenMetrics() {
@@ -143,21 +142,25 @@ public class TabActivity extends Activity {
         unregisterReceiver(mGattUpdateReceiver);
     }
 
-    public void setTemp(Time t, double data) {
+    public void setTempData(long stamp, double data) {
         try {
             generalViewHelper.setTemp(data);
             generalViewHelper.setGerm(data);
-            visualViewHelper.setTemp(t, data);
+
+            visualViewHelper.setTemp(stamp, data);
+
             originViewHelper.setTemp(data);
         } catch (NumberFormatException e) {
             Log.e("wshg", "Received an error format data!");
         }
     }
 
-    public void setPress(Time t, double data) {
+    public void setPressData(long stamp, double data) {
         try {
             generalViewHelper.setPress(data);
-            visualViewHelper.setPress(t, data);
+
+            visualViewHelper.setHum(stamp, data);
+
             originViewHelper.setHum(data);
         } catch (NumberFormatException e) {
             Log.e("wshg", "Received an error format data!");
@@ -178,17 +181,17 @@ public class TabActivity extends Activity {
             if (null == model) {
                 LogUtil.e("mGattUpdateReceiver model is null");
             } else {
-                Time time = new Time();
-                time.set(model.getTime());
+               /* Time time = new Time();
+                time.set(model.getTime());*/
 
                 float hum = model.getHum();
                 if (BroadcastModel.Empty != hum) {
-                    setPress(time, hum);
+                    setPressData(model.getTime(), hum);
                 }
 
                 float temp = model.getTemp();
                 if (BroadcastModel.Empty != temp) {
-                    setTemp(time, temp);
+                    setTempData(model.getTime(), temp);
                 }
             }
         }

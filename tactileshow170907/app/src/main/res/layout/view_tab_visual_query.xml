@@ -58,7 +58,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/visual_query_ll_duration"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingBottom="46dp">
 
         <LinearLayout
             android:id="@+id/visual_query_ll_slot"
@@ -85,76 +86,106 @@
                 android:textColor="@android:color/darker_gray" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/visual_query_ll_hour"
+        <RelativeLayout
+            android:id="@+id/visual_query_rl_hour"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignBottom="@id/visual_query_ll_slot"
+            android:layout_alignTop="@id/visual_query_ll_slot"
             android:layout_toRightOf="@id/visual_query_ll_slot"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="visible">
-
-            <com.tactileshow.view.custom.DefinedTimeEditText
-                android:id="@+id/visual_query_time_et_from"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="  —  " />
-
-            <com.tactileshow.view.custom.DefinedTimeEditText
-                android:id="@+id/visual_query_time_et_to"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal" />
+            android:visibility="invisible">
 
             <Button
                 android:id="@+id/visual_query_hour_query"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:text="查询" />
-        </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/visual_query_ll_day"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/visual_query_hour_query"
+                android:orientation="horizontal">
+
+                <com.tactileshow.view.custom.DefinedTimeEditText
+                    android:id="@+id/visual_query_time_et_from"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal" />
+
+                <TextView
+                    android:id="@+id/visual_query_hour_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:text=" — " />
+
+                <com.tactileshow.view.custom.DefinedTimeEditText
+                    android:id="@+id/visual_query_time_et_to"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/visual_query_rl_day"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignBottom="@id/visual_query_ll_slot"
+            android:layout_alignTop="@id/visual_query_ll_slot"
             android:layout_toRightOf="@id/visual_query_ll_slot"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:visibility="invisible">
-
-            <com.tactileshow.view.custom.DefinedDateEditText
-                android:id="@+id/visual_query_date_et_from"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="  —  " />
-
-            <com.tactileshow.view.custom.DefinedDateEditText
-                android:id="@+id/visual_query_date_et_to"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal" />
+            android:visibility="visible">
 
             <Button
                 android:id="@+id/visual_query_day_query"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center_vertical"
                 android:text="查询" />
-        </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/visual_query_day_query"
+                android:orientation="horizontal">
+
+                <com.tactileshow.view.custom.DefinedDateEditText
+                    android:id="@+id/visual_query_date_et_from"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:text="  —  " />
+
+                <com.tactileshow.view.custom.DefinedDateEditText
+                    android:id="@+id/visual_query_date_et_to"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal" />
+            </LinearLayout>
+        </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>

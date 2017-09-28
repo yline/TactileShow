@@ -80,8 +80,8 @@ public class TabVisualQueryView extends RelativeLayout {
         // 查询分类
         hourTextView.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_light));
         dayTextView.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
-        viewHolder.get(R.id.visual_query_ll_hour).setVisibility(VISIBLE);
-        viewHolder.get(R.id.visual_query_ll_day).setVisibility(GONE);
+        viewHolder.get(R.id.visual_query_rl_hour).setVisibility(VISIBLE);
+        viewHolder.get(R.id.visual_query_rl_day).setVisibility(GONE);
 
         // 时间初始化
         Calendar calendar = Calendar.getInstance();
@@ -146,8 +146,8 @@ public class TabVisualQueryView extends RelativeLayout {
                 hourTextView.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_light));
                 dayTextView.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
 
-                viewHolder.get(R.id.visual_query_ll_hour).setVisibility(VISIBLE);
-                viewHolder.get(R.id.visual_query_ll_day).setVisibility(GONE);
+                viewHolder.get(R.id.visual_query_rl_hour).setVisibility(VISIBLE);
+                viewHolder.get(R.id.visual_query_rl_day).setVisibility(GONE);
             }
         });
 
@@ -158,8 +158,8 @@ public class TabVisualQueryView extends RelativeLayout {
                 hourTextView.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
                 dayTextView.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_light));
 
-                viewHolder.get(R.id.visual_query_ll_hour).setVisibility(GONE);
-                viewHolder.get(R.id.visual_query_ll_day).setVisibility(VISIBLE);
+                viewHolder.get(R.id.visual_query_rl_hour).setVisibility(GONE);
+                viewHolder.get(R.id.visual_query_rl_day).setVisibility(VISIBLE);
             }
         });
     }

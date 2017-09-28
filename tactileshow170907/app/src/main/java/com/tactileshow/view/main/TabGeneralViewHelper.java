@@ -155,8 +155,8 @@ public class TabGeneralViewHelper {
         }
     }
 
-    public void setTemp(double tp) {
-        temp.setText(parseTemp(tp));
+    public void setTemp(double data) {
+        temp.setText(parseTemp(data));
     }
 
     public void setPress(double hm) {
