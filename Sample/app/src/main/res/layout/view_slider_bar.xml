@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.yline.view.SliderBarView
+        android:id="@+id/slider_bar"
+        android:layout_width="26dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true" />
+
+    <TextView
+        android:id="@+id/slider_bar_tv"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/bg_sidebar_toast"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="A"
+        android:textColor="#99ffffff"
+        android:textSize="30dp"
+        android:visibility="gone" />
+</RelativeLayout>

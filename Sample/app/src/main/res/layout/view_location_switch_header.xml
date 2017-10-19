@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/location_switch_header_search"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:background="#f8f8f8"
+        android:paddingBottom="8dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingTop="7dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:gravity="center_horizontal">
+
+            <ImageView
+                android:id="@+id/location_switch_header_iv"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/location_icon_search" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/location_switch_header_iv"
+                android:gravity="center"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:text="请输入城市名或首字母"
+                android:textColor="#999999"
+                android:textSize="14dp" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="20dp"
+        android:paddingLeft="15dp"
+        android:paddingTop="17dp">
+
+        <TextView
+            android:id="@+id/location_switch_header_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="当前定位城市"
+            android:textColor="#999999"
+            android:textSize="13dp" />
+
+        <RelativeLayout
+            android:id="@+id/location_switch_header_rl"
+            android:layout_width="110dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/location_switch_header_tv"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="10dp"
+            android:background="#f7f7f7">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:drawableLeft="@drawable/icon_mine_location"
+                android:drawablePadding="5dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:lines="1"
+                android:text="定位失败"
+                android:textColor="#eb5444"
+                android:textSize="13dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/location_switch_header_relocation"
+            android:layout_width="110dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/location_switch_header_tv"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_toRightOf="@id/location_switch_header_rl">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:drawableLeft="@drawable/location_switch_relocation"
+                android:drawablePadding="5dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:lines="1"
+                android:text="重新定位"
+                android:textColor="#658199"
+                android:textSize="13dp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/location_switch_header_hot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="13dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="25dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="精选城市"
+            android:textColor="#999999"
+            android:textSize="13dp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/location_switch_header_hot_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="11dp" />
+    </LinearLayout>
+</LinearLayout>
