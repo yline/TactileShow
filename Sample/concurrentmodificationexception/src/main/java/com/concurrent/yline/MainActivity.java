@@ -1,6 +1,7 @@
 package com.concurrent.yline;
 
 import android.os.Bundle;
+import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -10,12 +11,15 @@ import com.yline.utils.FileUtil;
 import com.yline.utils.LogUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.NotSerializableException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class MainActivity extends BaseTestActivity {
@@ -24,6 +28,17 @@ public class MainActivity extends BaseTestActivity {
     @Override
     public void testStart(View view, Bundle savedInstanceState) {
         genData();
+
+        addButton("null", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Object data = null;
+                String temp = (String) data;
+
+                Map<String, String> map = new ArrayMap<String, String>();
+                map.put("", temp);
+            }
+        });
 
         addButton("ConcurrentModificationException", new View.OnClickListener() {
             @Override
@@ -34,38 +49,64 @@ public class MainActivity extends BaseTestActivity {
                         long time = System.currentTimeMillis();
                         LogUtil.v("modifyData start");
 
-                        for (int i = 0; i < 2000; i++) {
+                        for (int i = 0; i < 20; i++) {
                             modifyData();
+
+                            long timeA = System.currentTimeMillis();
+                            try {
+                                bytes = ModelDaoUtil.objectToByte(sampleModel);
+                            } catch (NotSerializableException e) {
+                                LogUtil.e("", e);
+                            }
+                            LogUtil.i("objectToByte diffTime = " + (System.currentTimeMillis() - timeA));
+
+                            try {
+                                Thread.sleep(300);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         LogUtil.v("modifyData end diffTime = " + (System.currentTimeMillis() - time));
                     }
                 }).start();
 
-                long time = System.currentTimeMillis();
-                LogUtil.v("testStart start");
-                for (int i = 0; i < 20; i++) {
-                    saveToFile();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        long time = System.currentTimeMillis();
+                        LogUtil.v("testStart start");
+                        for (int i = 0; i < 20; i++) {
+                            saveToFile();
+                            SampleModel.log(sampleModel);
 
-                }
-                LogUtil.v("testStart end diffTime = " + (System.currentTimeMillis() - time));
+                            try {
+                                Thread.sleep(300);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        LogUtil.v("testStart end diffTime = " + (System.currentTimeMillis() - time));
+                    }
+                }).start();
+
             }
         });
     }
 
     private void genData() {
         List<String> locationList = new ArrayList<>();
-        for (int i = 0; i < 128; i++) {
+        for (int i = 0; i < 12800; i++) {
             locationList.add("location-" + i);
         }
 
         List<Long> phoneList = new ArrayList<>();
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < 25600; i++) {
             phoneList.add((long) i);
         }
 
         List<DemoModel> demoModelList = new ArrayList<>();
-        for (int i = 0; i < 512; i++) {
+        for (int i = 0; i < 51200; i++) {
             demoModelList.add(new DemoModel("name-" + i, "age-" + i));
         }
 
@@ -101,9 +142,9 @@ public class MainActivity extends BaseTestActivity {
         }
     }
 
-    private void saveToFile() {
-        SampleModel.log(sampleModel);
+    private byte[] bytes;
 
+    private void saveToFile() {
         String fileName = FileUtil.getPathTop();
         if (!TextUtils.isEmpty(fileName)) {
             fileName += "location_switch_cache.txt";
@@ -116,8 +157,8 @@ public class MainActivity extends BaseTestActivity {
                 }
 
                 fileOutputStream = new FileOutputStream(loadFile);
-                byte[] bytes = null;
-                bytes = ModelDaoUtil.objectToByte(sampleModel);
+                // byte[] bytes = ModelDaoUtil.objectToByte(sampleModel);
+
                 if (null != bytes) {
                     fileOutputStream.write(bytes);
                 }
@@ -134,6 +175,13 @@ public class MainActivity extends BaseTestActivity {
                     LogUtil.v("saveDownLoadModel" + " IOException " + Log.getStackTraceString(e));
                 }
             }
+        }
+
+        try {
+            float size = new FileInputStream(fileName).available();
+            LogUtil.v("size = " + size / 1024 + "kb");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

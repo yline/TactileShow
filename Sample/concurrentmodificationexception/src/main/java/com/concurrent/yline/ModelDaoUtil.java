@@ -8,13 +8,15 @@ import java.io.NotSerializableException;
 import java.io.ObjectOutputStream;
 
 public class ModelDaoUtil {
-    public synchronized static byte[] objectToByte(Object object) throws NotSerializableException {
+    public static byte[] objectToByte(Object object) throws NotSerializableException {
         if (null != object) { //  && object instanceof Serializable
             ByteArrayOutputStream baoStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream = null;
             try {
                 objectOutputStream = new ObjectOutputStream(baoStream);
-                    objectOutputStream.writeObject(object);
+
+                objectOutputStream.writeObject(object);
+
                 return baoStream.toByteArray();
             } catch (NotSerializableException e) {
                 throw e;
