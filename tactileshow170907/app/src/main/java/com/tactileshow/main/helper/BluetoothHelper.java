@@ -1,4 +1,4 @@
-package com.tactileshow.helper;
+package com.tactileshow.main.helper;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;

@@ -24,13 +24,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.tactileshow.helper.BluetoothHelper;
-import com.tactileshow.helper.BroadcastModel;
-import com.tactileshow.helper.DataManager;
+import com.tactileshow.main.helper.BluetoothHelper;
+import com.tactileshow.main.helper.MainDialogHelper;
+import com.tactileshow.main.helper.MainListViewAdapter;
+import com.tactileshow.manager.TactileModel;
+import com.tactileshow.manager.SQLiteManager;
+import com.tactileshow.maintab.TabActivity;
 import com.tactileshow.util.Point3D;
 import com.tactileshow.util.macro;
-import com.tactileshow.view.main.MainDialogHelper;
-import com.tactileshow.view.main.MainListViewAdapter;
 import com.yline.application.BaseApplication;
 import com.yline.application.SDKConstant;
 import com.yline.application.SDKManager;
@@ -242,15 +243,15 @@ public class MainActivity extends Activity {
                     Point3D p3d_temp = convertTemp(characteristic.getValue());
                     float temp = (float) p3d_temp.x;
 
-                    BroadcastModel model = new BroadcastModel(System.currentTimeMillis(), hum, temp);
+                    TactileModel model = new TactileModel(System.currentTimeMillis(), hum, temp);
 
-                    String actionMsg = BroadcastModel.toJson(model);
+                    String actionMsg = TactileModel.toJson(model);
                     Intent broadIntent = new Intent(macro.BROADCAST_ADDRESS);
                     broadIntent.putExtra("msg", actionMsg);
                     sendBroadcast(broadIntent);
 
                     if (!model.isDataEmpty()) {
-                        DataManager.getInstance().insert(model);
+                        SQLiteManager.getInstance().insert(model);
                     }
                     // updateBroadcast("#" + "TEMP" + "#" + str_time + "#" + p3d_temp.x);
                     // updateBroadcast("#" + "PRESS" + "#" + str_time + "#" + p3d_hum.x);

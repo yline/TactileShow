@@ -1,4 +1,4 @@
-package com.tactileshow.main;
+package com.tactileshow;
 
 import com.yline.application.BaseApplication;
 
@@ -9,10 +9,9 @@ import com.yline.application.BaseApplication;
  * @version 1.0.0
  */
 public class IApplication extends BaseApplication {
+
     @Override
     public void onCreate() {
         super.onCreate();
-
-       // DataManager.init(this);
     }
 }

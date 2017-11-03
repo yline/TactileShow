@@ -1,4 +1,4 @@
-package com.tactileshow.main;
+package com.tactileshow.maintab;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -13,16 +13,17 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.tactileshow.helper.BroadcastModel;
+import com.tactileshow.manager.TactileModel;
+import com.tactileshow.main.R;
 import com.tactileshow.util.StaticValue;
 import com.tactileshow.util.macro;
-import com.tactileshow.view.custom.DefinedViewPager;
-import com.tactileshow.view.main.TabBodyViewHelper;
-import com.tactileshow.view.main.TabGeneralViewHelper;
-import com.tactileshow.view.main.TabOriginViewHelper;
-import com.tactileshow.view.main.TabSettingViewHelper;
-import com.tactileshow.view.main.TabVisualViewHelper;
-import com.tactileshow.view.main.ViewPagerAdapter;
+import com.tactileshow.maintab.view.DefinedViewPager;
+import com.tactileshow.maintab.viewhelper.TabBodyViewHelper;
+import com.tactileshow.maintab.viewhelper.TabGeneralViewHelper;
+import com.tactileshow.maintab.viewhelper.TabOriginViewHelper;
+import com.tactileshow.maintab.viewhelper.TabSettingViewHelper;
+import com.tactileshow.maintab.viewhelper.TabVisualViewHelper;
+import com.tactileshow.maintab.viewhelper.ViewPagerAdapter;
 import com.yline.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -177,7 +178,7 @@ public class TabActivity extends Activity {
                 return;
             }
 
-            BroadcastModel model = BroadcastModel.fromJson(action);
+            TactileModel model = TactileModel.fromJson(action);
             if (null == model) {
                 LogUtil.e("mGattUpdateReceiver model is null");
             } else {
@@ -185,12 +186,12 @@ public class TabActivity extends Activity {
                 time.set(model.getTime());*/
 
                 float hum = model.getHum();
-                if (BroadcastModel.Empty != hum) {
+                if (TactileModel.Empty != hum) {
                     setPressData(model.getTime(), hum);
                 }
 
                 float temp = model.getTemp();
-                if (BroadcastModel.Empty != temp) {
+                if (TactileModel.Empty != temp) {
                     setTempData(model.getTime(), temp);
                 }
             }

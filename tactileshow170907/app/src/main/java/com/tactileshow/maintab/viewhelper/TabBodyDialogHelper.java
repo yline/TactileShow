@@ -1,4 +1,4 @@
-package com.tactileshow.view.main;
+package com.tactileshow.maintab.viewhelper;
 
 import android.app.AlertDialog;
 import android.content.Context;

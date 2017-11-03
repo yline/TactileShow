@@ -1,4 +1,4 @@
-package com.tactileshow.view.custom;
+package com.tactileshow.maintab.view;
 
 import android.content.Context;
 import android.content.DialogInterface;

@@ -1,4 +1,4 @@
-package com.tactileshow.view.main;
+package com.tactileshow.maintab.viewhelper;
 
 import android.content.Context;
 import android.support.design.widget.TabLayout;
@@ -7,7 +7,7 @@ import android.view.View;
 
 import com.tactileshow.main.R;
 import com.tactileshow.util.StaticValue;
-import com.tactileshow.view.custom.DefinedViewPager;
+import com.tactileshow.maintab.view.DefinedViewPager;
 
 import java.util.ArrayList;
 import java.util.List;

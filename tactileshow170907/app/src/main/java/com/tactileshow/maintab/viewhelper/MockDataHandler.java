@@ -1,10 +1,11 @@
-package com.tactileshow.helper;
+package com.tactileshow.maintab.viewhelper;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 
+import com.tactileshow.manager.TactileModel;
 import com.tactileshow.util.macro;
 import com.yline.log.LogFileUtil;
 
@@ -16,7 +17,7 @@ import java.lang.ref.WeakReference;
  * @author yline 2017/9/22 -- 9:56
  * @version 1.0.0
  */
-public class BroadcastHandler extends Handler {
+public class MockDataHandler extends Handler {
     public static final int Start = -100;
 
     public static final int Stop = -200;
@@ -29,9 +30,9 @@ public class BroadcastHandler extends Handler {
 
     private WeakReference<Context> sWeakContext;
 
-    private BroadcastModel broadcastModel;
+    private TactileModel broadcastModel;
 
-    public BroadcastHandler(Context context) {
+    public MockDataHandler(Context context) {
 
         this.sWeakContext = new WeakReference<>(context);
         this.perTime = 1000;
@@ -53,7 +54,7 @@ public class BroadcastHandler extends Handler {
                 sendEmptyMessageDelayed(Run, perTime);
 
                 if (null != broadcastModel && !broadcastModel.isDataEmpty()) {
-                    String actionMsg = BroadcastModel.toJson(broadcastModel);
+                    String actionMsg = TactileModel.toJson(broadcastModel);
                     LogFileUtil.i("TimeHandler", "handleMessage: actionMsg = " + actionMsg);
 
                     Intent broadIntent = new Intent(macro.BROADCAST_ADDRESS);
@@ -68,7 +69,7 @@ public class BroadcastHandler extends Handler {
         }
     }
 
-    public void setBroadcastModel(BroadcastModel model) {
+    public void setBroadcastModel(TactileModel model) {
         this.broadcastModel = model;
     }
 

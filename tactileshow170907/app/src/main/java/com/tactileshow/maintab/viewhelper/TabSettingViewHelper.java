@@ -1,4 +1,4 @@
-package com.tactileshow.view.main;
+package com.tactileshow.maintab.viewhelper;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -10,9 +10,8 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
-import com.tactileshow.helper.BroadcastHandler;
-import com.tactileshow.helper.BroadcastModel;
-import com.tactileshow.helper.DataManager;
+import com.tactileshow.manager.TactileModel;
+import com.tactileshow.manager.SQLiteManager;
 import com.tactileshow.main.R;
 import com.tactileshow.util.macro;
 import com.yline.application.SDKManager;
@@ -34,10 +33,10 @@ public class TabSettingViewHelper {
 
     private ThresholdDialogHelper thresholdDialogHelper;
 
-    private BroadcastHandler mHandler;
+    private MockDataHandler mHandler;
 
     public TabSettingViewHelper(Context context) {
-        mHandler = new BroadcastHandler(context);
+        mHandler = new MockDataHandler(context);
 
         View view = LayoutInflater.from(context).inflate(R.layout.view_tab_setting, null);
         this.mViewHolder = new ViewHolder(view);
@@ -92,13 +91,13 @@ public class TabSettingViewHelper {
                 if (macro.SETTINGS_BCAST) {
                     macro.SETTINGS_BCAST = false;
 
-                    mHandler.sendEmptyMessageAtTime(BroadcastHandler.Stop, 0);
+                    mHandler.sendEmptyMessageAtTime(MockDataHandler.Stop, 0);
 
                     SDKManager.toast("测试广播已关闭");
                 } else {
                     macro.SETTINGS_BCAST = true;
 
-                    mHandler.sendEmptyMessageAtTime(BroadcastHandler.Start, 100);
+                    mHandler.sendEmptyMessageAtTime(MockDataHandler.Start, 100);
 
                     SDKManager.toast("测试广播已开启");
                 }
@@ -122,11 +121,11 @@ public class TabSettingViewHelper {
         });
 
         // 数据条数
-        mViewHolder.setText(R.id.setting_tv_data_count, DataManager.getInstance().count() + "");
+        mViewHolder.setText(R.id.setting_tv_data_count, SQLiteManager.getInstance().count() + "");
         mViewHolder.setOnClickListener(R.id.setting_rl_data, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewHolder.setText(R.id.setting_tv_data_count, DataManager.getInstance().count() + "");
+                mViewHolder.setText(R.id.setting_tv_data_count, SQLiteManager.getInstance().count() + "");
             }
         });
 
@@ -151,7 +150,7 @@ public class TabSettingViewHelper {
 
     public void finish() {
         if (null != mHandler) {
-            mHandler.sendEmptyMessageAtTime(BroadcastHandler.Stop, 0);
+            mHandler.sendEmptyMessageAtTime(MockDataHandler.Stop, 0);
             mHandler.removeCallbacks(null);
             mHandler = null;
         }
@@ -169,11 +168,11 @@ public class TabSettingViewHelper {
                     float temp = broadcastDialogHelper.getMockTemp();
                     float hum = broadcastDialogHelper.getMockHum();
                     LogUtil.i("Mock:" + "temp = " + temp + ", hum = " + hum);
-                    BroadcastModel model = new BroadcastModel(System.currentTimeMillis(), hum, temp);
+                    TactileModel model = new TactileModel(System.currentTimeMillis(), hum, temp);
 
                     mHandler.setBroadcastModel(model);
                     if (!model.isDataEmpty()) {
-                        DataManager.getInstance().insert(model);
+                        SQLiteManager.getInstance().insert(model);
                     }
                 }
 
@@ -254,7 +253,7 @@ public class TabSettingViewHelper {
                     return humMin;
                 }
             } else {
-                return BroadcastModel.Empty;
+                return TactileModel.Empty;
             }
         }
 
@@ -267,7 +266,7 @@ public class TabSettingViewHelper {
                     return tempMin;
                 }
             } else {
-                return BroadcastModel.Empty;
+                return TactileModel.Empty;
             }
         }
 

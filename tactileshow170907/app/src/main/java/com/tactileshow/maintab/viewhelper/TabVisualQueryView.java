@@ -1,4 +1,4 @@
-package com.tactileshow.view.main;
+package com.tactileshow.maintab.viewhelper;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -9,8 +9,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tactileshow.main.R;
-import com.tactileshow.view.custom.DefinedDateEditText;
-import com.tactileshow.view.custom.DefinedTimeEditText;
+import com.tactileshow.maintab.view.DefinedDateEditText;
+import com.tactileshow.maintab.view.DefinedTimeEditText;
 import com.yline.view.recycler.holder.ViewHolder;
 
 import java.util.Calendar;

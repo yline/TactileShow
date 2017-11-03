@@ -1,14 +1,14 @@
-package com.tactileshow.helper;
+package com.tactileshow.manager;
 
 import com.google.gson.Gson;
 
 /**
- * App内，本地储存，使用的协议
+ * App内，蓝牙传输数据--界面展示数据，使用的数据结构
  *
  * @author yline 2017/9/22 -- 8:16
  * @version 1.0.0
  */
-public class BroadcastModel {
+public class TactileModel {
     public static final int Empty = -1024; // 数据为空
 
     private long time; // 时间戳
@@ -17,11 +17,11 @@ public class BroadcastModel {
 
     private float temp = Empty; // 温度
 
-    public BroadcastModel(long time) {
+    public TactileModel(long time) {
         this.time = time;
     }
 
-    public BroadcastModel(long time, float hum, float temp) {
+    public TactileModel(long time, float hum, float temp) {
         this.time = time;
         this.hum = hum;
         this.temp = temp;
@@ -57,17 +57,17 @@ public class BroadcastModel {
 
     private static Gson gson;
 
-    public static String toJson(BroadcastModel model) {
+    public static String toJson(TactileModel model) {
         if (null == gson) {
             gson = new Gson();
         }
-        return gson.toJson(model, BroadcastModel.class);
+        return gson.toJson(model, TactileModel.class);
     }
 
-    public static BroadcastModel fromJson(String jsonStr) {
+    public static TactileModel fromJson(String jsonStr) {
         if (null == gson) {
             gson = new Gson();
         }
-        return new Gson().fromJson(jsonStr, BroadcastModel.class);
+        return new Gson().fromJson(jsonStr, TactileModel.class);
     }
 }

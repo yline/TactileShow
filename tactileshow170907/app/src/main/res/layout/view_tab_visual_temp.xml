@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tactileshow.view.custom.DefinedScrollView
+<com.tactileshow.maintab.view.DefinedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/visual_temp_scroll"
     android:layout_width="match_parent"
@@ -10,14 +10,14 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.tactileshow.view.custom.DefineChartView
+        <com.tactileshow.maintab.view.DefineChartView
             android:id="@+id/visual_temp_chart"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <com.tactileshow.view.main.TabVisualQueryView
+        <com.tactileshow.maintab.viewhelper.TabVisualQueryView
             android:id="@+id/visual_temp_query"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </LinearLayout>
-</com.tactileshow.view.custom.DefinedScrollView>
+</com.tactileshow.maintab.view.DefinedScrollView>

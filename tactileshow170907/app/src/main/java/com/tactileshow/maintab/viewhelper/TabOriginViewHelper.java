@@ -1,4 +1,4 @@
-package com.tactileshow.view.main;
+package com.tactileshow.maintab.viewhelper;
 
 import android.content.Context;
 import android.view.LayoutInflater;

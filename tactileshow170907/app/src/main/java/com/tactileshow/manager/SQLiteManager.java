@@ -1,4 +1,4 @@
-package com.tactileshow.helper;
+package com.tactileshow.manager;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
-import com.tactileshow.main.IApplication;
+import com.tactileshow.IApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,37 +20,37 @@ import java.util.concurrent.Executors;
  * @author yline 2017/9/24 -- 16:51
  * @version 1.0.0
  */
-public class DataManager {
+public class SQLiteManager {
     public static final int Error = -1;
 
-    private final DataOpenHelper openHelper;
+    private final SQLiteManagerOpenHelper openHelper;
     private final SQLiteDatabase sqLiteDatabase;
     private final String[] mAllColumns;
 
     private SQLiteStatement insertOrReplaceStatement;
 
-    private DataManager(Context context) {
-        this.openHelper = new DataOpenHelper(context, 1);
+    private SQLiteManager(Context context) {
+        this.openHelper = new SQLiteManagerOpenHelper(context, 1);
         this.sqLiteDatabase = openHelper.getWritableDatabase();
-        this.mAllColumns = new String[]{DataOpenHelper.Table.stamp.name, DataOpenHelper.Table.hum.name, DataOpenHelper.Table.temp.name, DataOpenHelper.Table.header.name, DataOpenHelper.Table.footer.name};
+        this.mAllColumns = new String[]{SQLiteManagerOpenHelper.Table.stamp.name, SQLiteManagerOpenHelper.Table.hum.name, SQLiteManagerOpenHelper.Table.temp.name, SQLiteManagerOpenHelper.Table.header.name, SQLiteManagerOpenHelper.Table.footer.name};
     }
 
-    public static DataManager getInstance() {
+    public static SQLiteManager getInstance() {
         return DataManagerHolder.getInstance();
     }
 
     private static class DataManagerHolder {
-        private static DataManager sInstance;
+        private static SQLiteManager sInstance;
 
-        private static DataManager getInstance() {
+        private static SQLiteManager getInstance() {
             if (null == sInstance) {
-                sInstance = new DataManager(IApplication.getApplication());
+                sInstance = new SQLiteManager(IApplication.getApplication());
             }
             return sInstance;
         }
     }
 
-    public long insert(BroadcastModel model) {
+    public long insert(TactileModel model) {
         long rowId;
         if (sqLiteDatabase.isDbLockedByCurrentThread()) {
             rowId = executeInsert(model);
@@ -68,7 +68,7 @@ public class DataManager {
         return rowId;
     }
 
-    private long executeInsert(BroadcastModel model) {
+    private long executeInsert(TactileModel model) {
         // sql insert
         insertOrReplaceStatement = getInsertOrReplaceStatement(sqLiteDatabase);
         synchronized (insertOrReplaceStatement) {
@@ -78,10 +78,10 @@ public class DataManager {
         }
     }
 
-    private boolean bindValues(SQLiteStatement stmt, BroadcastModel model) {
-        stmt.bindLong(1 + DataOpenHelper.Table.stamp.ordinal, model.getTime());
-        stmt.bindDouble(1 + DataOpenHelper.Table.hum.ordinal, model.getHum());
-        stmt.bindDouble(1 + DataOpenHelper.Table.temp.ordinal, model.getTemp());
+    private boolean bindValues(SQLiteStatement stmt, TactileModel model) {
+        stmt.bindLong(1 + SQLiteManagerOpenHelper.Table.stamp.ordinal, model.getTime());
+        stmt.bindDouble(1 + SQLiteManagerOpenHelper.Table.hum.ordinal, model.getHum());
+        stmt.bindDouble(1 + SQLiteManagerOpenHelper.Table.temp.ordinal, model.getTemp());
 
         return true;
     }
@@ -98,7 +98,7 @@ public class DataManager {
                     }
                 }
 
-                List<BroadcastModel> resultList = load(fromStamp, toStamp);
+                List<TactileModel> resultList = load(fromStamp, toStamp);
                 if (null != callback) {
                     callback.onSuccess(resultList);
                 }
@@ -108,7 +108,7 @@ public class DataManager {
 
     public long count() {
         long count = -1;
-        Cursor cursor = sqLiteDatabase.query(DataOpenHelper.DefaultSQLiteName, null, null, null, null, null, null);
+        Cursor cursor = sqLiteDatabase.query(SQLiteManagerOpenHelper.DefaultSQLiteName, null, null, null, null, null, null);
         try {
             if (null != cursor) {
                 count = cursor.getCount();
@@ -121,21 +121,21 @@ public class DataManager {
         }
     }
 
-    private List<BroadcastModel> load(long fromStamp, long toStamp) {
-        String sql = String.format(Locale.CHINA, "select * from %s where %s between %d and %d order by %s", DataOpenHelper.DefaultSQLiteName, DataOpenHelper.Table.stamp.name, fromStamp, toStamp, DataOpenHelper.Table.stamp.name);
+    private List<TactileModel> load(long fromStamp, long toStamp) {
+        String sql = String.format(Locale.CHINA, "select * from %s where %s between %d and %d order by %s", SQLiteManagerOpenHelper.DefaultSQLiteName, SQLiteManagerOpenHelper.Table.stamp.name, fromStamp, toStamp, SQLiteManagerOpenHelper.Table.stamp.name);
         Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
         return loadAndCloseCursor(cursor);
     }
 
-    private List<BroadcastModel> loadAndCloseCursor(Cursor cursor) {
+    private List<TactileModel> loadAndCloseCursor(Cursor cursor) {
         try {
             int count = cursor.getCount();
             if (0 == count) {
                 return new ArrayList<>();
             }
 
-            List<BroadcastModel> resultList = new ArrayList<>();
-            BroadcastModel model;
+            List<TactileModel> resultList = new ArrayList<>();
+            TactileModel model;
             if (cursor.moveToFirst()) {
                 do {
                     model = readModel(cursor);
@@ -150,15 +150,15 @@ public class DataManager {
         }
     }
 
-    private BroadcastModel readModel(Cursor cursor) {
-        long stamp = cursor.isNull(DataOpenHelper.Table.stamp.ordinal) ? BroadcastModel.Empty : cursor.getLong(DataOpenHelper.Table.stamp.ordinal);
-        float hum = cursor.isNull(DataOpenHelper.Table.hum.ordinal) ? BroadcastModel.Empty : cursor.getLong(DataOpenHelper.Table.hum.ordinal);
-        float temp = cursor.isNull(DataOpenHelper.Table.temp.ordinal) ? BroadcastModel.Empty : cursor.getLong(DataOpenHelper.Table.temp.ordinal);
+    private TactileModel readModel(Cursor cursor) {
+        long stamp = cursor.isNull(SQLiteManagerOpenHelper.Table.stamp.ordinal) ? TactileModel.Empty : cursor.getLong(SQLiteManagerOpenHelper.Table.stamp.ordinal);
+        float hum = cursor.isNull(SQLiteManagerOpenHelper.Table.hum.ordinal) ? TactileModel.Empty : cursor.getLong(SQLiteManagerOpenHelper.Table.hum.ordinal);
+        float temp = cursor.isNull(SQLiteManagerOpenHelper.Table.temp.ordinal) ? TactileModel.Empty : cursor.getLong(SQLiteManagerOpenHelper.Table.temp.ordinal);
 
-        if (BroadcastModel.Empty == stamp || (BroadcastModel.Empty == hum && BroadcastModel.Empty == temp)) {
+        if (TactileModel.Empty == stamp || (TactileModel.Empty == hum && TactileModel.Empty == temp)) {
             return null;
         } else {
-            return new BroadcastModel(stamp, hum, temp);
+            return new TactileModel(stamp, hum, temp);
         }
     }
 
@@ -180,7 +180,7 @@ public class DataManager {
 
     private String genInsertSql(String header) {
         StringBuilder stringBuilder = new StringBuilder(header + " ");
-        stringBuilder.append('"').append(DataOpenHelper.DefaultSQLiteName).append('"').append(" (");
+        stringBuilder.append('"').append(SQLiteManagerOpenHelper.DefaultSQLiteName).append('"').append(" (");
 
         int length = mAllColumns.length;
         for (int i = 0; i < length; i++) {
@@ -212,6 +212,6 @@ public class DataManager {
         /**
          * 读取本地信息成功
          */
-        void onSuccess(List<BroadcastModel> modelList);
+        void onSuccess(List<TactileModel> modelList);
     }
 }

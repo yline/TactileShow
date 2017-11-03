@@ -1,4 +1,4 @@
-package com.tactileshow.view.main;
+package com.tactileshow.main.helper;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -92,9 +92,7 @@ public class MainListViewAdapter extends CommonListAdapter<BluetoothDevice> {
         return false;
     }
 
-    /**
-     * 清除数据，并更新界面
-     */
+    @Override
     public void clear() {
         this.sList.clear();
         this.notifyDataSetChanged();

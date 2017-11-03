@@ -2,9 +2,9 @@ package com.tactileshow;
 
 import android.util.Log;
 
-import com.tactileshow.helper.BroadcastModel;
-import com.tactileshow.helper.DataManager;
-import com.tactileshow.helper.DataOpenHelper;
+import com.tactileshow.manager.TactileModel;
+import com.tactileshow.manager.SQLiteManager;
+import com.tactileshow.manager.SQLiteManagerOpenHelper;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,7 +26,7 @@ public class SQLiteAsyncSimpleTest {
 
     @Test
     public void testName() throws Exception {
-        String sql = String.format(Locale.CHINA, "select * from %s where %s between %d and %d", DataOpenHelper.DefaultSQLiteName, DataOpenHelper.Table.stamp.name, 1506510999000l, 1506511999000l);
+        String sql = String.format(Locale.CHINA, "select * from %s where %s between %d and %d", SQLiteManagerOpenHelper.DefaultSQLiteName, SQLiteManagerOpenHelper.Table.stamp.name, 1506510999000l, 1506511999000l);
 
         Log.i(TAG, "testName: sql = " + sql);
     }
@@ -35,30 +35,30 @@ public class SQLiteAsyncSimpleTest {
     public void testSQLite() throws Exception {
         long start = System.currentTimeMillis();
 
-        long beforeCount = DataManager.getInstance().count();
+        long beforeCount = SQLiteManager.getInstance().count();
 
         long rowId = -1;
         for (int i = 0; i < 20; i++) {
-            rowId = DataManager.getInstance().insert(createModel());
+            rowId = SQLiteManager.getInstance().insert(createModel());
         }
 
-        Assert.assertEquals(beforeCount + 20, DataManager.getInstance().count());
+        Assert.assertEquals(beforeCount + 20, SQLiteManager.getInstance().count());
         Log.i(TAG, "testSQLite: diff = " + (System.currentTimeMillis() - start));
 
-        DataManager.getInstance().loadAsync(Long.MIN_VALUE, Long.MAX_VALUE, new DataManager.OnReadCallback() {
+        SQLiteManager.getInstance().loadAsync(Long.MIN_VALUE, Long.MAX_VALUE, new SQLiteManager.OnReadCallback() {
             @Override
             public void onFailure(String errorMsg) {
                 Log.i(TAG, "onFailure: ");
             }
 
             @Override
-            public void onSuccess(List<BroadcastModel> modelList) {
+            public void onSuccess(List<TactileModel> modelList) {
                 Log.i(TAG, "onSuccess: size = " + modelList.size());
             }
         });
     }
 
-    private BroadcastModel createModel() {
-        return new BroadcastModel(mRandom.nextLong(), mRandom.nextFloat(), mRandom.nextFloat());
+    private TactileModel createModel() {
+        return new TactileModel(mRandom.nextLong(), mRandom.nextFloat(), mRandom.nextFloat());
     }
 }

@@ -1,4 +1,4 @@
-package com.tactileshow.helper;
+package com.tactileshow.manager;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -14,20 +14,20 @@ import java.util.Locale;
  * @author yline 2017/9/27 -- 17:35
  * @version 1.0.0
  */
-public class DataOpenHelper extends SQLiteOpenHelper {
+public class SQLiteManagerOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = "xxx-";
 
     public static final String DefaultSQLiteName = "tactileShow";
 
     public static class Table {
-        public final static DataOpenHelper.Property stamp = new DataOpenHelper.Property(0, Long.class, "stamp", true);
-        public final static DataOpenHelper.Property hum = new DataOpenHelper.Property(1, Float.class, "hum", false);
-        public final static DataOpenHelper.Property temp = new DataOpenHelper.Property(2, Float.class, "temp", false);
-        public final static DataOpenHelper.Property header = new DataOpenHelper.Property(3, Float.class, "header", false);
-        public final static DataOpenHelper.Property footer = new DataOpenHelper.Property(4, Float.class, "footer", false);
+        public final static SQLiteManagerOpenHelper.Property stamp = new SQLiteManagerOpenHelper.Property(0, Long.class, "stamp", true);
+        public final static SQLiteManagerOpenHelper.Property hum = new SQLiteManagerOpenHelper.Property(1, Float.class, "hum", false);
+        public final static SQLiteManagerOpenHelper.Property temp = new SQLiteManagerOpenHelper.Property(2, Float.class, "temp", false);
+        public final static SQLiteManagerOpenHelper.Property header = new SQLiteManagerOpenHelper.Property(3, Float.class, "header", false);
+        public final static SQLiteManagerOpenHelper.Property footer = new SQLiteManagerOpenHelper.Property(4, Float.class, "footer", false);
     }
 
-    public DataOpenHelper(Context context, int version) {
+    public SQLiteManagerOpenHelper(Context context, int version) {
         super(context, DefaultSQLiteName, null, version);
     }
 
