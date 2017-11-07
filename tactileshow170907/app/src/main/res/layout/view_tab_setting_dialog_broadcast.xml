@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:columnCount="5"
-        android:rowCount="4">
+        android:rowCount="5">
 
         <!-- 第一行 -->
         <TextView
@@ -110,19 +110,64 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:paddingTop="5dp"
+            android:text="压力" />
+
+        <CheckBox
+            android:id="@+id/broadcast_dialog_cb_header_range"
+            android:layout_column="1"
+            android:layout_gravity="center_horizontal"
+            android:layout_row="3" />
+
+        <EditText
+            android:id="@+id/broadcast_dialog_et_header_min"
+            android:layout_width="60dp"
+            android:layout_column="2"
+            android:layout_row="3"
+            android:ems="10"
+            android:inputType="numberDecimal"
+            android:text="20"
+            android:textSize="12sp">
+
+            <requestFocus />
+        </EditText>
+
+        <EditText
+            android:id="@+id/broadcast_dialog_et_header_max"
+            android:layout_width="60dp"
+            android:layout_column="3"
+            android:layout_row="3"
+            android:ems="10"
+            android:inputType="numberDecimal"
+            android:text="50"
+            android:textSize="12sp" />
+
+        <CheckBox
+            android:id="@+id/broadcast_dialog_cb_header"
+            android:layout_column="4"
+            android:layout_gravity="center_horizontal"
+            android:layout_row="3" />
+
+        <!-- 第四行 -->
+        <TextView
+            android:layout_column="0"
+            android:layout_row="4"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp"
             android:text="湿度" />
 
         <CheckBox
             android:id="@+id/broadcast_dialog_cb_hum_range"
             android:layout_column="1"
             android:layout_gravity="center_horizontal"
-            android:layout_row="3" />
+            android:layout_row="4" />
 
         <EditText
             android:id="@+id/broadcast_dialog_et_hum_min"
             android:layout_width="60dp"
             android:layout_column="2"
-            android:layout_row="3"
+            android:layout_row="4"
             android:ems="10"
             android:inputType="numberDecimal"
             android:text="0"
@@ -132,7 +177,7 @@
             android:id="@+id/broadcast_dialog_et_hum_max"
             android:layout_width="60dp"
             android:layout_column="3"
-            android:layout_row="3"
+            android:layout_row="4"
             android:ems="10"
             android:inputType="numberDecimal"
             android:text="100"
@@ -142,7 +187,7 @@
             android:id="@+id/broadcast_dialog_cb_hum"
             android:layout_column="4"
             android:layout_gravity="center_horizontal"
-            android:layout_row="3" />
+            android:layout_row="4" />
     </GridLayout>
 
     <RelativeLayout

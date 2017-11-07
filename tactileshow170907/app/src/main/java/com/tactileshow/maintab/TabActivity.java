@@ -21,7 +21,7 @@ import com.tactileshow.maintab.view.DefinedViewPager;
 import com.tactileshow.maintab.viewhelper.TabBodyViewHelper;
 import com.tactileshow.maintab.viewhelper.TabGeneralViewHelper;
 import com.tactileshow.maintab.viewhelper.TabOriginViewHelper;
-import com.tactileshow.maintab.viewhelper.TabSettingViewHelper;
+import com.tactileshow.maintab.viewhelper.setting.SettingViewHelper;
 import com.tactileshow.maintab.viewhelper.TabVisualViewHelper;
 import com.tactileshow.maintab.viewhelper.ViewPagerAdapter;
 import com.yline.utils.LogUtil;
@@ -38,7 +38,7 @@ public class TabActivity extends Activity {
     private TabGeneralViewHelper generalViewHelper; // 一般信息
     private TabVisualViewHelper visualViewHelper; // 图像信息
     private TabOriginViewHelper originViewHelper; // 原始数据；温度、湿度
-    private TabSettingViewHelper settingViewHelper;  // 设置
+    private SettingViewHelper settingViewHelper;  // 设置
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +53,7 @@ public class TabActivity extends Activity {
         generalViewHelper = new TabGeneralViewHelper(this);
         visualViewHelper = new TabVisualViewHelper(this, viewPager);
         originViewHelper = new TabOriginViewHelper(this);
-        settingViewHelper = new TabSettingViewHelper(this);
+        settingViewHelper = new SettingViewHelper(this);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(macro.BROADCAST_ADDRESS);
@@ -108,25 +108,9 @@ public class TabActivity extends Activity {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
             settingViewHelper.showExitDialog();
             return true;
-        } else
+        } else {
             return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //visualViewHelper.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedState) {
-        super.onRestoreInstanceState(savedState);
-        //visualViewHelper.onRestoreInstanceState(savedState);
+        }
     }
 
     private void getScreenMetrics() {
@@ -182,9 +166,6 @@ public class TabActivity extends Activity {
             if (null == model) {
                 LogUtil.e("mGattUpdateReceiver model is null");
             } else {
-               /* Time time = new Time();
-                time.set(model.getTime());*/
-
                 float hum = model.getHum();
                 if (TactileModel.Empty != hum) {
                     setPressData(model.getTime(), hum);

@@ -59,6 +59,6 @@ public class SQLiteAsyncSimpleTest {
     }
 
     private TactileModel createModel() {
-        return new TactileModel(mRandom.nextLong(), mRandom.nextFloat(), mRandom.nextFloat());
+        return new TactileModel(mRandom.nextLong(), mRandom.nextFloat(), mRandom.nextFloat(), mRandom.nextFloat());
     }
 }

@@ -27,6 +27,9 @@ import java.util.Locale;
  * @version 1.0.0
  */
 public class LineChartHelper {
+    public static final int TypeOfTemp = 0;
+    public static final int TypeOfHum = 1;
+
     private static final int MaxCount = 60; // 显示的最大数据
 
     private static final int DIVISOR_HOUR = 3_600_000; // 1个小时
@@ -107,9 +110,6 @@ public class LineChartHelper {
             }
         }
     }
-
-    public static final int TypeOfTemp = 0;
-    public static final int TypeOfHum = 1;
 
     /**
      * 设置 从数据库中，读取的数据

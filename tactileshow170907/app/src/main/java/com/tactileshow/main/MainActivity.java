@@ -243,7 +243,9 @@ public class MainActivity extends Activity {
                     Point3D p3d_temp = convertTemp(characteristic.getValue());
                     float temp = (float) p3d_temp.x;
 
-                    TactileModel model = new TactileModel(System.currentTimeMillis(), hum, temp);
+                    float header = TactileModel.Empty;
+
+                    TactileModel model = new TactileModel(System.currentTimeMillis(), hum, temp, header);
 
                     String actionMsg = TactileModel.toJson(model);
                     Intent broadIntent = new Intent(macro.BROADCAST_ADDRESS);

@@ -32,7 +32,8 @@ public class SQLiteManager {
     private SQLiteManager(Context context) {
         this.openHelper = new SQLiteManagerOpenHelper(context, 1);
         this.sqLiteDatabase = openHelper.getWritableDatabase();
-        this.mAllColumns = new String[]{SQLiteManagerOpenHelper.Table.stamp.name, SQLiteManagerOpenHelper.Table.hum.name, SQLiteManagerOpenHelper.Table.temp.name, SQLiteManagerOpenHelper.Table.header.name, SQLiteManagerOpenHelper.Table.footer.name};
+        this.mAllColumns = new String[]{SQLiteManagerOpenHelper.Table.stamp.name, SQLiteManagerOpenHelper.Table.hum.name,
+                SQLiteManagerOpenHelper.Table.temp.name, SQLiteManagerOpenHelper.Table.header.name, SQLiteManagerOpenHelper.Table.footer.name};
     }
 
     public static SQLiteManager getInstance() {
@@ -154,11 +155,12 @@ public class SQLiteManager {
         long stamp = cursor.isNull(SQLiteManagerOpenHelper.Table.stamp.ordinal) ? TactileModel.Empty : cursor.getLong(SQLiteManagerOpenHelper.Table.stamp.ordinal);
         float hum = cursor.isNull(SQLiteManagerOpenHelper.Table.hum.ordinal) ? TactileModel.Empty : cursor.getLong(SQLiteManagerOpenHelper.Table.hum.ordinal);
         float temp = cursor.isNull(SQLiteManagerOpenHelper.Table.temp.ordinal) ? TactileModel.Empty : cursor.getLong(SQLiteManagerOpenHelper.Table.temp.ordinal);
+        float header = cursor.isNull(SQLiteManagerOpenHelper.Table.header.ordinal) ? TactileModel.Empty : cursor.getLong(SQLiteManagerOpenHelper.Table.header.ordinal);
 
         if (TactileModel.Empty == stamp || (TactileModel.Empty == hum && TactileModel.Empty == temp)) {
             return null;
         } else {
-            return new TactileModel(stamp, hum, temp);
+            return new TactileModel(stamp, hum, temp, header);
         }
     }
 
