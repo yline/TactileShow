@@ -143,7 +143,7 @@ public class TabActivity extends Activity {
         unregisterReceiver(mGattUpdateReceiver);
     }
 
-    public void setTempData(long stamp, double data) {
+    public void setTempData(long stamp, float data) {
         try {
             generalViewHelper.setTemp(data);
             generalViewHelper.setGerm(data);
@@ -156,7 +156,7 @@ public class TabActivity extends Activity {
         }
     }
 
-    public void setPressData(long stamp, double data) {
+    public void setPressData(long stamp, float data) {
         try {
             generalViewHelper.setPress(data);
 

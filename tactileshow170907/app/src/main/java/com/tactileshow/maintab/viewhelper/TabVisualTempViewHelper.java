@@ -4,13 +4,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.tactileshow.manager.TactileModel;
-import com.tactileshow.manager.SQLiteManager;
+import com.github.mikephil.charting.charts.LineChart;
 import com.tactileshow.main.R;
-import com.tactileshow.util.StaticValue;
-import com.tactileshow.maintab.view.DefineChartView;
 import com.tactileshow.maintab.view.DefinedScrollView;
 import com.tactileshow.maintab.view.DefinedViewPager;
+import com.tactileshow.manager.SQLiteManager;
+import com.tactileshow.manager.TactileModel;
 import com.yline.application.SDKManager;
 
 import java.util.List;
@@ -22,11 +21,11 @@ import java.util.List;
  * @version 1.0.0
  */
 public class TabVisualTempViewHelper {
-
     private View parentView;
     private DefinedScrollView definedScrollView;
     private TabVisualQueryView queryView;
-    private DefineChartView defineChartView;
+
+    private LineChartHelper lineChartHelper;
 
     public TabVisualTempViewHelper(Context context, DefinedViewPager viewPager) {
         initView(context, viewPager);
@@ -37,9 +36,14 @@ public class TabVisualTempViewHelper {
         definedScrollView = parentView.findViewById(R.id.visual_temp_scroll);
         queryView = parentView.findViewById(R.id.visual_temp_query);
 
-        defineChartView = parentView.findViewById(R.id.visual_temp_chart);
-        defineChartView.setYRange(StaticValue.temp_min_axis, StaticValue.temp_max_axis);
-        defineChartView.setOnTouchChartCallback(new DefineChartView.OnTouchChartCallback() {
+        LineChart lineChart = parentView.findViewById(R.id.tab_visual_temp_line_chart);
+        lineChartHelper = new LineChartHelper(lineChart);
+
+        initViewClick(viewPager);
+    }
+
+    private void initViewClick(final DefinedViewPager viewPager) {
+        lineChartHelper.setOnTouchChartCallback(new LineChartHelper.OnTouchChartCallback() {
             @Override
             public void onActionUp() {
                 viewPager.setTouchIntercept(true);
@@ -56,7 +60,7 @@ public class TabVisualTempViewHelper {
         queryView.setOnVisualQueryCallback(new TabVisualQueryView.OnVisualQueryCallback() {
             @Override
             public void onModeChange(boolean isNow) {
-                defineChartView.changeMode(isNow);
+                // defineChartView.changeMode(isNow);
             }
 
             @Override
@@ -72,17 +76,9 @@ public class TabVisualTempViewHelper {
                     @Override
                     public void onSuccess(List<TactileModel> modelList) {
                         view.setClickable(true);
-                        if (modelList.size() == 0) {
-                            SDKManager.toast("该时间段内没有数据");
-                        } else {
-                            TactileModel model;
-                            for (int i = 0; i < modelList.size(); i++) {
-                                model = modelList.get(i);
-                                defineChartView.addHistoryData(model.getTime(), model.getTemp());
-                            }
-                            defineChartView.notifyDataChanged();
-                            SDKManager.toast("加载成功");
-                        }
+
+                        boolean result = lineChartHelper.setDataList(modelList, LineChartHelper.TypeOfTemp);
+                        SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                     }
                 });
             }
@@ -100,17 +96,9 @@ public class TabVisualTempViewHelper {
                     @Override
                     public void onSuccess(List<TactileModel> modelList) {
                         view.setClickable(true);
-                        if (modelList.size() == 0) {
-                            SDKManager.toast("该时间段内没有数据");
-                        } else {
-                            TactileModel model;
-                            for (int i = 0; i < modelList.size(); i++) {
-                                model = modelList.get(i);
-                                defineChartView.addHistoryData(model.getTime(), model.getTemp());
-                            }
-                            defineChartView.notifyDataChanged();
-                            SDKManager.toast("加载成功");
-                        }
+
+                        boolean result = lineChartHelper.setDataList(modelList, LineChartHelper.TypeOfTemp);
+                        SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                     }
                 });
             }
@@ -128,17 +116,9 @@ public class TabVisualTempViewHelper {
                     @Override
                     public void onSuccess(List<TactileModel> modelList) {
                         view.setClickable(true);
-                        if (modelList.size() == 0) {
-                            SDKManager.toast("该时间段内没有数据");
-                        } else {
-                            TactileModel model;
-                            for (int i = 0; i < modelList.size(); i++) {
-                                model = modelList.get(i);
-                                defineChartView.addHistoryData(model.getTime(), model.getTemp());
-                            }
-                            defineChartView.notifyDataChanged();
-                            SDKManager.toast("加载成功");
-                        }
+
+                        boolean result = lineChartHelper.setDataList(modelList, LineChartHelper.TypeOfTemp);
+                        SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                     }
                 });
             }
@@ -159,17 +139,9 @@ public class TabVisualTempViewHelper {
                         @Override
                         public void onSuccess(List<TactileModel> modelList) {
                             view.setClickable(true);
-                            if (modelList.size() == 0) {
-                                SDKManager.toast("该时间段内没有数据");
-                            } else {
-                                TactileModel model;
-                                for (int i = 0; i < modelList.size(); i++) {
-                                    model = modelList.get(i);
-                                    defineChartView.addHistoryData(model.getTime(), model.getTemp());
-                                }
-                                defineChartView.notifyDataChanged();
-                                SDKManager.toast("加载成功");
-                            }
+
+                            boolean result = lineChartHelper.setDataList(modelList, LineChartHelper.TypeOfTemp);
+                            SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                         }
                     });
                 }
@@ -191,17 +163,9 @@ public class TabVisualTempViewHelper {
                         @Override
                         public void onSuccess(List<TactileModel> modelList) {
                             view.setClickable(true);
-                            if (modelList.size() == 0) {
-                                SDKManager.toast("该时间段内没有数据");
-                            } else {
-                                TactileModel model;
-                                for (int i = 0; i < modelList.size(); i++) {
-                                    model = modelList.get(i);
-                                    defineChartView.addHistoryData(model.getTime(), model.getTemp());
-                                }
-                                defineChartView.notifyDataChanged();
-                                SDKManager.toast("加载成功");
-                            }
+
+                            boolean result = lineChartHelper.setDataList(modelList, LineChartHelper.TypeOfTemp);
+                            SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                         }
                     });
                 }
@@ -209,10 +173,8 @@ public class TabVisualTempViewHelper {
         });
     }
 
-    public void addData(long stamp, double tempNum) {
-        defineChartView.addNowData(stamp, tempNum);
-        defineChartView.updateXRange(stamp);
-        defineChartView.notifyDataChanged();
+    public void addData(long stamp, float tempNum) {
+        lineChartHelper.addData(stamp, tempNum);
     }
 
     public View getView() {

@@ -25,9 +25,12 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile files('libs/achartengine-1.1.0.jar')
+
     compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
     compile 'com.yline.lib:LibSDK:2.0.7'
     compile 'com.yline.lib:LibViewRecycler:1.0.3'
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.android.support:design:26.0.0-alpha1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }

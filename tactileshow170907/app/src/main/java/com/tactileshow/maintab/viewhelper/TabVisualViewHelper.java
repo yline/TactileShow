@@ -50,11 +50,11 @@ public class TabVisualViewHelper {
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    public void setTemp(long stamp, double tempNum) {
+    public void setTemp(long stamp, float tempNum) {
         tempViewHelper.addData(stamp, tempNum);
     }
 
-    public void setHum(long stamp, double humNum) {
+    public void setHum(long stamp, float humNum) {
         humViewHelper.addData(stamp, humNum);
     }
 
