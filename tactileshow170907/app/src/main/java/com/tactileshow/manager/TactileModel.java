@@ -1,6 +1,10 @@
 package com.tactileshow.manager;
 
+import android.content.Context;
+import android.content.Intent;
+
 import com.google.gson.Gson;
+import com.tactileshow.util.macro;
 
 /**
  * App内，蓝牙传输数据--界面展示数据，使用的数据结构
@@ -63,18 +67,35 @@ public class TactileModel {
         return (Empty == hum) && (Empty == temp);
     }
 
-    private static Gson gson;
 
-    public static String toJson(TactileModel model) {
-        if (null == gson) {
-            gson = new Gson();
+
+    public static String receiveBroadcast(Intent intent){
+        if (null != intent){
+            return intent.getStringExtra("msg");
         }
-        return gson.toJson(model, TactileModel.class);
+        return "";
+    }
+
+    public static void sendBroadcast(Context context, TactileModel model){
+        String actionMsg = toJson(model);
+
+        Intent broadIntent = new Intent(macro.BROADCAST_ADDRESS);
+        broadIntent.putExtra("msg", actionMsg);
+        context.sendBroadcast(broadIntent);
+    }
+
+    private static Gson mGson;
+
+    private static String toJson(TactileModel model) {
+        if (null == mGson) {
+            mGson = new Gson();
+        }
+        return mGson.toJson(model, TactileModel.class);
     }
 
     public static TactileModel fromJson(String jsonStr) {
-        if (null == gson) {
-            gson = new Gson();
+        if (null == mGson) {
+            mGson = new Gson();
         }
         return new Gson().fromJson(jsonStr, TactileModel.class);
     }

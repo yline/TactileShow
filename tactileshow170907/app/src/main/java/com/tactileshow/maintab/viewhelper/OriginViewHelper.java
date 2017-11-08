@@ -13,12 +13,12 @@ import com.tactileshow.main.R;
  * @author yline 2017/9/24 -- 19:35
  * @version 1.0.0
  */
-public class TabOriginViewHelper {
+public class OriginViewHelper {
     private View view;
 
     private TextView temp, hum;
 
-    public TabOriginViewHelper(Context context) {
+    public OriginViewHelper(Context context) {
         view = LayoutInflater.from(context).inflate(R.layout.view_tab_origin, null);
 
         temp = (TextView) view.findViewById(R.id.label_detail_temp);

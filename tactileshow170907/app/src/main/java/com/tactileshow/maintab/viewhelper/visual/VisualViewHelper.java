@@ -1,4 +1,4 @@
-package com.tactileshow.maintab.viewhelper;
+package com.tactileshow.maintab.viewhelper.visual;
 
 import android.content.Context;
 import android.support.design.widget.TabLayout;
@@ -6,27 +6,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.tactileshow.main.R;
-import com.tactileshow.util.StaticValue;
 import com.tactileshow.maintab.view.DefinedViewPager;
+import com.tactileshow.maintab.viewhelper.ViewPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TabVisualViewHelper {
+public class VisualViewHelper {
     private View view;
 
     private DefinedViewPager viewPager;
-    private TabVisualTempViewHelper tempViewHelper;
-    private TabVisualHumViewHelper humViewHelper;
+    private VisualTempViewHelper tempViewHelper;
+    private VisualHumViewHelper humViewHelper;
 
 
-    public TabVisualViewHelper(Context context, DefinedViewPager pager) {
+    public VisualViewHelper(Context context, DefinedViewPager pager) {
         this.view = LayoutInflater.from(context).inflate(R.layout.view_tab_visual, null);
         this.viewPager = (DefinedViewPager) view.findViewById(R.id.visual_view_pager);
         viewPager.setOffscreenPageLimit(2);
 
-        tempViewHelper = new TabVisualTempViewHelper(context, pager);
-        humViewHelper = new TabVisualHumViewHelper(context, pager);
+        tempViewHelper = new VisualTempViewHelper(context, pager);
+        humViewHelper = new VisualHumViewHelper(context, pager);
 
         initView(view);
     }
@@ -36,10 +36,10 @@ public class TabVisualViewHelper {
         final List<String> titleList = new ArrayList<>();
 
         viewList.add(tempViewHelper.getView());
-        titleList.add(StaticValue.temp_visual_info_name);
+        titleList.add("温度信息");
 
         viewList.add(humViewHelper.getView());
-        titleList.add(StaticValue.press_visual_info_name);
+        titleList.add("湿度信息");
 
         TabLayout tabLayout = parentView.findViewById(R.id.visual_tab_layout);
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter();

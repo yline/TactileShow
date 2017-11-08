@@ -227,11 +227,6 @@ public class MainActivity extends Activity {
 
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-                /*
-                Time t = new Time();
-                t.setToNow();
-                String str_time = t.format2445();*/
-
                 String uuid = characteristic.getUuid().toString();
 
                 Log.i(TAG, "onCharacteristicChanged: onCharacteristicChanged");
@@ -246,17 +241,11 @@ public class MainActivity extends Activity {
                     float header = TactileModel.Empty;
 
                     TactileModel model = new TactileModel(System.currentTimeMillis(), hum, temp, header);
-
-                    String actionMsg = TactileModel.toJson(model);
-                    Intent broadIntent = new Intent(macro.BROADCAST_ADDRESS);
-                    broadIntent.putExtra("msg", actionMsg);
-                    sendBroadcast(broadIntent);
+                    TactileModel.sendBroadcast(MainActivity.this, model);
 
                     if (!model.isDataEmpty()) {
                         SQLiteManager.getInstance().insert(model);
                     }
-                    // updateBroadcast("#" + "TEMP" + "#" + str_time + "#" + p3d_temp.x);
-                    // updateBroadcast("#" + "PRESS" + "#" + str_time + "#" + p3d_hum.x);
                 }
             }
         });
@@ -406,8 +395,7 @@ public class MainActivity extends Activity {
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            final String action = intent.getStringExtra("msg");
-            Log.i(TAG, "广播来了 " + action);
+            final String action = TactileModel.receiveBroadcast(intent);
             helloTextView.setText(action);
         }
     };

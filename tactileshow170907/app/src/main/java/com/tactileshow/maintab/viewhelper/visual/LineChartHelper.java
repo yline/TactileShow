@@ -1,4 +1,4 @@
-package com.tactileshow.maintab.viewhelper;
+package com.tactileshow.maintab.viewhelper.visual;
 
 import android.graphics.Color;
 import android.view.MotionEvent;

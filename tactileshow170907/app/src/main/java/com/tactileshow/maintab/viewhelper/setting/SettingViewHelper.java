@@ -7,7 +7,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
 import com.tactileshow.main.R;
-import com.tactileshow.maintab.viewhelper.MockDataHandler;
 import com.tactileshow.manager.SQLiteManager;
 import com.tactileshow.manager.TactileModel;
 import com.tactileshow.util.macro;

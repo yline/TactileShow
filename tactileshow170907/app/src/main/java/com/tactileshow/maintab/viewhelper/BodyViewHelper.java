@@ -13,18 +13,18 @@ import com.tactileshow.main.R;
  * @author yline 2017/9/24 -- 20:05
  * @version 1.0.0
  */
-public class TabBodyViewHelper {
+public class BodyViewHelper {
     private View view;
 
     private ImageView ivHead, ivBody, iv_l_thigh, iv_r_thigh, iv_l_arm, iv_r_arm;
 
-    private TabBodyDialogHelper dialogHelper;
+    private BodyDialogHelper dialogHelper;
 
     private OnBodyClickListener onBodyClickListener;
 
-    public TabBodyViewHelper(Context context) {
+    public BodyViewHelper(Context context) {
         view = LayoutInflater.from(context).inflate(R.layout.view_tab_body, null);
-        dialogHelper = new TabBodyDialogHelper(context);
+        dialogHelper = new BodyDialogHelper(context);
 
         ivHead = (ImageView) view.findViewById(R.id.bodymap_iv_head);
         ivBody = (ImageView) view.findViewById(R.id.bodymap_iv_body);

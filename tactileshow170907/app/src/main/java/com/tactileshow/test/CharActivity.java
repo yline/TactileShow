@@ -9,7 +9,7 @@ import android.view.View;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.tactileshow.main.R;
-import com.tactileshow.maintab.viewhelper.LineChartHelper;
+import com.tactileshow.maintab.viewhelper.visual.LineChartHelper;
 import com.yline.application.SDKManager;
 
 import java.util.ArrayList;

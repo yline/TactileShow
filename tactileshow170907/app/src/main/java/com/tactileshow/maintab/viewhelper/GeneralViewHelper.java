@@ -22,7 +22,7 @@ import java.io.IOException;
  * @author yline 2017/9/24 -- 20:05
  * @version 1.0.0
  */
-public class TabGeneralViewHelper {
+public class GeneralViewHelper {
     private Context context;
 
     private View view;
@@ -37,7 +37,7 @@ public class TabGeneralViewHelper {
 
     private ImageView iv_hand, iv_needle, iv_alert, iv_germ, iv_fire;
 
-    public TabGeneralViewHelper(Context context) {
+    public GeneralViewHelper(Context context) {
         this.context = context;
         this.view = LayoutInflater.from(context).inflate(R.layout.view_tab_general, null);
 

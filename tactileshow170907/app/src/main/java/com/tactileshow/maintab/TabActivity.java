@@ -7,23 +7,21 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.util.DisplayMetrics;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
 
-import com.tactileshow.manager.TactileModel;
 import com.tactileshow.main.R;
-import com.tactileshow.util.StaticValue;
-import com.tactileshow.util.macro;
 import com.tactileshow.maintab.view.DefinedViewPager;
-import com.tactileshow.maintab.viewhelper.TabBodyViewHelper;
-import com.tactileshow.maintab.viewhelper.TabGeneralViewHelper;
-import com.tactileshow.maintab.viewhelper.TabOriginViewHelper;
-import com.tactileshow.maintab.viewhelper.setting.SettingViewHelper;
-import com.tactileshow.maintab.viewhelper.TabVisualViewHelper;
+import com.tactileshow.maintab.viewhelper.BodyViewHelper;
+import com.tactileshow.maintab.viewhelper.GeneralViewHelper;
+import com.tactileshow.maintab.viewhelper.OriginViewHelper;
 import com.tactileshow.maintab.viewhelper.ViewPagerAdapter;
+import com.tactileshow.maintab.viewhelper.setting.SettingViewHelper;
+import com.tactileshow.maintab.viewhelper.visual.VisualViewHelper;
+import com.tactileshow.manager.TactileModel;
+import com.tactileshow.util.macro;
+import com.yline.log.LogFileUtil;
 import com.yline.utils.LogUtil;
 
 import java.util.ArrayList;
@@ -34,25 +32,24 @@ public class TabActivity extends Activity {
 
     private DefinedViewPager viewPager;
 
-    private TabBodyViewHelper bodyViewHelper; // 人体图
-    private TabGeneralViewHelper generalViewHelper; // 一般信息
-    private TabVisualViewHelper visualViewHelper; // 图像信息
-    private TabOriginViewHelper originViewHelper; // 原始数据；温度、湿度
+    private BodyViewHelper bodyViewHelper; // 人体图
+    private GeneralViewHelper generalViewHelper; // 一般信息
+    private VisualViewHelper visualViewHelper; // 图像信息
+    private OriginViewHelper originViewHelper; // 原始数据；温度、湿度
     private SettingViewHelper settingViewHelper;  // 设置
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab);
-        getScreenMetrics();
 
         viewPager = (DefinedViewPager) findViewById(R.id.tab_view_pager);
         viewPager.setOffscreenPageLimit(6);
 
-        bodyViewHelper = new TabBodyViewHelper(this);
-        generalViewHelper = new TabGeneralViewHelper(this);
-        visualViewHelper = new TabVisualViewHelper(this, viewPager);
-        originViewHelper = new TabOriginViewHelper(this);
+        bodyViewHelper = new BodyViewHelper(this);
+        generalViewHelper = new GeneralViewHelper(this);
+        visualViewHelper = new VisualViewHelper(this, viewPager);
+        originViewHelper = new OriginViewHelper(this);
         settingViewHelper = new SettingViewHelper(this);
 
         IntentFilter filter = new IntentFilter();
@@ -68,19 +65,19 @@ public class TabActivity extends Activity {
         final List<String> titleList = new ArrayList<>();
 
         viewList.add(bodyViewHelper.getView());
-        titleList.add(StaticValue.bodymap_info_tab_name);
+        titleList.add("人体\n地图");
 
         viewList.add(generalViewHelper.getView());
-        titleList.add(StaticValue.general_info_tab_name);
+        titleList.add("一般\n信息");
 
         viewList.add(visualViewHelper.getView());
-        titleList.add(StaticValue.visual_info_tab_name);
+        titleList.add("图像\n信息");
 
         viewList.add(originViewHelper.getView());
-        titleList.add(StaticValue.detail_info_tab_name);
+        titleList.add("原始\n信息");
 
         viewList.add(settingViewHelper.getView());
-        titleList.add(StaticValue.set_tab_name);
+        titleList.add("设置");
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_tab_layout);
 
@@ -93,10 +90,10 @@ public class TabActivity extends Activity {
 
     private void initViewClick() {
         // 点击身体
-        bodyViewHelper.setOnBodyClickListener(new TabBodyViewHelper.OnBodyClickListener() {
+        bodyViewHelper.setOnBodyClickListener(new BodyViewHelper.OnBodyClickListener() {
             @Override
-            public void onBodyClick(TabBodyViewHelper.BodyType bodyType) {
-                if (bodyType == TabBodyViewHelper.BodyType.LeftArm) {
+            public void onBodyClick(BodyViewHelper.BodyType bodyType) {
+                if (bodyType == BodyViewHelper.BodyType.LeftArm) {
                     viewPager.setCurrentItem(1);
                 }
             }
@@ -113,14 +110,6 @@ public class TabActivity extends Activity {
         }
     }
 
-    private void getScreenMetrics() {
-        WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics dm = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(dm);
-        StaticValue.width = dm.widthPixels;
-        StaticValue.height = dm.heightPixels;
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -131,34 +120,28 @@ public class TabActivity extends Activity {
         try {
             generalViewHelper.setTemp(data);
             generalViewHelper.setGerm(data);
-
             visualViewHelper.setTemp(stamp, data);
-
             originViewHelper.setTemp(data);
         } catch (NumberFormatException e) {
-            Log.e("wshg", "Received an error format data!");
+            LogFileUtil.e("wshg", "Received an error format data!", e);
         }
     }
 
     public void setPressData(long stamp, float data) {
         try {
             generalViewHelper.setPress(data);
-
             visualViewHelper.setHum(stamp, data);
-
             originViewHelper.setHum(data);
         } catch (NumberFormatException e) {
-            Log.e("wshg", "Received an error format data!");
+            LogFileUtil.e("wshg", "Received an error format data!", e);
         }
     }
 
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            final String action = intent.getStringExtra("msg");
-            LogUtil.i(TAG + "onReceive: action = " + action);
-
-            if (null == action) {
+            final String action = TactileModel.receiveBroadcast(intent);
+            if (TextUtils.isEmpty(action)) {
                 return;
             }
 

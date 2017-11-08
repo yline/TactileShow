@@ -2,9 +2,9 @@ package com.tactileshow.util;
 
 public class macro
 {
-	public static int INTENT_REQUEST_ENABLE_BT = 10001;
+	public static final int INTENT_REQUEST_ENABLE_BT = 10001;
 	
-	public static long BLE_SCAN_PERIOD = 10000;
+	public static final long BLE_SCAN_PERIOD = 10000;
 	
 	public static int HANDLER_SERVICE_DISCOVERED = 20000;
 	
@@ -18,23 +18,17 @@ public class macro
 	
 	public static int HANDLER_NEWDATA = 20005;
 	
-	public static String BROADCAST_ADDRESS = "zju.ccnt.ble";
+	public static final String BROADCAST_ADDRESS = "zju.ccnt.ble";
 	
-	public static int MENU_GROUPID_BLE = 21000;
+	public static final int MENU_GROUPID_BLE = 21000;
+	public static final int MENU_ITEMID_FRESH = 21001;
+	public static final int MENU_ITEMID_EXIT = 21002;
+	public static final int MENU_ITEMID_DEBUG = 21003;
 	
-	public static int MENU_ITEMID_FRESH = 21001;
-	
-	public static int MENU_ITEMID_EXIT = 21002;
-	
-	public static int MENU_ITEMID_DEBUG = 21003;
-	
-	public static String UUID_HUM_SER = "f000aa20-0451-4000-b000-000000000000";//压力
-	
-	public static String UUID_HUM_DAT = "f000aa21-0451-4000-b000-000000000000";
-	
-	public static String UUID_HUM_CON = "f000aa22-0451-4000-b000-000000000000";
-	
-	public static String UUID_CLIENT_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
+	public static final String UUID_HUM_SER = "f000aa20-0451-4000-b000-000000000000";//压力
+	public static final String UUID_HUM_DAT = "f000aa21-0451-4000-b000-000000000000";
+	public static final String UUID_HUM_CON = "f000aa22-0451-4000-b000-000000000000";
+	public static final String  UUID_CLIENT_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
 	
 	public static String UUID_IRT_SER = "f000aa00-0451-4000-b000-000000000000";
 	
@@ -42,15 +36,12 @@ public class macro
 	
 	public static String UUID_IRT_CON = "f000aa02-0451-4000-b000-000000000000"; // 0: disable, 1: enable
 	
-	public static String UUID_MAG_SER = "f000aa30-0451-4000-b000-000000000000";//温度
-	
-	public static String UUID_MAG_DAT = "f000aa31-0451-4000-b000-000000000000";
-	
-	public static String UUID_MAG_CON = "f000aa32-0451-4000-b000-000000000000"; // 0: disable, 1: enable
+	public static final String UUID_MAG_SER = "f000aa30-0451-4000-b000-000000000000";//温度
+	public static final String UUID_MAG_DAT = "f000aa31-0451-4000-b000-000000000000";
+	public static final String UUID_MAG_CON = "f000aa32-0451-4000-b000-000000000000"; // 0: disable, 1: enable
 	
 	public static String UUID_MAG_PER = "f000aa33-0451-4000-b000-000000000000"; // Period in tens of milliseconds
-	
-	
+
 	public final static String ACTION_GATT_CONNECTED = "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
 	
 	public final static String ACTION_GATT_DISCONNECTED = "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
@@ -78,6 +69,4 @@ public class macro
 	public static double SETTING_GERM_RANGE[] = {38, 42};
 	
 	public static boolean SETTING_EXIT_DIRECTLY = false;
-	
-	
 }

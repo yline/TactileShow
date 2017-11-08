@@ -1,4 +1,4 @@
-package com.tactileshow.maintab.viewhelper;
+package com.tactileshow.maintab.viewhelper.visual;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -20,7 +20,7 @@ import java.util.Calendar;
  * @author yline 2017/9/28 -- 14:56
  * @version 1.0.0
  */
-public class TabVisualQueryView extends RelativeLayout {
+public class VisualQueryView extends RelativeLayout {
     private ViewHolder viewHolder;
 
     private OnVisualQueryCallback onVisualQueryCallback;
@@ -35,17 +35,17 @@ public class TabVisualQueryView extends RelativeLayout {
 
     private DefinedDateEditText fromDateEditText, toDateEditText;
 
-    public TabVisualQueryView(Context context) {
+    public VisualQueryView(Context context) {
         super(context);
         initView(context);
     }
 
-    public TabVisualQueryView(Context context, AttributeSet attrs) {
+    public VisualQueryView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView(context);
     }
 
-    public TabVisualQueryView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public VisualQueryView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView(context);
     }

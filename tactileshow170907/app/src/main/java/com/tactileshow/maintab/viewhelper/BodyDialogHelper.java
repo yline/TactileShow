@@ -4,10 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
-public class TabBodyDialogHelper {
+public class BodyDialogHelper {
     private AlertDialog dialog;
 
-    public TabBodyDialogHelper(Context context) {
+    public BodyDialogHelper(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("该区域无电子皮肤");
 

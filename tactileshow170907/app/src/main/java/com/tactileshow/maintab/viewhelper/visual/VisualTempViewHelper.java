@@ -1,4 +1,4 @@
-package com.tactileshow.maintab.viewhelper;
+package com.tactileshow.maintab.viewhelper.visual;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -20,14 +20,14 @@ import java.util.List;
  * @author yline 2017/9/28 -- 16:46
  * @version 1.0.0
  */
-public class TabVisualTempViewHelper {
+public class VisualTempViewHelper {
     private View parentView;
     private DefinedScrollView definedScrollView;
-    private TabVisualQueryView queryView;
+    private VisualQueryView queryView;
 
     private LineChartHelper lineChartHelper;
 
-    public TabVisualTempViewHelper(Context context, DefinedViewPager viewPager) {
+    public VisualTempViewHelper(Context context, DefinedViewPager viewPager) {
         initView(context, viewPager);
     }
 
@@ -57,7 +57,7 @@ public class TabVisualTempViewHelper {
             }
         });
 
-        queryView.setOnVisualQueryCallback(new TabVisualQueryView.OnVisualQueryCallback() {
+        queryView.setOnVisualQueryCallback(new VisualQueryView.OnVisualQueryCallback() {
             @Override
             public void onModeChange(boolean isNow) {
                 // defineChartView.changeMode(isNow);
