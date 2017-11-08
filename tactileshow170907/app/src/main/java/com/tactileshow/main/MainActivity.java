@@ -1,7 +1,6 @@
 package com.tactileshow.main;
 
 import android.Manifest;
-import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -27,14 +26,15 @@ import android.widget.TextView;
 import com.tactileshow.main.helper.BluetoothHelper;
 import com.tactileshow.main.helper.MainDialogHelper;
 import com.tactileshow.main.helper.MainListViewAdapter;
-import com.tactileshow.manager.TactileModel;
-import com.tactileshow.manager.SQLiteManager;
 import com.tactileshow.maintab.TabActivity;
+import com.tactileshow.manager.SQLiteManager;
+import com.tactileshow.manager.TactileModel;
 import com.tactileshow.util.Point3D;
 import com.tactileshow.util.macro;
 import com.yline.application.BaseApplication;
 import com.yline.application.SDKConstant;
 import com.yline.application.SDKManager;
+import com.yline.base.BaseActivity;
 import com.yline.log.LogFileUtil;
 import com.yline.utils.PermissionUtil;
 
@@ -45,7 +45,7 @@ import java.util.List;
  * 整个连接执行过程为：onMenuItemSelected里的macro.MENU_ITEMID_FRESH情况（当点击刷新时，进行设备扫描），scanLeDevice（真正开始扫描）
  * deviceListView.setOnItemClickListener（当点击设备时，进行连接）
  */
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
     private final static String TAG = "xxx-Main";
     private static final int RequestCodeOfTab = 1;
 

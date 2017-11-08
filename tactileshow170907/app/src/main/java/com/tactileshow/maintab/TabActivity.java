@@ -21,13 +21,14 @@ import com.tactileshow.maintab.viewhelper.setting.SettingViewHelper;
 import com.tactileshow.maintab.viewhelper.visual.VisualViewHelper;
 import com.tactileshow.manager.TactileModel;
 import com.tactileshow.util.macro;
+import com.yline.base.BaseActivity;
 import com.yline.log.LogFileUtil;
 import com.yline.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TabActivity extends Activity {
+public class TabActivity extends BaseActivity {
     private static final String TAG = "TabActivity";
 
     private DefinedViewPager viewPager;
@@ -50,7 +51,7 @@ public class TabActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab);
 
-        viewPager = (DefinedViewPager) findViewById(R.id.tab_view_pager);
+        viewPager = findViewById(R.id.tab_view_pager);
         viewPager.setOffscreenPageLimit(6);
 
         bodyViewHelper = new BodyViewHelper(this);
@@ -86,7 +87,7 @@ public class TabActivity extends Activity {
         viewList.add(settingViewHelper.getView());
         titleList.add("设置");
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_tab_layout);
+        TabLayout tabLayout = findViewById(R.id.tab_tab_layout);
 
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter();
         pagerAdapter.setViews(viewList, titleList);
@@ -124,27 +125,6 @@ public class TabActivity extends Activity {
         settingViewHelper.finish();
     }
 
-    public void setTempData(long stamp, float data) {
-        try {
-            generalViewHelper.setTemp(data);
-            generalViewHelper.setGerm(data);
-            visualViewHelper.setTemp(stamp, data);
-            originViewHelper.setTemp(data);
-        } catch (NumberFormatException e) {
-            LogFileUtil.e("wshg", "Received an error format data!", e);
-        }
-    }
-
-    public void setPressData(long stamp, float data) {
-        try {
-            generalViewHelper.setPress(data);
-            visualViewHelper.setHum(stamp, data);
-            originViewHelper.setHum(data);
-        } catch (NumberFormatException e) {
-            LogFileUtil.e("wshg", "Received an error format data!", e);
-        }
-    }
-
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -159,14 +139,48 @@ public class TabActivity extends Activity {
             } else {
                 float hum = model.getHum();
                 if (TactileModel.Empty != hum) {
-                    setPressData(model.getTime(), hum);
+                    setHumData(model.getTime(), hum);
                 }
 
                 float temp = model.getTemp();
                 if (TactileModel.Empty != temp) {
                     setTempData(model.getTime(), temp);
                 }
+
+                float header = model.getHeader();
+                if (TactileModel.Empty != header) {
+                    setHeaderData(model.getTime(), header);
+                }
             }
         }
     };
+
+    private void setHeaderData(long stamp, float header) {
+        try {
+            originViewHelper.setHeader(header);
+        } catch (NumberFormatException e) {
+            LogFileUtil.e("hum", "Received an error format data!", e);
+        }
+    }
+
+    private void setHumData(long stamp, float hum) {
+        try {
+            generalViewHelper.setHum(hum);
+            visualViewHelper.setHum(stamp, hum);
+            originViewHelper.setHum(hum);
+        } catch (NumberFormatException e) {
+            LogFileUtil.e("hum", "Received an error format data!", e);
+        }
+    }
+
+    private void setTempData(long stamp, float temp) {
+        try {
+            generalViewHelper.setTemp(temp);
+            generalViewHelper.setGerm(temp);
+            visualViewHelper.setTemp(stamp, temp);
+            originViewHelper.setTemp(temp);
+        } catch (NumberFormatException e) {
+            LogFileUtil.e("temp", "Received an error format data!", e);
+        }
+    }
 }

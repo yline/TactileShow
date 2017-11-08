@@ -58,6 +58,13 @@ public class VisualViewHelper {
         humViewHelper.addData(stamp, humNum);
     }
 
+    /**
+     * 第三渠道，内容
+     */
+    public void setHeader(){
+
+    }
+
     public View getView() {
         return this.view;
     }

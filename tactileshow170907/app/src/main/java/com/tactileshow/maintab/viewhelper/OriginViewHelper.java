@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import com.tactileshow.main.R;
 
+import java.util.Locale;
+
 /**
  * 原始信息界面
  *
@@ -16,23 +18,29 @@ import com.tactileshow.main.R;
 public class OriginViewHelper {
     private View view;
 
-    private TextView temp, hum;
+    private TextView tvTemp, tvHum, tvHeader;
 
     public OriginViewHelper(Context context) {
         view = LayoutInflater.from(context).inflate(R.layout.view_tab_origin, null);
 
-        temp = (TextView) view.findViewById(R.id.label_detail_temp);
-        hum = (TextView) view.findViewById(R.id.label_detail_hum);
+        tvTemp = view.findViewById(R.id.label_detail_temp);
+        tvHum = view.findViewById(R.id.label_detail_hum);
+        tvHeader = view.findViewById(R.id.label_detail_header);
     }
 
     public void setTemp(double number) {
-        String str = String.format("%.2f", number);
-        temp.setText(str);
+        String str = String.format(Locale.CHINA, "%.2f", number);
+        tvTemp.setText(str);
     }
 
     public void setHum(double number) {
-        String str = String.format("%.2f", number);
-        hum.setText(str);
+        String str = String.format(Locale.CHINA, "%.2f", number);
+        tvHum.setText(str);
+    }
+
+    public void setHeader(double number) {
+        String str = String.format(Locale.CHINA, "%.2f", number);
+        tvHeader.setText(str);
     }
 
     public View getView() {

@@ -7,64 +7,99 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin">
 
-    <TextView
-        android:id="@+id/label_detail_temp_name"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/tab_origin_hum"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="148dp"
-        android:text="@string/label_detail_temp_name_str"
-        android:textSize="@dimen/dimen_detail_text_size" />
+        android:layout_centerVertical="true">
 
-    <TextView
-        android:id="@+id/label_detail_hum_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/label_detail_temp_name"
-        android:layout_centerVertical="true"
-        android:text="@string/label_detail_hum_name_str"
-        android:textSize="@dimen/dimen_detail_text_size" />
+        <TextView
+            android:id="@+id/label_detail_hum_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_detail_hum_name_str"
+            android:textSize="@dimen/dimen_detail_text_size" />
 
-    <TextView
-        android:id="@+id/label_detail_hum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/label_detail_temp"
-        android:layout_centerVertical="true"
-        android:text=""
-        android:textSize="@dimen/dimen_detail_text_size" />
+        <TextView
+            android:id="@+id/label_detail_hum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:text=""
+            android:textSize="@dimen/dimen_detail_text_size" />
 
-    <TextView
-        android:id="@+id/label_detail_hum_unit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/label_detail_hum"
-        android:layout_alignStart="@+id/label_detail_temp_unit"
-        android:text="@string/label_hum_unit_str"
-        android:textSize="@dimen/dimen_detail_text_size" />
+        <TextView
+            android:id="@+id/label_detail_hum_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_hum_unit_str"
+            android:textSize="@dimen/dimen_detail_text_size" />
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/label_detail_temp"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/tab_origin_temp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/label_detail_temp_name"
-        android:layout_alignBottom="@+id/label_detail_temp_name"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="10dp"
-        android:layout_toEndOf="@+id/label_detail_temp_name"
-        android:text=""
-        android:textSize="@dimen/dimen_detail_text_size" />
+        android:layout_above="@id/tab_origin_hum"
+        android:layout_marginBottom="30dp">
 
-    <TextView
-        android:id="@+id/label_detail_temp_unit"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/label_detail_temp_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:text="@string/label_detail_temp_name_str"
+            android:textSize="@dimen/dimen_detail_text_size" />
+
+        <TextView
+            android:id="@+id/label_detail_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:text=""
+            android:textSize="@dimen/dimen_detail_text_size" />
+
+        <TextView
+            android:id="@+id/label_detail_temp_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:text="@string/label_temp_unit_str"
+            android:textSize="@dimen/dimen_detail_text_size" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/tab_origin_header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/label_detail_temp"
-        android:layout_alignBottom="@+id/label_detail_temp"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="20dp"
-        android:text="@string/label_temp_unit_str"
-        android:textSize="@dimen/dimen_detail_text_size" />
+        android:layout_below="@id/tab_origin_hum"
+        android:layout_marginTop="30dp">
+
+        <TextView
+            android:id="@+id/label_detail_header_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:text="@string/label_detail_header_name_str"
+            android:textSize="@dimen/dimen_detail_text_size" />
+
+        <TextView
+            android:id="@+id/label_detail_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:text=""
+            android:textSize="@dimen/dimen_detail_text_size" />
+
+        <TextView
+            android:id="@+id/label_detail_header_unit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:text="@string/label_header_unit_str"
+            android:textSize="@dimen/dimen_detail_text_size" />
+    </LinearLayout>
 </RelativeLayout>
