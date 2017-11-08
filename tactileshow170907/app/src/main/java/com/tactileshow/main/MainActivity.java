@@ -160,17 +160,18 @@ public class MainActivity extends BaseActivity {
         mBluetoothHelper.setOnConnectCallback(new BluetoothHelper.OnConnectCallback() {
             @Override
             public void onConnectionStateChangeHandler(BluetoothGatt gatt, int status, int newState) {
-
+                LogFileUtil.v("setOnConnectCallback onConnectionStateChangeHandler status = " + status + ", newState = " + newState);
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     mDialogHelper.setText("连接成功，开始寻找服务");
-                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) // 当设备无法连接
-                {
+                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) { // 当设备无法连接
                     mDialogHelper.setText("连接失败，请返回重连");
                 }
             }
 
             @Override
             public void onServicesDiscoveredHandler(BluetoothGatt gatt, int status) {
+                LogFileUtil.v("onServicesDiscoveredHandler status = " + status);
+
                 if (status == BluetoothGatt.GATT_SUCCESS) {
                     mDialogHelper.setText("成功发现服务，开始启动服务");
                     mBluetoothHelper.logServiceInfo();
@@ -228,8 +229,6 @@ public class MainActivity extends BaseActivity {
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
                 String uuid = characteristic.getUuid().toString();
 
-                Log.i(TAG, "onCharacteristicChanged: onCharacteristicChanged");
-
                 if (uuid.equals(macro.UUID_HUM_DAT)) {
                     Point3D p3d_hum = convertHum(characteristic.getValue());
                     float hum = (float) p3d_hum.x;
@@ -238,6 +237,8 @@ public class MainActivity extends BaseActivity {
                     float temp = (float) p3d_temp.x;
 
                     float header = TactileModel.Empty;
+
+                    LogFileUtil.i(TAG, "onCharacteristicChanged: value = " + characteristic.getValue());
 
                     TactileModel model = new TactileModel(System.currentTimeMillis(), hum, temp, header);
                     TactileModel.sendBroadcast(MainActivity.this, model);

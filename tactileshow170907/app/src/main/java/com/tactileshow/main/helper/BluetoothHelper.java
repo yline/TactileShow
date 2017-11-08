@@ -88,7 +88,7 @@ public class BluetoothHelper {
                 public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int newState) {
                     super.onConnectionStateChange(gatt, status, newState);
 
-                    LogFileUtil.i(TAG, "status = " + status + ", newState = " + newState);
+                    LogFileUtil.i(TAG, "onConnectionStateChange status = " + status + ", newState = " + newState);
                     if (newState == BluetoothProfile.STATE_CONNECTED) {
                         // 发现服务
                         discoverServices();
@@ -111,7 +111,7 @@ public class BluetoothHelper {
                 public void onServicesDiscovered(final BluetoothGatt gatt, final int status) {
                     super.onServicesDiscovered(gatt, status);
 
-                    LogFileUtil.i(TAG, "status = " + status);
+                    LogFileUtil.i(TAG, "onServicesDiscovered status = " + status);
 
                     SDKManager.getHandler().post(new Runnable() {
                         @Override
@@ -127,8 +127,7 @@ public class BluetoothHelper {
                 @Override
                 public void onCharacteristicRead(final BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic, final int status) {
                     super.onCharacteristicRead(gatt, characteristic, status);
-
-                    LogFileUtil.i(TAG, "characteristic = " + characteristic + ", status = " + status);
+                    LogFileUtil.i(TAG, "onCharacteristicRead characteristic = " + characteristic + ", status = " + status);
 
                     if (null != onConnectCallback) {
                         onConnectCallback.onCharacteristicRead(gatt, characteristic, status);
@@ -139,8 +138,7 @@ public class BluetoothHelper {
                 @Override
                 public void onCharacteristicChanged(final BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
                     super.onCharacteristicChanged(gatt, characteristic);
-
-                    LogFileUtil.i(TAG, "characteristic = " + characteristic);
+                    LogFileUtil.i(TAG, "onCharacteristicChanged characteristic = " + characteristic);
 
                     if (null != onConnectCallback) {
                         onConnectCallback.onCharacteristicChanged(gatt, characteristic);
