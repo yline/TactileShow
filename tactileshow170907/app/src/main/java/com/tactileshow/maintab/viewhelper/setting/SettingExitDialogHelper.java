@@ -5,7 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
-import com.tactileshow.util.macro;
+import com.tactileshow.IApplication;
 
 /**
  * 退出界面弹框
@@ -35,10 +35,7 @@ public class SettingExitDialogHelper {
         dialogBuilder.setNeutralButton("直接退出", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                macro.SETTING_EXIT_DIRECTLY = true;
-                if (context instanceof Activity) {
-                    ((Activity) context).finish();
-                }
+                IApplication.finishActivity();
             }
         });
 

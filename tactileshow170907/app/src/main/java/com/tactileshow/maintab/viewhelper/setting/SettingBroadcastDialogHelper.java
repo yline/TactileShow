@@ -12,6 +12,7 @@ import com.yline.view.recycler.holder.ViewHolder;
 
 /**
  * 设定广播信息(mock蓝牙数据)
+ *
  * @author yline 2017/11/7 -- 23:34
  * @version 1.0.0
  */
@@ -38,7 +39,7 @@ public class SettingBroadcastDialogHelper {
                 if (null != dialog && dialog.isShowing()) {
                     saveData();
 
-                    if (null != onPerSureClickListener){
+                    if (null != onPerSureClickListener) {
                         onPerSureClickListener.onSureClick(per);
                     }
 
@@ -76,45 +77,6 @@ public class SettingBroadcastDialogHelper {
         if (null != dialog && !dialog.isShowing()) {
             initView();
             dialog.show();
-        }
-    }
-
-    // 生成 湿度 的模拟数据
-    public float getMockHum() {
-        if (isHumAble) {
-            if (isHumRange) {
-                return (float) (humMin + Math.random() * Math.abs(humMax - humMin + 1));
-            } else {
-                return humMin;
-            }
-        } else {
-            return TactileModel.Empty;
-        }
-    }
-
-    // 生成 温度 的模拟数据
-    public float getMockTemp() {
-        if (isTempAble) {
-            if (isTempRange) {
-                return (float) (tempMin + Math.random() * Math.abs(tempMax - tempMin + 1));
-            } else {
-                return tempMin;
-            }
-        } else {
-            return TactileModel.Empty;
-        }
-    }
-
-    // 生成 第三个渠道 的模拟数据
-    public float getMockHeader() {
-        if (isHeaderAble) {
-            if (isHeaderRange) {
-                return (float) (headerMin + Math.random() * Math.abs(headerMax - headerMin + 1));
-            } else {
-                return headerMin;
-            }
-        } else {
-            return TactileModel.Empty;
         }
     }
 
@@ -168,9 +130,57 @@ public class SettingBroadcastDialogHelper {
         per = Integer.parseInt(sViewHolder.getText(R.id.broadcast_dialog_et_per));
     }
 
-    public interface OnPerSureClickListener{
+    public int getPer() {
+        return per * 1000;
+    }
+
+    public TactileModel getMockModel() {
+        return new TactileModel(System.currentTimeMillis(), getMockHum(), getMockTemp(), getMockHeader());
+    }
+
+    // 生成 湿度 的模拟数据
+    private float getMockHum() {
+        if (isHumAble) {
+            if (isHumRange) {
+                return (float) (humMin + Math.random() * Math.abs(humMax - humMin + 1));
+            } else {
+                return humMin;
+            }
+        } else {
+            return TactileModel.Empty;
+        }
+    }
+
+    // 生成 温度 的模拟数据
+    private float getMockTemp() {
+        if (isTempAble) {
+            if (isTempRange) {
+                return (float) (tempMin + Math.random() * Math.abs(tempMax - tempMin + 1));
+            } else {
+                return tempMin;
+            }
+        } else {
+            return TactileModel.Empty;
+        }
+    }
+
+    // 生成 第三个渠道 的模拟数据
+    private float getMockHeader() {
+        if (isHeaderAble) {
+            if (isHeaderRange) {
+                return (float) (headerMin + Math.random() * Math.abs(headerMax - headerMin + 1));
+            } else {
+                return headerMin;
+            }
+        } else {
+            return TactileModel.Empty;
+        }
+    }
+
+    public interface OnPerSureClickListener {
         /**
          * 点击确定时，响应
+         *
          * @param per 设置的间隔周期; unit: s
          */
         void onSureClick(int per);

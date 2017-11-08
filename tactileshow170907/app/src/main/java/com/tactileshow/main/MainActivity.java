@@ -47,6 +47,7 @@ import java.util.List;
  */
 public class MainActivity extends Activity {
     private final static String TAG = "xxx-Main";
+    private static final int RequestCodeOfTab = 1;
 
     private BluetoothHelper mBluetoothHelper;
     private MainDialogHelper mDialogHelper;
@@ -209,10 +210,8 @@ public class MainActivity extends Activity {
                         SDKManager.getHandler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                Intent intent = new Intent();
-                                intent.setClass(MainActivity.this, TabActivity.class);
-                                intent.putExtra("str", "come from first activity");
-                                startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
+                                TabActivity.launcherForResult(MainActivity.this, RequestCodeOfTab);
+
                                 mDialogHelper.dismiss();
                             }
                         }, 1000);
@@ -272,14 +271,9 @@ public class MainActivity extends Activity {
             helloTextView.setText("开始搜索");
             mBluetoothHelper.startScanDevice(macro.BLE_SCAN_PERIOD);
         } else if (item.getItemId() == macro.MENU_ITEMID_EXIT) {
-            Log.w(TAG, "滚");
             finish();
         } else if (item.getItemId() == macro.MENU_ITEMID_DEBUG) {
-            Log.w(TAG, "测试模式");
-            Intent intent = new Intent();
-            intent.setClass(MainActivity.this, TabActivity.class);
-            intent.putExtra("str", "come from first activity TEST");
-            startActivityForResult(intent, macro.INTENT_BLEACTIVITY_TESTSHOW);
+            TabActivity.launcherForResult(MainActivity.this, RequestCodeOfTab);
         }
 
         return super.onMenuItemSelected(featureId, item);
@@ -322,12 +316,8 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.i(TAG, "onActivityResult: requestCode = " + requestCode + ", resultCode = " + ", data = " + data);
-        if (requestCode == macro.INTENT_BLEACTIVITY_TESTSHOW) {
+        if (requestCode == RequestCodeOfTab) {
             mBluetoothHelper.closeBluetooth();
-            if (macro.SETTING_EXIT_DIRECTLY) // 上一个activity要求直接退出。
-            {
-                finish();
-            }
         }
     }
 

@@ -38,6 +38,13 @@ public class TabActivity extends Activity {
     private OriginViewHelper originViewHelper; // 原始数据；温度、湿度
     private SettingViewHelper settingViewHelper;  // 设置
 
+    public static void launcherForResult(Activity activity, int requestCode) {
+        if (null != activity) {
+            Intent intent = new Intent(activity, TabActivity.class);
+            activity.startActivityForResult(intent, requestCode);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,6 +121,7 @@ public class TabActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mGattUpdateReceiver);
+        settingViewHelper.finish();
     }
 
     public void setTempData(long stamp, float data) {

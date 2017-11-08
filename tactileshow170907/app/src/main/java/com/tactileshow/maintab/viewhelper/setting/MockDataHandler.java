@@ -18,25 +18,23 @@ import java.lang.ref.WeakReference;
 public class MockDataHandler extends Handler {
     public static final int Start = -100;
     public static final int Stop = -200;
-
-    private static final int Run = 1;
+    public static final int Run = 1;
 
     private boolean isRunning;
-    private int perTime;
 
-    private WeakReference<Context> sWeakContext;
+    private WeakReference<Context> mWeakContext;
+    private SettingBroadcastDialogHelper mGenDataHelper;
 
-    private TactileModel broadcastModel;
-
-    public MockDataHandler(Context context) {
-        this.sWeakContext = new WeakReference<>(context);
-        this.perTime = 1000;
+    public MockDataHandler(Context context, SettingBroadcastDialogHelper dialogHelper) {
+        this.mWeakContext = new WeakReference<>(context);
+        this.mGenDataHelper = dialogHelper;
     }
 
     @Override
     public void handleMessage(Message msg) {
         super.handleMessage(msg);
 
+        int perTime = getPerTime();
         if (msg.what == Start) {
             isRunning = true;
             sendEmptyMessageDelayed(Run, perTime);
@@ -46,10 +44,9 @@ public class MockDataHandler extends Handler {
             if (isRunning) {
                 sendEmptyMessageDelayed(Run, perTime);
 
-                if (null != broadcastModel && !broadcastModel.isDataEmpty()) {
-                    TactileModel.sendBroadcast(sWeakContext.get(), broadcastModel);
-
-                    broadcastModel = null;
+                TactileModel tactileModel = getTactileModel();
+                if (null != tactileModel && !tactileModel.isDataEmpty()) {
+                    TactileModel.sendBroadcast(mWeakContext.get(), tactileModel);
                 } else {
                     LogFileUtil.i("TimeHandler", "handleMessage: broadcastModel is null or empty");
                 }
@@ -57,25 +54,18 @@ public class MockDataHandler extends Handler {
         }
     }
 
-    public void setBroadcastModel(TactileModel model) {
-        this.broadcastModel = model;
+    private TactileModel getTactileModel() {
+        if (null != mGenDataHelper) {
+            return mGenDataHelper.getMockModel();
+        }
+        return null;
     }
 
-    public int getPerTime() {
-        return perTime;
-    }
-
-    public void setPerTime(int perTime) {
-        if (perTime < 50) {
-            this.perTime = 1000;
-            return;
+    private int getPerTime() {
+        if (null != mGenDataHelper) {
+            int perTime = mGenDataHelper.getPer();
+            return Math.min(30 * 1000, Math.max(300, perTime));
         }
-
-        if (perTime > 30 * 1000) {
-            this.perTime = 10 * 1000;
-            return;
-        }
-
-        this.perTime = perTime;
+        return 1000;
     }
 }

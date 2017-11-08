@@ -8,10 +8,8 @@ import android.widget.CompoundButton;
 
 import com.tactileshow.main.R;
 import com.tactileshow.manager.SQLiteManager;
-import com.tactileshow.manager.TactileModel;
 import com.tactileshow.util.macro;
 import com.yline.application.SDKManager;
-import com.yline.utils.LogUtil;
 import com.yline.view.recycler.holder.ViewHolder;
 
 /**
@@ -30,8 +28,6 @@ public class SettingViewHelper {
     private MockDataHandler mHandler;
 
     public SettingViewHelper(Context context) {
-        mHandler = new MockDataHandler(context);
-
         View view = LayoutInflater.from(context).inflate(R.layout.view_tab_setting, null);
         this.mViewHolder = new ViewHolder(view);
 
@@ -39,11 +35,9 @@ public class SettingViewHelper {
         this.mBroadcastDialogHelper = new SettingBroadcastDialogHelper(context);
         this.mThresholdDialogHelper = new SettingThresholdDialogHelper(context);
 
-        initViewClick();
+        mHandler = new MockDataHandler(context, mBroadcastDialogHelper);
 
-        // 开启模拟数据
-        MockThread mockThread = new MockThread();
-        mockThread.start();
+        initViewClick();
     }
 
     private void initViewClick() {
@@ -77,34 +71,17 @@ public class SettingViewHelper {
             }
         });
 
-        // 更改数据周期
-        mBroadcastDialogHelper.setOnPerSureClickListener(new SettingBroadcastDialogHelper.OnPerSureClickListener() {
-            @Override
-            public void onSureClick(int per) {
-                // 更新发送周期
-                if (mHandler.getPerTime() != per) {
-                    mHandler.setPerTime(per * 1000);
-                }
-            }
-        });
-
         // 测试广播
         CheckBox checkBoxBroadcast = mViewHolder.get(R.id.setting_cb_broadcast_toggle);
         checkBoxBroadcast.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (macro.SETTINGS_BCAST) {
-                    macro.SETTINGS_BCAST = false;
-
-                    mHandler.sendEmptyMessageAtTime(MockDataHandler.Stop, 0);
-
-                    SDKManager.toast("测试广播已关闭");
-                } else {
-                    macro.SETTINGS_BCAST = true;
-
+                if (isChecked){
                     mHandler.sendEmptyMessageAtTime(MockDataHandler.Start, 100);
-
                     SDKManager.toast("测试广播已开启");
+                }else {
+                    mHandler.sendEmptyMessageAtTime(MockDataHandler.Stop, 0);
+                    SDKManager.toast("测试广播已关闭");
                 }
             }
         });
@@ -125,7 +102,7 @@ public class SettingViewHelper {
             }
         });
 
-        // 数据条数
+        // 数据库，数据条数
         mViewHolder.setText(R.id.setting_tv_data_count, SQLiteManager.getInstance().count() + "");
         mViewHolder.setOnClickListener(R.id.setting_rl_data, new View.OnClickListener() {
             @Override
@@ -158,37 +135,6 @@ public class SettingViewHelper {
             mHandler.sendEmptyMessageAtTime(MockDataHandler.Stop, 0);
             mHandler.removeCallbacks(null);
             mHandler = null;
-        }
-    }
-
-    /* 模拟数据源，不停的发送信息 */
-    private class MockThread extends Thread {
-        @Override
-        public void run() {
-            super.run();
-
-            while (true) {
-                if (null != mHandler && macro.SETTINGS_BCAST) {
-                    // temp
-                    float temp = mBroadcastDialogHelper.getMockTemp();
-                    float hum = mBroadcastDialogHelper.getMockHum();
-                    float header = mBroadcastDialogHelper.getMockHeader();
-
-                    LogUtil.i("Mock:" + "temp = " + temp + ", hum = " + hum);
-                    TactileModel model = new TactileModel(System.currentTimeMillis(), hum, temp, header);
-
-                    mHandler.setBroadcastModel(model);
-                    if (!model.isDataEmpty()) {
-                        SQLiteManager.getInstance().insert(model);
-                    }
-                }
-
-                try {
-                    Thread.sleep(800); // 最小的频率
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 }
