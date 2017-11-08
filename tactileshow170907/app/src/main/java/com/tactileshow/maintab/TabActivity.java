@@ -158,6 +158,7 @@ public class TabActivity extends BaseActivity {
     private void setHeaderData(long stamp, float header) {
         try {
             originViewHelper.setHeader(header);
+            visualViewHelper.setHeader(stamp, header);
         } catch (NumberFormatException e) {
             LogFileUtil.e("hum", "Received an error format data!", e);
         }

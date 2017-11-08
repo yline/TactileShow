@@ -4,9 +4,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 
 import com.tactileshow.IApplication;
+import com.yline.log.LogFileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,17 +91,27 @@ public class SQLiteManager {
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
             public void run() {
-                Log.i("xxx-", "run: loadAsync");
+                LogFileUtil.v("loadAsync", "from = " + fromStamp + ", to = " + toStamp);
 
                 if (fromStamp >= toStamp) {
                     if (null != callback) {
-                        callback.onFailure("输入参数不合法");
+                        IApplication.getHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.onFailure("输入参数不合法");
+                            }
+                        });
                     }
                 }
 
-                List<TactileModel> resultList = load(fromStamp, toStamp);
+                final List<TactileModel> resultList = load(fromStamp, toStamp);
                 if (null != callback) {
-                    callback.onSuccess(resultList);
+                    IApplication.getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onSuccess(resultList);
+                        }
+                    });
                 }
             }
         });

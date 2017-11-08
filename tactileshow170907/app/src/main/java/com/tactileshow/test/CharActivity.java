@@ -33,7 +33,7 @@ public class CharActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-            lineChartHelper.addData(System.currentTimeMillis(), (float) (Math.random() * 10));
+            lineChartHelper.addNowData(System.currentTimeMillis(), (float) (Math.random() * 10));
             mHandler.sendEmptyMessageDelayed(0, 1000);
         }
     };
@@ -59,5 +59,12 @@ public class CharActivity extends AppCompatActivity {
         }
 
         lineChartHelper.setDataList(yVals3);
+    }
+
+    int index = 0;
+
+    public void onModeData(View view) {
+        index++;
+        lineChartHelper.changeMode(index % 2 == 0);
     }
 }

@@ -25,5 +25,10 @@
             android:layout_height="wrap_content"
             android:onClick="onSetData"
             android:text="设置数据" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onModeData"
+            android:text="切换模式" />
     </LinearLayout>
 </RelativeLayout>

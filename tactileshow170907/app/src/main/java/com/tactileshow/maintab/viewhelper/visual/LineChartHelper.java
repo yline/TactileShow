@@ -29,8 +29,9 @@ import java.util.Locale;
 public class LineChartHelper {
     public static final int TypeOfTemp = 0;
     public static final int TypeOfHum = 1;
+    public static final int TypeOfHeader = 2;
 
-    private static final int MaxCount = 60; // 显示的最大数据
+    private static final int MaxCount = 512; // 显示的最大数据
 
     private static final int DIVISOR_HOUR = 3_600_000; // 1个小时
     private static final int DIVISOR_MINUTE = 60_000; // 1个分钟
@@ -38,9 +39,11 @@ public class LineChartHelper {
 
     private LineChart mLineChart;
     private OnTouchChartCallback onTouchChartCallback;
+    private boolean mIsNow;
 
     public LineChartHelper(LineChart lineChart) {
         mLineChart = lineChart;
+        mIsNow = true;
 
         lineChart.setOnTouchListener(new OnDrawLineChartTouchListener() {
             @Override
@@ -83,13 +86,12 @@ public class LineChartHelper {
         });
     }
 
-    public void addData(long stamp, float y) {
-        if (null != mLineChart) {
+    public void addNowData(long stamp, float y) {
+        if (null != mLineChart && isNowMode()) {
             initLineDataSet();
 
-            if (mLineChart.getData().getDataSetCount() > 0) {
-                LineDataSet dataSet = (LineDataSet) mLineChart.getData().getDataSetByIndex(0);
-
+            LineDataSet dataSet = (LineDataSet) mLineChart.getData().getDataSetByIndex(0);
+            if (null != dataSet) {
                 int value = stampToValue(stamp);
                 dataSet.addEntry(new Entry(value, y));
 
@@ -115,11 +117,11 @@ public class LineChartHelper {
      * 设置 从数据库中，读取的数据
      *
      * @param modelList   数据内容
-     * @param tactileType 展示的内容 {LineChartHelper.TypeOfTemp},{LineChartHelper.TypeOfHum}
+     * @param tactileType 展示的内容 {LineChartHelper.TypeOfTemp},{LineChartHelper.TypeOfHum},{LineChartHelper.TypeOfHeader}
      * @return true 设置成功
      */
-    public boolean setDataList(List<TactileModel> modelList, int tactileType) {
-        if (null != modelList && modelList.size() > 0) {
+    public boolean setHistoryDataList(List<TactileModel> modelList, int tactileType) {
+        if (null != modelList && modelList.size() > 0 && !isNowMode()) {
             List<Entry> entryList = new ArrayList<>();
 
             int xValue;
@@ -130,6 +132,8 @@ public class LineChartHelper {
                     yValue = modelList.get(i).getTemp();
                 } else if (TypeOfHum == tactileType) {
                     yValue = modelList.get(i).getHum();
+                } else if (TypeOfHeader == tactileType) {
+                    yValue = modelList.get(i).getHeader();
                 } else {
                     return false;
                 }
@@ -153,9 +157,9 @@ public class LineChartHelper {
         if (null != dataList && dataList.size() > 0) {
             initLineDataSet();
 
-            if (mLineChart.getData().getDataSetCount() > 0) {
-                LineDataSet dataSet = (LineDataSet) mLineChart.getData().getDataSetByIndex(0);
-
+            LineDataSet dataSet = (LineDataSet) mLineChart.getData().getDataSetByIndex(0);
+            if (null != dataSet) {
+                dataSet.setVisible(true);
                 dataSet.setValues(dataList);
 
                 mLineChart.getData().notifyDataChanged();
@@ -176,14 +180,27 @@ public class LineChartHelper {
         }
     }
 
-    private void initLineDataSet() {
-        if (null == mLineChart.getData()) {
-            LineDataSet dataSet = new LineDataSet(new ArrayList<Entry>(), "DataSet A");
+    /**
+     * 切换 line
+     */
+    public void changeMode(boolean isNow) {
+        if (null != mLineChart && null != mLineChart.getData()){
+            mLineChart.getData().clearValues();
+        }
+        mIsNow = isNow;
+    }
 
+    public boolean isNowMode() {
+        return mIsNow;
+    }
+
+    private void initLineDataSet() {
+        if (null == mLineChart.getData() || mLineChart.getData().getEntryCount() == 0) {
+            LineDataSet dataSet = new LineDataSet(new ArrayList<Entry>(), mIsNow ? "Now" : "History");
             dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-            dataSet.setColor(Color.RED);
+            dataSet.setColor(mIsNow ? Color.RED : Color.GREEN);
             dataSet.setLineWidth(1);
-            dataSet.setCircleColor(Color.RED);
+            dataSet.setCircleColor(mIsNow ? Color.RED : Color.GREEN);
             dataSet.setCircleRadius(2);
             dataSet.setDrawCircleHole(false);
 

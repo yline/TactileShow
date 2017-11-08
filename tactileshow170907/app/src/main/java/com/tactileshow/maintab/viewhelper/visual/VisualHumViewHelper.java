@@ -60,7 +60,8 @@ public class VisualHumViewHelper {
         queryView.setOnVisualQueryCallback(new VisualQueryView.OnVisualQueryCallback() {
             @Override
             public void onModeChange(boolean isNow) {
-//                defineChartView.changeMode(isNow);
+                lineChartHelper.changeMode(isNow);
+                SDKManager.toast(isNow ? "开始展示实时数据" : "实时数据停止监听，准备展示历史数据");
             }
 
             @Override
@@ -77,7 +78,7 @@ public class VisualHumViewHelper {
                     public void onSuccess(List<TactileModel> modelList) {
                         view.setClickable(true);
 
-                        boolean result = lineChartHelper.setDataList(modelList, LineChartHelper.TypeOfHum);
+                        boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfHum);
                         SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                     }
                 });
@@ -97,7 +98,7 @@ public class VisualHumViewHelper {
                     public void onSuccess(List<TactileModel> modelList) {
                         view.setClickable(true);
 
-                        boolean result = lineChartHelper.setDataList(modelList, LineChartHelper.TypeOfHum);
+                        boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfHum);
                         SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                     }
                 });
@@ -117,7 +118,7 @@ public class VisualHumViewHelper {
                     public void onSuccess(List<TactileModel> modelList) {
                         view.setClickable(true);
 
-                        boolean result = lineChartHelper.setDataList(modelList, LineChartHelper.TypeOfHum);
+                        boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfHum);
                         SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                     }
                 });
@@ -140,7 +141,7 @@ public class VisualHumViewHelper {
                         public void onSuccess(List<TactileModel> modelList) {
                             view.setClickable(true);
 
-                            boolean result = lineChartHelper.setDataList(modelList, LineChartHelper.TypeOfHum);
+                            boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfHum);
                             SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                         }
                     });
@@ -164,7 +165,7 @@ public class VisualHumViewHelper {
                         public void onSuccess(List<TactileModel> modelList) {
                             view.setClickable(true);
 
-                            boolean result = lineChartHelper.setDataList(modelList, LineChartHelper.TypeOfHum);
+                            boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfHum);
                             SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                         }
                     });
@@ -174,7 +175,7 @@ public class VisualHumViewHelper {
     }
 
     public void addData(long stamp, float humData) {
-        lineChartHelper.addData(stamp, humData);
+        lineChartHelper.addNowData(stamp, humData);
     }
 
     public View getView() {

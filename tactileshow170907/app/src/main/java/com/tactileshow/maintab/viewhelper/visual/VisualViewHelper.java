@@ -22,7 +22,7 @@ public class VisualViewHelper {
 
     public VisualViewHelper(Context context, DefinedViewPager pager) {
         this.view = LayoutInflater.from(context).inflate(R.layout.view_tab_visual, null);
-        this.viewPager = (DefinedViewPager) view.findViewById(R.id.visual_view_pager);
+        this.viewPager = view.findViewById(R.id.visual_view_pager);
         viewPager.setOffscreenPageLimit(2);
 
         tempViewHelper = new VisualTempViewHelper(context, pager);
@@ -61,7 +61,7 @@ public class VisualViewHelper {
     /**
      * 第三渠道，内容
      */
-    public void setHeader(){
+    public void setHeader(long stamp, float headerNum) {
 
     }
 
