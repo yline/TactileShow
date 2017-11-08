@@ -153,7 +153,8 @@ public class BluetoothHelper {
     /* 发现服务 */
     public void discoverServices() {
         if (null != mBluetoothGatt) {
-            mBluetoothGatt.discoverServices();
+            boolean discoverResult = mBluetoothGatt.discoverServices();
+            LogFileUtil.v("discoverServices result = " + discoverResult);
         }
     }
 
