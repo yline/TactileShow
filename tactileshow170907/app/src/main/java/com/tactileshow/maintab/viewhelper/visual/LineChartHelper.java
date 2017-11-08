@@ -12,7 +12,9 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.listener.OnDrawLineChartTouchListener;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.tactileshow.manager.TactileModel;
 
 import java.util.ArrayList;
@@ -33,9 +35,9 @@ public class LineChartHelper {
 
     private static final int MaxCount = 512; // 显示的最大数据
 
-    private static final int DIVISOR_HOUR = 3_600_000; // 1个小时
-    private static final int DIVISOR_MINUTE = 60_000; // 1个分钟
-    private static final int DIVISOR_SECOND = 1_000; // 1个秒
+    public static final int DIVISOR_HOUR = 3_600_000; // 1个小时
+    public static final int DIVISOR_MINUTE = 60_000; // 1个分钟
+    public static final int DIVISOR_SECOND = 1_000; // 1个秒
 
     private LineChart mLineChart;
     private OnTouchChartCallback onTouchChartCallback;
@@ -92,8 +94,8 @@ public class LineChartHelper {
 
             LineDataSet dataSet = (LineDataSet) mLineChart.getData().getDataSetByIndex(0);
             if (null != dataSet) {
-                int value = stampToValue(stamp);
-                dataSet.addEntry(new Entry(value, y));
+                int xValue = stampToValue(stamp);
+                dataSet.addEntry(new Entry(xValue, y));
 
                 mLineChart.getData().notifyDataChanged();
                 mLineChart.notifyDataSetChanged();
@@ -138,11 +140,15 @@ public class LineChartHelper {
                     return false;
                 }
 
-                entryList.add(new Entry(xValue, yValue));
+                if (TactileModel.Empty != yValue) {
+                    entryList.add(new Entry(xValue, yValue));
+                }
             }
 
-            setDataList(entryList);
-            return true;
+            if (entryList.size() != 0) {
+                setDataList(entryList);
+                return true;
+            }
         }
 
         return false;
@@ -184,7 +190,7 @@ public class LineChartHelper {
      * 切换 line
      */
     public void changeMode(boolean isNow) {
-        if (null != mLineChart && null != mLineChart.getData()){
+        if (null != mLineChart && null != mLineChart.getData()) {
             mLineChart.getData().clearValues();
         }
         mIsNow = isNow;
@@ -197,12 +203,19 @@ public class LineChartHelper {
     private void initLineDataSet() {
         if (null == mLineChart.getData() || mLineChart.getData().getEntryCount() == 0) {
             LineDataSet dataSet = new LineDataSet(new ArrayList<Entry>(), mIsNow ? "Now" : "History");
+
             dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
             dataSet.setColor(mIsNow ? Color.RED : Color.GREEN);
             dataSet.setLineWidth(1);
             dataSet.setCircleColor(mIsNow ? Color.RED : Color.GREEN);
             dataSet.setCircleRadius(2);
             dataSet.setDrawCircleHole(false);
+            dataSet.setValueFormatter(new IValueFormatter() {
+                @Override
+                public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                    return String.format(Locale.CHINA, "%3.2f", value);
+                }
+            });
 
             LineData data = new LineData(dataSet);
             mLineChart.setData(data);

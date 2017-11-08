@@ -18,15 +18,16 @@ public class VisualViewHelper {
     private DefinedViewPager viewPager;
     private VisualTempViewHelper tempViewHelper;
     private VisualHumViewHelper humViewHelper;
-
+    private VisualHeaderViewHelper headerViewHelper;
 
     public VisualViewHelper(Context context, DefinedViewPager pager) {
         this.view = LayoutInflater.from(context).inflate(R.layout.view_tab_visual, null);
         this.viewPager = view.findViewById(R.id.visual_view_pager);
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.setOffscreenPageLimit(3);
 
         tempViewHelper = new VisualTempViewHelper(context, pager);
         humViewHelper = new VisualHumViewHelper(context, pager);
+        headerViewHelper = new VisualHeaderViewHelper(context, pager);
 
         initView(view);
     }
@@ -40,6 +41,9 @@ public class VisualViewHelper {
 
         viewList.add(humViewHelper.getView());
         titleList.add("湿度信息");
+
+        viewList.add(headerViewHelper.getView());
+        titleList.add("第三渠道信息");
 
         TabLayout tabLayout = parentView.findViewById(R.id.visual_tab_layout);
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter();
@@ -62,7 +66,7 @@ public class VisualViewHelper {
      * 第三渠道，内容
      */
     public void setHeader(long stamp, float headerNum) {
-
+        headerViewHelper.addData(stamp, headerNum);
     }
 
     public View getView() {

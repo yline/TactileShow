@@ -15,28 +15,28 @@ import com.yline.application.SDKManager;
 import java.util.List;
 
 /**
- * 温度
+ * 第三渠道
  *
  * @author yline 2017/9/28 -- 16:46
  * @version 1.0.0
  */
-public class VisualTempViewHelper {
+public class VisualHeaderViewHelper {
     private View parentView;
     private DefinedScrollView definedScrollView;
     private VisualQueryView queryView;
 
     private LineChartHelper lineChartHelper;
 
-    public VisualTempViewHelper(Context context, DefinedViewPager viewPager) {
+    public VisualHeaderViewHelper(Context context, DefinedViewPager viewPager) {
         initView(context, viewPager);
     }
 
     private void initView(Context context, final DefinedViewPager viewPager) {
-        parentView = LayoutInflater.from(context).inflate(R.layout.view_tab_visual_temp, null);
-        definedScrollView = parentView.findViewById(R.id.visual_temp_scroll);
-        queryView = parentView.findViewById(R.id.visual_temp_query);
+        parentView = LayoutInflater.from(context).inflate(R.layout.view_tab_visual_header, null);
+        definedScrollView = parentView.findViewById(R.id.visual_header_scroll);
+        queryView = parentView.findViewById(R.id.visual_header_query);
 
-        LineChart lineChart = parentView.findViewById(R.id.tab_visual_temp_line_chart);
+        LineChart lineChart = parentView.findViewById(R.id.tab_visual_header_line_chart);
         lineChartHelper = new LineChartHelper(lineChart);
 
         initViewClick(viewPager);
@@ -78,7 +78,7 @@ public class VisualTempViewHelper {
                     public void onSuccess(List<TactileModel> modelList) {
                         view.setClickable(true);
 
-                        boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfTemp);
+                        boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfHeader);
                         SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                     }
                 });
@@ -98,7 +98,7 @@ public class VisualTempViewHelper {
                     public void onSuccess(List<TactileModel> modelList) {
                         view.setClickable(true);
 
-                        boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfTemp);
+                        boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfHeader);
                         SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                     }
                 });
@@ -118,7 +118,7 @@ public class VisualTempViewHelper {
                     public void onSuccess(List<TactileModel> modelList) {
                         view.setClickable(true);
 
-                        boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfTemp);
+                        boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfHeader);
                         SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                     }
                 });
@@ -141,7 +141,7 @@ public class VisualTempViewHelper {
                         public void onSuccess(List<TactileModel> modelList) {
                             view.setClickable(true);
 
-                            boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfTemp);
+                            boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfHeader);
                             SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                         }
                     });
@@ -165,7 +165,7 @@ public class VisualTempViewHelper {
                         public void onSuccess(List<TactileModel> modelList) {
                             view.setClickable(true);
 
-                            boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfTemp);
+                            boolean result = lineChartHelper.setHistoryDataList(modelList, LineChartHelper.TypeOfHeader);
                             SDKManager.toast(result ? "加载成功" : "该时间段内没有数据");
                         }
                     });
@@ -174,8 +174,8 @@ public class VisualTempViewHelper {
         });
     }
 
-    public void addData(long stamp, float tempNum) {
-        lineChartHelper.addNowData(stamp, tempNum);
+    public void addData(long stamp, float headerNum) {
+        lineChartHelper.addNowData(stamp, headerNum);
     }
 
     public View getView() {

@@ -67,7 +67,7 @@ public class VisualHumViewHelper {
             @Override
             public void onQueryHour(final View view, long currentStamp) {
                 view.setClickable(false);
-                SQLiteManager.getInstance().loadAsync(currentStamp - 360_1000, currentStamp, new SQLiteManager.OnReadCallback() {
+                SQLiteManager.getInstance().loadAsync(currentStamp - 3_600_000, currentStamp, new SQLiteManager.OnReadCallback() {
                     @Override
                     public void onFailure(String errorMsg) {
                         view.setClickable(true);
@@ -87,7 +87,7 @@ public class VisualHumViewHelper {
             @Override
             public void onQueryDay(final View view, long currentStamp) {
                 view.setClickable(false);
-                SQLiteManager.getInstance().loadAsync(currentStamp - 8640_1000, currentStamp, new SQLiteManager.OnReadCallback() {
+                SQLiteManager.getInstance().loadAsync(currentStamp - 86_400_000, currentStamp, new SQLiteManager.OnReadCallback() {
                     @Override
                     public void onFailure(String errorMsg) {
                         view.setClickable(true);
