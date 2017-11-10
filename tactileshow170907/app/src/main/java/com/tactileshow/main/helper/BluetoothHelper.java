@@ -91,7 +91,10 @@ public class BluetoothHelper {
                     LogFileUtil.i(TAG, "onConnectionStateChange status = " + status + ", newState = " + newState);
                     if (newState == BluetoothProfile.STATE_CONNECTED) {
                         // 发现服务
-                        discoverServices();
+                        if (null != mBluetoothGatt) {
+                            boolean discoverResult = mBluetoothGatt.discoverServices();
+                            LogFileUtil.v("discoverServices result = " + discoverResult);
+                        }
                     } else if (newState == BluetoothProfile.STATE_DISCONNECTED) { // 断掉重连，就在这里了
                         mBluetoothGatt.connect();
                     }
@@ -148,14 +151,6 @@ public class BluetoothHelper {
             return bluetoothDevice.getName();
         }
         return null;
-    }
-
-    /* 发现服务 */
-    public void discoverServices() {
-        if (null != mBluetoothGatt) {
-            boolean discoverResult = mBluetoothGatt.discoverServices();
-            LogFileUtil.v("discoverServices result = " + discoverResult);
-        }
     }
 
     public boolean enableConfig(String uuid, byte[] value) {
