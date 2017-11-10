@@ -548,7 +548,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
         matrix.postScale(videoWidth * 1f / bitmap.getWidth(), videoHeight * 1f / bitmap.getHeight());
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
-        String imagePath = MyApplication.VIDEO_PATH +"/tuya.png";
+        String imagePath = IApplication.VIDEO_PATH +"/tuya.png";
         File file = new File(imagePath);//将要保存图片的路径
         try {
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
@@ -559,7 +559,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
             e.printStackTrace();
         }
 
-        String mergeVideo = MyApplication.VIDEO_PATH+"/mergeVideo.mp4";
+        String mergeVideo = IApplication.VIDEO_PATH+"/mergeVideo.mp4";
 
         //ffmpeg -i videoPath -i imagePath -filter_complex overlay=0:0 -vcodec libx264 -profile:v baseline -preset ultrafast -b:v 3000k -g 30 -f mp4 outPath
         StringBuilder sb = new StringBuilder();
@@ -587,7 +587,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
      */
     private String adjustVideoSpeed(String path, float speed){
 
-        String outPut = MyApplication.VIDEO_PATH+"/speedVideo.mp4";
+        String outPut = IApplication.VIDEO_PATH+"/speedVideo.mp4";
 
         //./ffmpeg -i 2x.mp4 -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" output3.mp4
         String filter = String.format(Locale.getDefault(), "[0:v]setpts=%f*PTS[v];[0:a]atempo=%f[a]", 1/speed, speed);

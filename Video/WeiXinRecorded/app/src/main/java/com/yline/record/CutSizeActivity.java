@@ -91,7 +91,7 @@ public class CutSizeActivity extends BaseActivity implements View.OnClickListene
      */
     private String cutVideo(String path, int cropWidth, int cropHeight, int x, int y){
 
-        String outPut = MyApplication.VIDEO_PATH+"/cutVideo.mp4";
+        String outPut = IApplication.VIDEO_PATH+"/cutVideo.mp4";
 
         //./ffmpeg -i 2x.mp4 -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" output3.mp4
         String filter = String.format(Locale.getDefault(), "crop=%d:%d:%d:%d", cropWidth, cropHeight, x, y);

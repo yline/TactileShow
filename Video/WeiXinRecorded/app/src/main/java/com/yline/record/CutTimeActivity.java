@@ -129,7 +129,7 @@ public class CutTimeActivity extends BaseActivity{
             protected String doInBackground(Void... params) {
 
                 //ffmpeg -ss 00:00:15 -t 00:00:05 -i input.mp4 -vcodec copy -acodec copy output.mp4
-                String output = MyApplication.VIDEO_PATH+"/"+System.currentTimeMillis()+".mp4";
+                String output = IApplication.VIDEO_PATH+"/"+System.currentTimeMillis()+".mp4";
 
                 int startM = startTime/1000;
                 int endM = (endTime-startTime)/1000;

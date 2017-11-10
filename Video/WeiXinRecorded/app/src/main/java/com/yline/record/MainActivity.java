@@ -14,8 +14,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.video.lib.FfmpegMananger;
 import com.yixia.camera.MediaRecorderNative;
-import com.yixia.camera.VCamera;
 import com.yixia.camera.model.MediaObject;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
 
@@ -206,7 +206,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
                 for (int x = 0; x < mMediaObject.getMediaParts().size(); x++) {
                     MediaObject.MediaPart mediaPart = mMediaObject.getMediaParts().get(x);
 
-                    String mp4Path = MyApplication.VIDEO_PATH+"/"+x+".mp4";
+                    String mp4Path = IApplication.VIDEO_PATH+"/"+x+".mp4";
                     List<String> list = new ArrayList<>();
                     list.add(mediaPart.mediaPath);
                     tsToMp4(list, mp4Path);
@@ -216,15 +216,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
                 List<String> tsList = new ArrayList<>();
                 for (int x = 0; x < pathList.size(); x++) {
                     String path = pathList.get(x);
-                    String ts = MyApplication.VIDEO_PATH+"/"+x+".ts";
+                    String ts = IApplication.VIDEO_PATH+"/"+x+".ts";
                     mp4ToTs(path, ts);
                     tsList.add(ts);
                 }
 
-                String output = MyApplication.VIDEO_PATH+"/finish.mp4";
+                String output = IApplication.VIDEO_PATH+"/finish.mp4";
                 boolean flag = tsToMp4(tsList, output);
                 if(!flag) output = "";
-                deleteDirRoom(new File(MyApplication.VIDEO_PATH), output);
+                deleteDirRoom(new File(IApplication.VIDEO_PATH), output);
                 return output;
             }
             @Override
@@ -317,11 +317,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
      * 初始化录制对象
      */
     private void initMediaRecorder() {
-
         mMediaRecorder = new MediaRecorderNative();
         String key = String.valueOf(System.currentTimeMillis());
         //设置缓存文件夹
-        mMediaObject = mMediaRecorder.setOutputDirectory(key, VCamera.getVideoCachePath());
+        mMediaObject = mMediaRecorder.setOutputDirectory(key, FfmpegMananger.getCachePath());
         //设置视频预览源
         mMediaRecorder.setSurfaceHolder(sv_ffmpeg.getHolder());
         //准备
@@ -395,7 +394,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             case R.id.iv_next:
                 rb_start.setDeleteMode(false);
                 Intent intent = new Intent(MainActivity.this, EditVideoActivity.class);
-                intent.putExtra("path", MyApplication.VIDEO_PATH+"/finish.mp4");
+                intent.putExtra("path", IApplication.VIDEO_PATH+"/finish.mp4");
                 startActivityForResult(intent, REQUEST_KEY);
                 break;
             case R.id.iv_close:
