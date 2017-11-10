@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.zhaoshuang.weixinrecordeddemo.FocusSurfaceView
+    <com.yline.record.FocusSurfaceView
         android:id="@+id/sv_ffmpeg"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    <com.example.zhaoshuang.weixinrecordeddemo.MyVideoView
+    <com.yline.record.MyVideoView
         android:id="@+id/vv_play"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -86,7 +86,7 @@
         android:layout_margin="7dp"
         android:layout_alignParentRight="true"
         android:src="@mipmap/video_camera"/>
-    <com.example.zhaoshuang.weixinrecordeddemo.RecordedButton
+    <com.yline.record.RecordedButton
         android:id="@+id/rb_start"
         android:layout_width="100dp"
         android:layout_height="120dp"

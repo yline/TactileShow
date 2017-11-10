@@ -1,4 +1,4 @@
-package com.example.zhaoshuang.weixinrecordeddemo;
+package com.yline.record;
 
 import android.content.Intent;
 import android.media.MediaPlayer;

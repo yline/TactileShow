@@ -1,4 +1,4 @@
-package com.example.zhaoshuang.weixinrecordeddemo;
+package com.yline.record;
 
 import android.app.Activity;
 import android.os.Build;

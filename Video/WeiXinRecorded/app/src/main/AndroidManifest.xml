@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.zhaoshuang.weixinrecordeddemo">
+    package="com.yline.record">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".MyApplication"
+        android:name="com.yline.record.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name="com.yline.record.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,10 +21,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EditVideoActivity"
+            android:name="com.yline.record.EditVideoActivity"
             android:windowSoftInputMode="adjustResize|adjustPan" />
-        <activity android:name=".VideoPlayActivity" />
-        <activity android:name=".CutSizeActivity" />
-        <activity android:name=".CutTimeActivity" />
+        <activity android:name="com.yline.record.VideoPlayActivity" />
+        <activity android:name="com.yline.record.CutSizeActivity" />
+        <activity android:name="com.yline.record.CutTimeActivity" />
     </application>
 </manifest>
