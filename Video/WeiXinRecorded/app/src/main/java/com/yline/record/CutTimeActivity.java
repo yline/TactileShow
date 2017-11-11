@@ -30,7 +30,7 @@ import com.yixia.videoeditor.adapter.UtilityAdapter;
  * Created by zhaoshuang on 2017/9/30.
  */
 
-public class CutTimeActivity extends BaseActivity{
+public class CutTimeActivity extends BaseActivity {
 
     private MediaPlayer mMediaPlayer;
     private String path;
@@ -89,14 +89,17 @@ public class CutTimeActivity extends BaseActivity{
             public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
                 initMediaPlay(surface);
             }
+
             @Override
             public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
 
             }
+
             @Override
             public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
                 return false;
             }
+
             @Override
             public void onSurfaceTextureUpdated(SurfaceTexture surface) {
 
@@ -125,53 +128,54 @@ public class CutTimeActivity extends BaseActivity{
                 TextView textView = showProgressDialog();
                 textView.setText("视频剪切中");
             }
+
             @Override
             protected String doInBackground(Void... params) {
-
                 //ffmpeg -ss 00:00:15 -t 00:00:05 -i input.mp4 -vcodec copy -acodec copy output.mp4
-                String output = IApplication.VIDEO_PATH+"/"+System.currentTimeMillis()+".mp4";
+                String output = IApplication.VIDEO_PATH + "/" + System.currentTimeMillis() + ".mp4";
 
-                int startM = startTime/1000;
-                int endM = (endTime-startTime)/1000;
+                int startM = startTime / 1000;
+                int endM = (endTime - startTime) / 1000;
 
                 String startStr;
                 String endStr;
 
-                if(startM < 10){
-                    startStr = "00:00:0"+startM;
-                }else{
-                    startStr = "00:00:"+startM;
+                if (startM < 10) {
+                    startStr = "00:00:0" + startM;
+                } else {
+                    startStr = "00:00:" + startM;
                 }
 
-                if(endM < 10){
-                    endStr = "00:00:0"+endM;
-                }else{
-                    endStr = "00:00:"+endM;
+                if (endM < 10) {
+                    endStr = "00:00:0" + endM;
+                } else {
+                    endStr = "00:00:" + endM;
                 }
 
                 StringBuilder sb = new StringBuilder("ffmpeg");
                 sb.append(" -i");
-                sb.append(" "+path);
+                sb.append(" " + path);
                 sb.append(" -vcodec");
                 sb.append(" copy");
                 sb.append(" -acodec");
                 sb.append(" copy");
                 sb.append(" -ss");
-                sb.append(" "+startStr);
+                sb.append(" " + startStr);
                 sb.append(" -t");
-                sb.append(" "+endStr);
-                sb.append(" "+output);
+                sb.append(" " + endStr);
+                sb.append(" " + output);
                 int i = UtilityAdapter.FFmpegRun("", sb.toString());
-                if(i == 0){
+                if (i == 0) {
                     return output;
-                }else{
+                } else {
                     return "";
                 }
             }
+
             @Override
             protected void onPostExecute(String result) {
                 closeProgressDialog();
-                if(!TextUtils.isEmpty(result)){
+                if (!TextUtils.isEmpty(result)) {
                     Toast.makeText(mContext, "剪切成功", Toast.LENGTH_SHORT).show();
                     CutSizeActivity.renameFile(result, path);
                     setResult(RESULT_OK);
@@ -184,20 +188,20 @@ public class CutTimeActivity extends BaseActivity{
     /**
      * 更改选择的裁剪区间的时间
      */
-    private void changeTime(){
+    private void changeTime() {
 
         float left = thumbnailView.getLeftInterval();
-        float pro1 = left/ll_thumbnail.getWidth();
+        float pro1 = left / ll_thumbnail.getWidth();
 
-        startTime = (int) (videoDuration*pro1);
+        startTime = (int) (videoDuration * pro1);
 
         float right = thumbnailView.getRightInterval();
-        float pro2 = right/ll_thumbnail.getWidth();
-        endTime = (int) (videoDuration*pro2);
+        float pro2 = right / ll_thumbnail.getWidth();
+        endTime = (int) (videoDuration * pro2);
     }
 
-    private void changeVideoPlay(){
-        if(mMediaPlayer != null) {
+    private void changeVideoPlay() {
+        if (mMediaPlayer != null) {
             mMediaPlayer.seekTo(startTime);
         }
     }
@@ -205,32 +209,32 @@ public class CutTimeActivity extends BaseActivity{
     /**
      * 初始化视频播放器
      */
-    private void initVideoSize(){
+    private void initVideoSize() {
 
-        float ra = videoWidth*1f/videoHeight;
+        float ra = videoWidth * 1f / videoHeight;
 
-        float widthF = videoWidth*1f/ MediaRecorderBase.VIDEO_HEIGHT;
-        float heightF = videoHeight*1f/MediaRecorderBase.VIDEO_WIDTH;
+        float widthF = videoWidth * 1f / MediaRecorderBase.VIDEO_HEIGHT;
+        float heightF = videoHeight * 1f / MediaRecorderBase.VIDEO_WIDTH;
         ViewGroup.LayoutParams layoutParams = textureView.getLayoutParams();
-        layoutParams.width = (int) (windowWidth*widthF);
-        layoutParams.height = (int) (layoutParams.width/ra);
+        layoutParams.width = (int) (windowWidth * widthF);
+        layoutParams.height = (int) (layoutParams.width / ra);
         textureView.setLayoutParams(layoutParams);
 
         //最小剪切时间500毫秒
-        int pxWidth = (int) (500f/videoDuration*thumbnailView.getWidth());
+        int pxWidth = (int) (500f / videoDuration * thumbnailView.getWidth());
         thumbnailView.setMinInterval(pxWidth);
     }
 
     /**
      * 初始化缩略图
      */
-    private void initThumbs(){
+    private void initThumbs() {
 
         final int frame = 15;
-        final int frameTime = videoDuration/frame*1000;
+        final int frameTime = videoDuration / frame * 1000;
 
-        int thumbnailWidth =  ll_thumbnail.getWidth()/frame;
-        for (int x=0; x<frame; x++){
+        int thumbnailWidth = ll_thumbnail.getWidth() / frame;
+        for (int x = 0; x < frame; x++) {
             ImageView imageView = new ImageView(this);
             imageView.setLayoutParams(new ViewGroup.LayoutParams(thumbnailWidth, ViewGroup.LayoutParams.MATCH_PARENT));
             imageView.setBackgroundColor(Color.parseColor("#666666"));
@@ -241,10 +245,10 @@ public class CutTimeActivity extends BaseActivity{
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
-                MediaMetadataRetriever mediaMetadata= new MediaMetadataRetriever();
+                MediaMetadataRetriever mediaMetadata = new MediaMetadataRetriever();
                 mediaMetadata.setDataSource(mContext, Uri.parse(path));
-                for (int x=0; x<frame; x++){
-                    Bitmap bitmap = mediaMetadata.getFrameAtTime(frameTime*x, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                for (int x = 0; x < frame; x++) {
+                    Bitmap bitmap = mediaMetadata.getFrameAtTime(frameTime * x, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
                     Message msg = myHandler.obtainMessage();
                     msg.obj = bitmap;
                     msg.arg1 = x;
@@ -253,24 +257,25 @@ public class CutTimeActivity extends BaseActivity{
                 mediaMetadata.release();
                 return true;
             }
+
             @Override
             protected void onPostExecute(Boolean result) {
             }
         }.execute();
     }
 
-    private Handler myHandler = new Handler(){
+    private Handler myHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             ImageView imageView = (ImageView) ll_thumbnail.getChildAt(msg.arg1);
             Bitmap bitmap = (Bitmap) msg.obj;
-            if(imageView!=null && bitmap!=null) {
+            if (imageView != null && bitmap != null) {
                 imageView.setImageBitmap(bitmap);
             }
         }
     };
 
-    private void initMediaPlay(SurfaceTexture surface){
+    private void initMediaPlay(SurfaceTexture surface) {
 
         try {
             mMediaPlayer = new MediaPlayer();
@@ -290,7 +295,7 @@ public class CutTimeActivity extends BaseActivity{
                 }
             });
             mMediaPlayer.prepareAsync();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
