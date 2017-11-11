@@ -6,7 +6,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.record.lib.temp.camera.model.MediaPartModel;
-import com.record.lib.temp.ffmpeg.FfmpegManager;
+import com.video.lib.FfmpegManager;
 
 /**
  * 视频录制：边录制边底层处理视频（旋转和裁剪）

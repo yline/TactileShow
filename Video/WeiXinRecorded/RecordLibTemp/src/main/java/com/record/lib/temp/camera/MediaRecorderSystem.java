@@ -8,8 +8,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.record.lib.temp.camera.model.MediaPartModel;
-import com.record.lib.temp.ffmpeg.FfmpegManager;
 import com.record.lib.temp.ffmpeg.FileUtils;
+import com.video.lib.FfmpegManager;
 
 import java.io.IOException;
 

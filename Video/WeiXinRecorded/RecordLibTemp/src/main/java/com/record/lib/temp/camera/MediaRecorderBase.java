@@ -23,8 +23,8 @@ import android.view.SurfaceHolder.Callback;
 
 import com.record.lib.temp.camera.model.MediaObject;
 import com.record.lib.temp.camera.model.MediaPartModel;
-import com.record.lib.temp.ffmpeg.FfmpegManager;
 import com.record.lib.temp.ffmpeg.record.MediaRecordCallback;
+import com.video.lib.FfmpegManager;
 
 import java.io.File;
 import java.io.IOException;

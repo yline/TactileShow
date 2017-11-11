@@ -1,4 +1,4 @@
-package com.record.lib.temp.ffmpeg;
+package com.video.lib;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -15,8 +15,7 @@ import java.util.Locale;
 
 /**
  * Ffmpeg 管理类
- *
- * @author yline 2017/11/9 -- 15:33
+ * @author yline 2017/11/10 -- 20:44
  * @version 1.0.0
  */
 public class FfmpegManager {
@@ -28,7 +27,11 @@ public class FfmpegManager {
         Log.i("xxx-", "v: method: " + method + ", msg: " + msg);
     }
 
-    public static void init(Context context) {
+    /**
+     * 初始化拍摄SDK，必须
+     * @param context 上下文
+     */
+    public static void init(Context context, String dirName) {
         long startTime = System.currentTimeMillis();
 
         // 初始化FFmpeg
@@ -59,9 +62,13 @@ public class FfmpegManager {
         // 初始化其它操作
         mIsLog = true;
         File dcimFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        cachePath = dcimFile.getPath() + "/WeChatJuns/";  // 设置拍摄视频缓存路径
+        cachePath = dcimFile.getPath() + File.separator + dirName + File.separator;  // 设置拍摄视频缓存路径
 
         v("FfmpegManager-init", "diffTime = " + (System.currentTimeMillis() - startTime));
+    }
+
+    public static String getCachePath() {
+        return cachePath;
     }
 
     /**
@@ -78,13 +85,6 @@ public class FfmpegManager {
         }
     }
 
-    public static void setCachePath(String cachePath) {
-        FfmpegManager.cachePath = cachePath;
-    }
-
-    public static String getCachePath() {
-        return cachePath;
-    }
 
     // 后置摄像头 flip
     private static final int FLIP_TYPE_BACK = 0x0;

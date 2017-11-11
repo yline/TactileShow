@@ -1,6 +1,6 @@
 package com.record;
 
-import com.record.lib.temp.ffmpeg.FfmpegManager;
+import com.video.lib.FfmpegManager;
 import com.yline.application.BaseApplication;
 
 public class RecordApplication extends BaseApplication {
@@ -10,6 +10,6 @@ public class RecordApplication extends BaseApplication {
         super.onCreate();
 
         // 初始化拍摄SDK，必须; 测试执行时间 13ms
-        FfmpegManager.init(this);
+        FfmpegManager.init(this, "WeChatJuns");
     }
 }

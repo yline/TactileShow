@@ -2,7 +2,7 @@ package com.yline.record;
 
 import android.app.Application;
 
-import com.video.lib.FfmpegMananger;
+import com.video.lib.FfmpegManager;
 import com.yixia.camera.VCamera;
 
 import java.io.File;
@@ -27,6 +27,6 @@ public class IApplication extends Application {
         //设置视频缓存路径
         VCamera.setVideoCachePath(VIDEO_PATH);
 
-        FfmpegMananger.init(this, "SimpleCut");
+        FfmpegManager.init(this, "SimpleCut");
     }
 }

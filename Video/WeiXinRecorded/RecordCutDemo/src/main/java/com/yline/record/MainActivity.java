@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.video.lib.FfmpegMananger;
+import com.video.lib.FfmpegManager;
 import com.yixia.camera.MediaRecorderNative;
 import com.yixia.camera.model.MediaObject;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
@@ -320,7 +320,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         mMediaRecorder = new MediaRecorderNative();
         String key = String.valueOf(System.currentTimeMillis());
         //设置缓存文件夹
-        mMediaObject = mMediaRecorder.setOutputDirectory(key, FfmpegMananger.getCachePath());
+        mMediaObject = mMediaRecorder.setOutputDirectory(key, FfmpegManager.getCachePath());
         //设置视频预览源
         mMediaRecorder.setSurfaceHolder(sv_ffmpeg.getHolder());
         //准备
