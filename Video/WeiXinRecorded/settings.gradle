@@ -1,1 +1,1 @@
-include ':app', ':VideoLib'
+include ':RecordCutDemo', ':VideoLib', ':RecordLibTemp', ':RecordDemo'

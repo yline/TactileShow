@@ -8,8 +8,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/RecordCutDemo" />
+            <option value="$PROJECT_DIR$/RecordDemo" />
+            <option value="$PROJECT_DIR$/RecordLibTemp" />
             <option value="$PROJECT_DIR$/VideoLib" />
-            <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

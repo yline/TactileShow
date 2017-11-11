@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/RecordCutDemo/RecordCutDemo.iml" filepath="$PROJECT_DIR$/RecordCutDemo/RecordCutDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RecordDemo/RecordDemo.iml" filepath="$PROJECT_DIR$/RecordDemo/RecordDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RecordLibTemp/RecordLibTemp.iml" filepath="$PROJECT_DIR$/RecordLibTemp/RecordLibTemp.iml" />
       <module fileurl="file://$PROJECT_DIR$/VideoLib/VideoLib.iml" filepath="$PROJECT_DIR$/VideoLib/VideoLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/WeiXinRecorded.iml" filepath="$PROJECT_DIR$/WeiXinRecorded.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
 </project>
