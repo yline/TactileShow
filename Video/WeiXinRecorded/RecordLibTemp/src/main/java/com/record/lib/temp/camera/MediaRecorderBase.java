@@ -21,7 +21,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 
-import com.record.lib.temp.camera.model.MediaObject;
+import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
 import com.record.lib.temp.ffmpeg.record.MediaRecordCallback;
 import com.video.lib.FfmpegManager;

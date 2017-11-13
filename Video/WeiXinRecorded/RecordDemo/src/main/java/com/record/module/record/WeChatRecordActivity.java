@@ -14,7 +14,7 @@ import com.record.R;
 import com.record.RecordApplication;
 import com.record.lib.temp.camera.MediaRecorderBase;
 import com.record.lib.temp.camera.MediaRecorderNative;
-import com.record.lib.temp.camera.model.MediaObject;
+import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
 import com.record.lib.temp.ffmpeg.FileUtils;
 import com.record.module.record.view.CircleTextView;

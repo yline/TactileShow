@@ -1,9 +1,6 @@
-package com.record.lib.temp.camera.model;
+package com.video.lib.model;
 
 import android.text.TextUtils;
-
-import com.record.lib.temp.ffmpeg.FileUtils;
-import com.video.lib.model.MediaPartModel;
 
 import java.io.File;
 import java.io.Serializable;
@@ -387,7 +384,25 @@ public class MediaObject implements Serializable {
                 part.stop();
             }
         }
-        FileUtils.deleteDir(mOutputDirectory);
+        deleteDir(mOutputDirectory);
+    }
+
+    private static void deleteDir(String f) {
+        if (f != null && f.length() > 0) {
+            deleteDir(new File(f));
+        }
+    }
+
+    private static void deleteDir(File f) {
+        if (f != null && f.exists() && f.isDirectory()) {
+            for (File file : f.listFiles()) {
+                if (file.isDirectory()) {
+                    deleteDir(file);
+                }
+                file.delete();
+            }
+            f.delete();
+        }
     }
 
     public LinkedList<MediaPartModel> getMedaParts() {
