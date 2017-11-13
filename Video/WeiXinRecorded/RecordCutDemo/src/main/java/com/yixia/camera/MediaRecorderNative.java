@@ -21,7 +21,7 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
 
 	/** 开始录制 */
 	@Override
-	public MediaPartModel startRecord() {
+	public MediaPartModel onRecordStart() {
 		//防止没有初始化的情况
 		if (!UtilityAdapter.isInitialized()) {
 			UtilityAdapter.initFilterParser();
@@ -56,9 +56,9 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
 
 	/** 停止录制 */
 	@Override
-	public void stopRecord() {
+	public void onRecordStop() {
 		UtilityAdapter.FilterParserAction("", UtilityAdapter.PARSERACTION_STOP);
-		super.stopRecord();
+		super.onRecordStop();
 	}
 
 	/** 数据回调 */
@@ -87,9 +87,9 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
 			if (mr != null){
 				mr.reset();}
 		} catch (IllegalStateException e) {
-			Log.w("Yixia", "stopRecord", e);
+			Log.w("Yixia", "onRecordStop", e);
 		} catch (Exception e) {
-			Log.w("Yixia", "stopRecord", e);
+			Log.w("Yixia", "onRecordStop", e);
 		}
 		if (mOnErrorListener != null){
 			mOnErrorListener.onVideoError(what, extra);}
@@ -97,7 +97,7 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
 
 	/** 接收音频数据，传递到底层 */
 	@Override
-	public void receiveAudioData(byte[] sampleBuffer, int len) {
+	public void onRecordAudioReceiving(byte[] sampleBuffer, int len) {
 		if (mRecording && len > 0) {
 			UtilityAdapter.RenderDataPcm(sampleBuffer);
 		}

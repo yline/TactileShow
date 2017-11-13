@@ -1,4 +1,4 @@
-package com.record.lib.temp.ffmpeg.record;
+package com.video.lib.manager;
 
 import com.video.lib.model.MediaPartModel;
 

@@ -14,14 +14,13 @@ import com.record.R;
 import com.record.RecordApplication;
 import com.record.lib.temp.camera.MediaRecorderBase;
 import com.record.lib.temp.camera.MediaRecorderNative;
-import com.video.lib.model.MediaObject;
-import com.video.lib.model.MediaPartModel;
-import com.record.lib.temp.ffmpeg.FileUtils;
 import com.record.module.record.view.CircleTextView;
 import com.record.module.record.view.HintTextHelper;
 import com.record.module.record.view.RecordProgressView;
 import com.record.module.record.view.WeChatProgressDialogHelper;
 import com.video.lib.FfmpegManager;
+import com.video.lib.model.MediaObject;
+import com.video.lib.model.MediaPartModel;
 
 import java.io.File;
 
@@ -275,13 +274,23 @@ public class WeChatRecordActivity extends Activity {
         });
 
         File f = new File(FfmpegManager.getCachePath());
-        if (!FileUtils.checkFile(f)) {
+        if (!checkFile(f)) {
             f.mkdirs();
         }
 
         String key = String.valueOf(System.currentTimeMillis());
         mMediaObject = mMediaRecorder.setOutputDirectory(FfmpegManager.getCachePath(), key);
         mMediaRecorder.prepare();
+    }
+
+    /**
+     * 检测文件是否可用
+     */
+    private static boolean checkFile(File f) {
+        if (f != null && f.exists() && f.canRead() && (f.isDirectory() || (f.isFile() && f.length() > 0))) {
+            return true;
+        }
+        return false;
     }
 
     @Override

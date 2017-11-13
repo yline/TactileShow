@@ -3,7 +3,7 @@ package com.record.lib.temp.camera;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 
-import com.record.lib.temp.ffmpeg.record.MediaRecordCallback;
+import com.video.lib.manager.MediaRecordCallback;
 
 /**
  * 音频录制

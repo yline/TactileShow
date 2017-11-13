@@ -84,7 +84,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void onLongClick() {
                 isRecordedOver = false;
-                mMediaRecorder.startRecord();
+                mMediaRecorder.onRecordStart();
                 rb_start.setSplit();
                 myHandler.sendEmptyMessageDelayed(HANDLER_RECORD, 100);
                 cameraTypeList.add(mMediaRecorder.getCameraType());
@@ -98,7 +98,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void onLift() {
                 isRecordedOver = true;
-                mMediaRecorder.stopRecord();
+                mMediaRecorder.onRecordStop();
                 changeButton(mMediaObject.getMediaParts().size() > 0);
             }
 
@@ -106,7 +106,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             public void onOver() {
                 isRecordedOver = true;
                 rb_start.closeButton();
-                mMediaRecorder.stopRecord();
+                mMediaRecorder.onRecordStop();
                 videoFinish();
             }
         });

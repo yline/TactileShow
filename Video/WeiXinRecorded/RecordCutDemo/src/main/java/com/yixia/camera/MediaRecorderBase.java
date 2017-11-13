@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 
+import com.video.lib.manager.MediaRecordCallback;
 import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
 import com.yixia.camera.util.DeviceUtils;
@@ -39,7 +40,7 @@ import java.util.List;
  *
  * @author yixia.com
  */
-public abstract class MediaRecorderBase implements Callback, PreviewCallback, IMediaRecorder {
+public abstract class MediaRecorderBase implements Callback, PreviewCallback, MediaRecordCallback {
 
     /**
      * 视频宽度
@@ -484,7 +485,7 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, IM
     }
 
     @Override
-    public void stopRecord() {
+    public void onRecordStop() {
         mRecording = false;
 
         // 判断数据是否处理完，处理完了关闭输出流
@@ -752,7 +753,7 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, IM
     }
 
     @Override
-    public void onAudioError(int what, String message) {
+    public void onRecordAudioError(int what, String message) {
         if (mOnErrorListener != null) {
             mOnErrorListener.onAudioError(what, message);
         }
@@ -788,7 +789,7 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, IM
      * 接收音频数据
      */
     @Override
-    public void receiveAudioData(byte[] sampleBuffer, int len) {
+    public void onRecordAudioReceiving(byte[] sampleBuffer, int len) {
 
     }
 
