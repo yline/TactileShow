@@ -539,20 +539,7 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
         mParameters.setPreviewFrameRate(mFrameRate);
         // mParameters.setPreviewFpsRange(15 * 1000, 20 * 1000);
 
-        boolean flag = false;
-        for (int x = 0; x < mSupportedPreviewSizes.size(); x++) {
-            Size size = mSupportedPreviewSizes.get(x);
-            if (size.width * size.height == MediaRecorderBase.VIDEO_WIDTH * MediaRecorderBase.VIDEO_HEIGHT) {
-                flag = true;
-            }
-        }
-        if (flag) {
-            mParameters.setPreviewSize(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT);
-        } else {
-            MediaRecorderBase.VIDEO_WIDTH = 720;
-            mParameters.setPreviewSize(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT);
-        }
-
+        mParameters.setPreviewSize(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT);
 
         // 设置输出视频流尺寸，采样率
         mParameters.setPreviewFormat(ImageFormat.NV21);
