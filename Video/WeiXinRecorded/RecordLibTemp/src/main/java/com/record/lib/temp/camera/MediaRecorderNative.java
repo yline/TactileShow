@@ -66,8 +66,8 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
      */
     @Override
     protected void onStartPreviewSuccess() {
-        FfmpegManager.setInputSetting(640, 480, mCameraId);
-        FfmpegManager.setOutputSetting(480, 480, mFrameRate, FfmpegManager.OUTPUT_FORMAT_MASK_MP4);
+        FfmpegManager.setInputSetting(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT, mCameraId);
+        FfmpegManager.setOutputSetting(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT, mFrameRate, FfmpegManager.OUTPUT_FORMAT_MASK_MP4);
     }
 
     @Override
