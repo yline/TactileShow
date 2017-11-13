@@ -5,6 +5,7 @@ import android.media.MediaRecorder;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
+import com.video.lib.manager.AudioRecordThread;
 import com.video.lib.model.MediaPartModel;
 import com.video.lib.FfmpegManager;
 

@@ -4,6 +4,7 @@ import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import com.video.lib.manager.AudioRecordThread;
 import com.video.lib.model.MediaPartModel;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
 
@@ -36,7 +37,7 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
 			cmd += String.format("addcmd = %s; ", " -vf \"transpose="+cameraState+"\" ");
 			UtilityAdapter.FilterParserAction(cmd, UtilityAdapter.PARSERACTION_START);
 			if (mAudioRecorder == null && result != null) {
-				mAudioRecorder = new AudioRecorder(this);
+				mAudioRecorder = new AudioRecordThread(this);
 				mAudioRecorder.start();
 			}
 		}

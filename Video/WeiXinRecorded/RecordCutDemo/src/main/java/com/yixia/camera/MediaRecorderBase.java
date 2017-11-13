@@ -21,12 +21,11 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 
+import com.video.lib.manager.AudioRecordThread;
 import com.video.lib.manager.MediaRecordCallback;
 import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
-import com.yixia.camera.util.DeviceUtils;
 import com.yixia.camera.util.FileUtils;
-import com.yixia.camera.util.StringUtils;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
 
 import java.io.File;
@@ -141,7 +140,7 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
     /**
      * 声音录制
      */
-    protected AudioRecorder mAudioRecorder;
+    protected AudioRecordThread mAudioRecorder;
     /**
      * 转码Handler
      */
@@ -202,10 +201,43 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
     public void setSurfaceHolder(SurfaceHolder sh) {
         if (sh != null) {
             sh.addCallback(this);
-            if (!DeviceUtils.hasHoneycomb()) {
-                sh.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        }
+    }
+
+    public int getCameraType() {
+        return mCameraId;
+    }
+
+    public Camera getCamera() {
+        return camera;
+    }
+
+    /**
+     * 设置视频临时存储文件夹
+     *
+     * @param key  视频输出的名称，同目录下唯一，一般取系统当前时间
+     * @param path 文件夹路径
+     * @return 录制信息对象
+     */
+    public MediaObject setOutputDirectory(String key, String path) {
+
+
+        if (!TextUtils.isEmpty(path)) {
+            File f = new File(path);
+            if (f.exists()) {
+                //已经存在，删除
+                if (f.isDirectory()) {
+                    FileUtils.deleteDir(f);
+                } else {
+                    FileUtils.deleteFile(f);
+                }
+            }
+
+            if (f.mkdirs()) {
+                mMediaObject = new MediaObject(path, key);
             }
         }
+        return mMediaObject;
     }
 
     /**
@@ -237,19 +269,12 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
         return mCameraId == Camera.CameraInfo.CAMERA_FACING_FRONT;
     }
 
-    public int getCameraType() {
-        return mCameraId;
-    }
-
     /**
      * 是否支持前置摄像头
      */
     @SuppressLint("NewApi")
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     public static boolean isSupportFrontCamera() {
-        if (!DeviceUtils.hasGingerbread()) {
-            return false;
-        }
         int numberOfCameras = Camera.getNumberOfCameras();
         if (2 == numberOfCameras) {
             return true;
@@ -301,7 +326,7 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
 
                 if (mParameters != null) {
                     String mode = getAutoFocusMode();
-                    if (StringUtils.isNotEmpty(mode)) {
+                    if (!TextUtils.isEmpty(mode)) {
                         mParameters.setFocusMode(mode);
                         camera.setParameters(mParameters);
                     }
@@ -346,7 +371,7 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
     @SuppressLint("NewApi")
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public boolean manualFocus(AutoFocusCallback cb, List<Area> focusAreas) {
-        if (camera != null && focusAreas != null && mParameters != null && DeviceUtils.hasICS()) {
+        if (camera != null && focusAreas != null && mParameters != null) {
             try {
                 camera.cancelAutoFocus();
                 // getMaxNumFocusAreas检测设备是否支持
@@ -356,8 +381,9 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
                     mParameters.setFocusAreas(focusAreas);
                 }
 
-                if (mParameters.getMaxNumMeteringAreas() > 0)
+                if (mParameters.getMaxNumMeteringAreas() > 0) {
                     mParameters.setMeteringAreas(focusAreas);
+                }
 
                 mParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_MACRO);
                 camera.setParameters(mParameters);
@@ -449,33 +475,6 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
         }
     }
 
-    /**
-     * 设置视频临时存储文件夹
-     *
-     * @param key  视频输出的名称，同目录下唯一，一般取系统当前时间
-     * @param path 文件夹路径
-     * @return 录制信息对象
-     */
-    public MediaObject setOutputDirectory(String key, String path) {
-        if (StringUtils.isNotEmpty(path)) {
-            File f = new File(path);
-            if (f != null) {
-                if (f.exists()) {
-                    //已经存在，删除
-                    if (f.isDirectory()) {
-                        FileUtils.deleteDir(f);
-                    } else {
-                        FileUtils.deleteFile(f);
-                    }
-                }
-
-                if (f.mkdirs()) {
-                    mMediaObject = new MediaObject(path, key);
-                }
-            }
-        }
-        return mMediaObject;
-    }
 
     /**
      * 设置视频信息
@@ -587,7 +586,7 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
 
         //设置自动连续对焦
         String mode = getAutoFocusMode();
-        if (StringUtils.isNotEmpty(mode)) {
+        if (!TextUtils.isEmpty(mode)) {
             mParameters.setFocusMode(mode);
         }
 
@@ -604,13 +603,8 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
             mParameters.set("video-stabilization", "true");
         }
 
-        //		mParameters.set("recording-hint", "false");
-        //
-        //		mParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        if (!DeviceUtils.isDevice("GT-N7100", "GT-I9308", "GT-I9300")) {
-            mParameters.set("cam_mode", 1);
-            mParameters.set("cam-mode", 1);
-        }
+        mParameters.set("cam_mode", 1);
+        mParameters.set("cam-mode", 1);
     }
 
     /**
@@ -662,9 +656,6 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
         }
     }
 
-    public Camera getCamera() {
-        return camera;
-    }
 
     /**
      * 预览调用成功，子类可以做一些操作
