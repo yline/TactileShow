@@ -496,8 +496,8 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
      */
     private void stopAllRecord() {
         mRecording = false;
-        if (mMediaObject != null && mMediaObject.getMedaParts() != null) {
-            for (MediaPartModel part : mMediaObject.getMedaParts()) {
+        if (mMediaObject != null && mMediaObject.getMediaParts() != null) {
+            for (MediaPartModel part : mMediaObject.getMediaParts()) {
                 if (part != null && part.isRecording()) {
                     part.setRecording(false);
                     part.setEndTime(System.currentTimeMillis());

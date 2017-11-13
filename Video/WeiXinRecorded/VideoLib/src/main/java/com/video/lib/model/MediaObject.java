@@ -7,61 +7,24 @@ import java.io.Serializable;
 import java.util.LinkedList;
 
 public class MediaObject implements Serializable {
-    /**
-     * 导入视频
-     */
-    public final static int MEDIA_PART_TYPE_IMPORT_VIDEO = 1;
-    /**
-     * 导入图片
-     */
-    public final static int MEDIA_PART_TYPE_IMPORT_IMAGE = 2;
-    /**
-     * 使用系统拍摄mp4
-     */
-    public final static int MEDIA_PART_TYPE_RECORD_MP4 = 3;
-    /**
-     * 默认最大时长
-     */
-    public final static int DEFAULT_MAX_DURATION = 10 * 1000;
+    public final static int MEDIA_PART_TYPE_IMPORT_VIDEO = 1; // 导入视频
+    public final static int MEDIA_PART_TYPE_IMPORT_IMAGE = 2; // 导入图片
+    public final static int MEDIA_PART_TYPE_RECORD_MP4 = 3; // 使用系统拍摄mp4
+
+    public final static int DEFAULT_MAX_DURATION = 10 * 1000; // 默认最大时长
 
     private final static int DEFAULT_VIDEO_BITRATE = 2048; // 默认码率
 
-    /**
-     * 视频最大时长，默认10秒
-     */
-    private int mMaxDuration;
-    /**
-     * 视频目录
-     */
-    private String mOutputDirectory;
-    /**
-     * 对象文件
-     */
-    private String mOutputObjectPath;
-    /**
-     * 视频码率
-     */
-    private int mVideoBitrate;
-    /**
-     * 最终视频输出路径
-     */
-    private String mOutputVideoPath;
-    /**
-     * 最终视频截图输出路径
-     */
-    private String mOutputVideoThumbPath;
-    /**
-     * 文件夹、文件名
-     */
-    private String mKey;
-    /**
-     * 当前分块
-     */
-    private volatile transient MediaPartModel mCurrentPart;
-    /**
-     * 获取所有分块
-     */
-    private LinkedList<MediaPartModel> mMediaList;
+    private int mMaxDuration; // 视频最大时长，默认10秒
+    private String mOutputDirectory; // 视频目录
+    private String mOutputObjectPath; // 对象文件
+    private int mVideoBitrate; // 视频码率
+    private String mOutputVideoPath; // 最终视频输出路径
+    private String mOutputVideoThumbPath; // 最终视频截图输出路径
+    private String mKey; // 文件夹、文件名
+
+    private volatile transient MediaPartModel mCurrentPart; // 当前分块
+    private LinkedList<MediaPartModel> mMediaList; // 获取所有分块
 
     private String mTsPath;
 
@@ -190,13 +153,6 @@ public class MediaObject implements Serializable {
         return duration;
     }
 
-    public void removeAllPart() {
-        if (mMediaList != null) {
-            mMediaList.clear();
-        }
-    }
-
-
     /**
      * 删除分块
      */
@@ -212,6 +168,12 @@ public class MediaObject implements Serializable {
                 part.delete();
             }
             mMediaList.remove(part);
+        }
+    }
+
+    public void removeAllPart() {
+        if (mMediaList != null) {
+            mMediaList.clear();
         }
     }
 
@@ -403,10 +365,6 @@ public class MediaObject implements Serializable {
             }
             f.delete();
         }
-    }
-
-    public LinkedList<MediaPartModel> getMedaParts() {
-        return mMediaList;
     }
 
     /**

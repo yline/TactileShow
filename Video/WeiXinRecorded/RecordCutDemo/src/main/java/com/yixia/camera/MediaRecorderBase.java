@@ -21,8 +21,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 
+import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
-import com.yixia.camera.model.MediaObject;
 import com.yixia.camera.util.DeviceUtils;
 import com.yixia.camera.util.FileUtils;
 import com.yixia.camera.util.StringUtils;
@@ -469,7 +469,7 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, IM
                 }
 
                 if (f.mkdirs()) {
-                    mMediaObject = new MediaObject(key, path, mVideoBitrate);
+                    mMediaObject = new MediaObject(path, key);
                 }
             }
         }

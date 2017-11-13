@@ -15,9 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.video.lib.FfmpegManager;
+import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
 import com.yixia.camera.MediaRecorderNative;
-import com.yixia.camera.model.MediaObject;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
 
 import java.io.File;
