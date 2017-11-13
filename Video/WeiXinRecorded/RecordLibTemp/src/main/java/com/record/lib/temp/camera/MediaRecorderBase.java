@@ -194,31 +194,35 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
         return false;
     }
 
-    /**
-     * 切换前置/后置摄像头
-     */
-    public void switchCamera(int cameraFacingFront) {
-        switch (cameraFacingFront) {
-            case Camera.CameraInfo.CAMERA_FACING_FRONT:
-            case Camera.CameraInfo.CAMERA_FACING_BACK:
-                mCameraId = cameraFacingFront;
-                stopPreview();
-                startPreview();
-                break;
-            default:
-                break;
+    public boolean changeFlash(Context context) {
+        boolean flashOn = false;
+        if (flashEnable(context)) {
+            Camera.Parameters params = camera.getParameters();
+            if (Camera.Parameters.FLASH_MODE_TORCH.equals(params.getFlashMode())) {
+                params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                flashOn = false;
+            } else {
+                params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                flashOn = true;
+            }
+            camera.setParameters(params);
         }
+        return flashOn;
+    }
+
+    public boolean flashEnable(Context context) {
+        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)
+                && mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK;
+
     }
 
     /**
      * 切换前置/后置摄像头
      */
-    public void switchCamera() {
-        if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
-            switchCamera(Camera.CameraInfo.CAMERA_FACING_FRONT);
-        } else {
-            switchCamera(Camera.CameraInfo.CAMERA_FACING_BACK);
-        }
+    public void switchCamera(int cameraFacingFront) {
+        mCameraId = cameraFacingFront;
+        stopPreview();
+        startPreview();
     }
 
     /**
@@ -323,28 +327,6 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
         return false;
     }
 
-    public boolean changeFlash(Context context) {
-        boolean flashOn = false;
-        if (flashEnable(context)) {
-            Camera.Parameters params = camera.getParameters();
-            if (Camera.Parameters.FLASH_MODE_TORCH.equals(params.getFlashMode())) {
-                params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                flashOn = false;
-            } else {
-                params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                flashOn = true;
-            }
-            camera.setParameters(params);
-        }
-        return flashOn;
-    }
-
-    public boolean flashEnable(Context context) {
-        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)
-                && mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK;
-
-    }
-
     /**
      * 设置闪光灯
      *
@@ -426,6 +408,7 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
         return list != null && list.contains(key);
     }
 
+    // ----------------------------------------------------------
     /**
      * 预处理一些拍摄参数
      * 注意：自动对焦参数cam_mode和cam-mode可能有些设备不支持，导致视频画面变形，需要判断一下，已知有"GT-N7100", "GT-I9308"会存在这个问题
@@ -454,6 +437,19 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
         mParameters.setPreviewFrameRate(mFrameRate);
 //		 mParameters.setPreviewFpsRange(15 * 1000, 20 * 1000);
         mParameters.setPreviewSize(640, 480);// 3:2
+//        boolean flag = false;
+//        for (int x = 0; x < mSupportedPreviewSizes.size(); x++) {
+//            Size size = mSupportedPreviewSizes.get(x);
+//            if (size.width * size.height == MediaRecorderBase.VIDEO_WIDTH * MediaRecorderBase.VIDEO_HEIGHT) {
+//                flag = true;
+//            }
+//        }
+//        if (flag) {
+//            mParameters.setPreviewSize(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT);
+//        } else {
+//            MediaRecorderBase.VIDEO_WIDTH = 720;
+//            mParameters.setPreviewSize(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT);
+//        }
 
         // 设置输出视频流尺寸，采样率
         mParameters.setPreviewFormat(ImageFormat.NV21);
@@ -477,9 +473,6 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
             mParameters.set("video-stabilization", "true");
         }
 
-        //		mParameters.set("recording-hint", "false");
-        //
-        //		mParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
         mParameters.set("cam_mode", 1);
         mParameters.set("cam-mode", 1);
     }
@@ -503,6 +496,7 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
             }
 
             camera.setDisplayOrientation(90);
+
             try {
                 camera.setPreviewDisplay(mSurfaceHolder);
             } catch (IOException e) {
@@ -655,6 +649,7 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
         mEncodeHanlder.sendEmptyMessage(MESSAGE_ENCODE_START);
     }
 
+    // -----------------------------------------------------------------
     /**
      * 合并视频片段
      */

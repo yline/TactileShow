@@ -21,11 +21,11 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 
+import com.video.lib.FfmpegManager;
 import com.video.lib.manager.AudioRecordThread;
 import com.video.lib.manager.MediaRecordCallback;
 import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
-import com.yixia.camera.util.FileUtils;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
 
 import java.io.File;
@@ -215,29 +215,39 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
     /**
      * 设置视频临时存储文件夹
      *
-     * @param key  视频输出的名称，同目录下唯一，一般取系统当前时间
-     * @param path 文件夹路径
+     * @param key     视频输出的名称，同目录下唯一，一般取系统当前时间
+     * @param dirPath 文件夹路径
      * @return 录制信息对象
      */
-    public MediaObject setOutputDirectory(String key, String path) {
+    public MediaObject setOutputDirectory(String key, String dirPath) {
+        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(dirPath)) {
+            return null;
+        }
 
+        // 创建文件夹
+        File dirFile = new File(dirPath);
+        boolean isDirExist;
+        if (dirFile.isDirectory()) {
+            isDirExist = true;
+        } else {
+            isDirExist = dirFile.mkdir();
+        }
 
-        if (!TextUtils.isEmpty(path)) {
-            File f = new File(path);
-            if (f.exists()) {
-                //已经存在，删除
-                if (f.isDirectory()) {
-                    FileUtils.deleteDir(f);
-                } else {
-                    FileUtils.deleteFile(f);
-                }
-            }
-
-            if (f.mkdirs()) {
-                mMediaObject = new MediaObject(path, key);
-            }
+        FfmpegManager.v("setOutputDirectory", "isDirExist = " + isDirExist);
+        if (isDirExist) {
+            mMediaObject = new MediaObject(dirPath, key);
         }
         return mMediaObject;
+    }
+
+    /**
+     * 开始预览
+     */
+    public void prepare() {
+        mPrepared = true;
+        if (mSurfaceCreated) {
+            startPreview();
+        }
     }
 
     /**
@@ -337,8 +347,7 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
                 if (mOnErrorListener != null) {
                     mOnErrorListener.onVideoError(MEDIA_ERROR_CAMERA_AUTO_FOCUS, 0);
                 }
-                if (e != null)
-                    Log.e("Yixia", "autoFocus", e);
+                Log.e("Yixia", "autoFocus", e);
             }
         }
         return false;
@@ -393,8 +402,7 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
                 if (mOnErrorListener != null) {
                     mOnErrorListener.onVideoError(MEDIA_ERROR_CAMERA_AUTO_FOCUS, 0);
                 }
-                if (e != null)
-                    Log.e("Yixia", "autoFocus", e);
+                Log.e("Yixia", "autoFocus", e);
             }
         }
         return false;
@@ -407,10 +415,11 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
         if (mParameters != null) {
             try {
                 final String mode = mParameters.getFlashMode();
-                if (TextUtils.isEmpty(mode) || Camera.Parameters.FLASH_MODE_OFF.equals(mode))
+                if (TextUtils.isEmpty(mode) || Camera.Parameters.FLASH_MODE_OFF.equals(mode)) {
                     setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                else
+                } else {
                     setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                }
                 return true;
             } catch (Exception e) {
                 Log.e("Yixia", "toggleFlashMode", e);
@@ -438,43 +447,6 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
         }
         return false;
     }
-
-    /**
-     * 设置码率
-     */
-    public void setVideoBitRate(int bitRate) {
-        if (bitRate > 0) {
-            mVideoBitrate = bitRate;
-        }
-    }
-
-    /**
-     * 设置帧数
-     */
-    public void setVideoRota(int rota) {
-        if (rota > 0) {
-            mFrameRate = rota;
-        }
-    }
-
-    /**
-     * 设置视频的宽高
-     */
-    public void setVideoRecordedSize(int width, int height) {
-        VIDEO_WIDTH = width;
-        VIDEO_HEIGHT = height;
-    }
-
-    /**
-     * 开始预览
-     */
-    public void prepare() {
-        mPrepared = true;
-        if (mSurfaceCreated) {
-            startPreview();
-        }
-    }
-
 
     /**
      * 设置视频信息
@@ -537,6 +509,8 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
         return list != null && list.contains(key);
     }
 
+    // ----------------------------------------------------------
+
     /**
      * 预处理一些拍摄参数
      * 注意：自动对焦参数cam_mode和cam-mode可能有些设备不支持，导致视频画面变形，需要判断一下，已知有"GT-N7100", "GT-I9308"会存在这个问题
@@ -562,7 +536,6 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
             }
         }
 
-        Size previewSize = mParameters.getPreviewSize();
         mParameters.setPreviewFrameRate(mFrameRate);
         // mParameters.setPreviewFpsRange(15 * 1000, 20 * 1000);
 
@@ -573,13 +546,13 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
                 flag = true;
             }
         }
-
         if (flag) {
             mParameters.setPreviewSize(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT);
         } else {
             MediaRecorderBase.VIDEO_WIDTH = 720;
             mParameters.setPreviewSize(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT);
         }
+
 
         // 设置输出视频流尺寸，采样率
         mParameters.setPreviewFormat(ImageFormat.NV21);
@@ -785,67 +758,12 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
     }
 
     /**
-     * 预处理监听
-     */
-    public interface OnPreparedListener {
-        /**
-         * 预处理完毕，可以开始录制了
-         */
-        void onPrepared();
-    }
-
-    /**
-     * 错误监听
-     */
-    public interface OnErrorListener {
-        /**
-         * 视频录制错误
-         *
-         * @param what
-         * @param extra
-         */
-        void onVideoError(int what, int extra);
-
-        /**
-         * 音频录制错误
-         *
-         * @param what
-         * @param message
-         */
-        void onAudioError(int what, String message);
-    }
-
-    /**
-     * 转码接口
-     */
-    public interface OnEncodeListener {
-        /**
-         * 开始转码
-         */
-        void onEncodeStart();
-
-        /**
-         * 转码进度
-         */
-        void onEncodeProgress(int progress);
-
-        /**
-         * 转码完成
-         */
-        void onEncodeComplete();
-
-        /**
-         * 转码失败
-         */
-        void onEncodeError();
-    }
-
-    /**
      * 开始转码，主要是合并视频片段
      */
     public void startEncoding() {
-        if (mMediaObject == null || mEncodeHanlder == null)
+        if (mMediaObject == null || mEncodeHanlder == null) {
             return;
+        }
 
         mEncodeHanlder.removeMessages(MESSAGE_ENCODE_PROGRESS);
         mEncodeHanlder.removeMessages(MESSAGE_ENCODE_COMPLETE);
@@ -853,6 +771,8 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
         mEncodeHanlder.removeMessages(MESSAGE_ENCODE_ERROR);
         mEncodeHanlder.sendEmptyMessage(MESSAGE_ENCODE_START);
     }
+
+    // -----------------------------------------------------------------
 
     /**
      * 合并视频片段
@@ -926,5 +846,60 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
         }
     }
 
-    ;
+
+    /**
+     * 预处理监听
+     */
+    public interface OnPreparedListener {
+        /**
+         * 预处理完毕，可以开始录制了
+         */
+        void onPrepared();
+    }
+
+    /**
+     * 错误监听
+     */
+    public interface OnErrorListener {
+        /**
+         * 视频录制错误
+         *
+         * @param what
+         * @param extra
+         */
+        void onVideoError(int what, int extra);
+
+        /**
+         * 音频录制错误
+         *
+         * @param what
+         * @param message
+         */
+        void onAudioError(int what, String message);
+    }
+
+    /**
+     * 转码接口
+     */
+    public interface OnEncodeListener {
+        /**
+         * 开始转码
+         */
+        void onEncodeStart();
+
+        /**
+         * 转码进度
+         */
+        void onEncodeProgress(int progress);
+
+        /**
+         * 转码完成
+         */
+        void onEncodeComplete();
+
+        /**
+         * 转码失败
+         */
+        void onEncodeError();
+    }
 }
