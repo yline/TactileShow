@@ -5,7 +5,7 @@ import android.media.MediaRecorder;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.record.lib.temp.camera.model.MediaPartModel;
+import com.video.lib.model.MediaPartModel;
 import com.video.lib.FfmpegManager;
 
 /**

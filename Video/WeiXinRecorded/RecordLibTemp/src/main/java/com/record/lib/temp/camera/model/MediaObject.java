@@ -3,17 +3,13 @@ package com.record.lib.temp.camera.model;
 import android.text.TextUtils;
 
 import com.record.lib.temp.ffmpeg.FileUtils;
+import com.video.lib.model.MediaPartModel;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.LinkedList;
 
 public class MediaObject implements Serializable {
-
-    /**
-     * 拍摄
-     */
-    public final static int MEDIA_PART_TYPE_RECORD = 0;
     /**
      * 导入视频
      */

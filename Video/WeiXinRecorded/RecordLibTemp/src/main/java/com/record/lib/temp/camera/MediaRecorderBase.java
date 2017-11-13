@@ -22,7 +22,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 
 import com.record.lib.temp.camera.model.MediaObject;
-import com.record.lib.temp.camera.model.MediaPartModel;
+import com.video.lib.model.MediaPartModel;
 import com.record.lib.temp.ffmpeg.record.MediaRecordCallback;
 import com.video.lib.FfmpegManager;
 
@@ -507,7 +507,7 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
 
                     // 检测视频大小是否大于0，否则丢弃（注意有音频没视频的情况下音频也会丢弃）
                     File videoFile = new File(part.getMediaPath());
-                    if (videoFile != null && videoFile.length() < 1) {
+                    if (videoFile.length() < 1) {
                         mMediaObject.removePart(part, true);
                     }
                 }

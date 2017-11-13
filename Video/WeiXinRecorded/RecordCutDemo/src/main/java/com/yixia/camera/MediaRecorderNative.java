@@ -4,7 +4,7 @@ import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-import com.yixia.camera.model.MediaObject;
+import com.video.lib.model.MediaPartModel;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
 
 /**
@@ -21,18 +21,18 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
 
 	/** 开始录制 */
 	@Override
-	public MediaObject.MediaPart startRecord() {
+	public MediaPartModel startRecord() {
 		//防止没有初始化的情况
 		if (!UtilityAdapter.isInitialized()) {
 			UtilityAdapter.initFilterParser();
 		}
 		
-		MediaObject.MediaPart result = null;
+		MediaPartModel result = null;
 
 		if (mMediaObject != null) {
 			mRecording = true;
 			result = mMediaObject.buildMediaPart(mCameraId, VIDEO_SUFFIX);
-			String cmd = String.format("filename = \"%s\"; ", result.mediaPath);
+			String cmd = String.format("filename = \"%s\"; ", result.getMediaPath());
 			cmd += String.format("addcmd = %s; ", " -vf \"transpose="+cameraState+"\" ");
 			UtilityAdapter.FilterParserAction(cmd, UtilityAdapter.PARSERACTION_START);
 			if (mAudioRecorder == null && result != null) {
@@ -84,15 +84,15 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
 	@Override
 	public void onError(MediaRecorder mr, int what, int extra) {
 		try {
-			if (mr != null)
-				mr.reset();
+			if (mr != null){
+				mr.reset();}
 		} catch (IllegalStateException e) {
 			Log.w("Yixia", "stopRecord", e);
 		} catch (Exception e) {
 			Log.w("Yixia", "stopRecord", e);
 		}
-		if (mOnErrorListener != null)
-			mOnErrorListener.onVideoError(what, extra);
+		if (mOnErrorListener != null){
+			mOnErrorListener.onVideoError(what, extra);}
 	}
 
 	/** 接收音频数据，传递到底层 */

@@ -1,6 +1,6 @@
 package com.record.lib.temp.ffmpeg.record;
 
-import com.record.lib.temp.camera.model.MediaPartModel;
+import com.video.lib.model.MediaPartModel;
 
 /**
  * 视频录制接口

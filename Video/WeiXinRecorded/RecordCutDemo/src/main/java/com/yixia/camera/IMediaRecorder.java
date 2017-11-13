@@ -1,6 +1,6 @@
 package com.yixia.camera;
 
-import com.yixia.camera.model.MediaObject;
+import com.video.lib.model.MediaPartModel;
 
 /**
  * 视频录制接口
@@ -15,7 +15,7 @@ public interface IMediaRecorder {
 	 * 
 	 * @return 录制失败返回null
 	 */
-	public MediaObject.MediaPart startRecord();
+	public MediaPartModel startRecord();
 	
 	/**
 	 * 停止录制

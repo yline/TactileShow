@@ -1,7 +1,6 @@
-package com.record.lib.temp.camera.model;
+package com.video.lib.model;
 
-import com.record.lib.temp.ffmpeg.FileUtils;
-
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -13,6 +12,8 @@ import java.io.Serializable;
  * @version 1.0.0
  */
 public class MediaPartModel implements Serializable{
+    public final static int MEDIA_PART_TYPE_RECORD = 0; // 拍摄
+
     private int index; // 索引
 
     private String mediaPath; // 视频路径
@@ -41,7 +42,7 @@ public class MediaPartModel implements Serializable{
     private transient volatile boolean recording;
 
     public MediaPartModel() {
-        this.type = MediaObject.MEDIA_PART_TYPE_RECORD;
+        this.type = MEDIA_PART_TYPE_RECORD;
         this.speed = 10;
     }
 
@@ -214,11 +215,25 @@ public class MediaPartModel implements Serializable{
     }
 
     public void delete() {
-        FileUtils.deleteFile(mediaPath);
-        FileUtils.deleteFile(audioPath);
-        FileUtils.deleteFile(thumbPath);
-        FileUtils.deleteFile(tempMediaPath);
-        FileUtils.deleteFile(tempAudioPath);
+        deleteFile(mediaPath);
+        deleteFile(audioPath);
+        deleteFile(thumbPath);
+        deleteFile(tempMediaPath);
+        deleteFile(tempAudioPath);
+    }
+
+    private static boolean deleteFile(String f) {
+        if (f != null && f.length() > 0) {
+            return deleteFile(new File(f));
+        }
+        return false;
+    }
+
+    private static boolean deleteFile(File f) {
+        if (f != null && f.exists() && !f.isDirectory()) {
+            return f.delete();
+        }
+        return false;
     }
 
     /**
