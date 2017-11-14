@@ -1,5 +1,6 @@
 package com.yline.record;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -13,15 +14,17 @@ import android.widget.TextView;
 
 import com.video.lib.manager.MediaRecorderBase;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
+import com.yline.record.viewhelper.DialogHelper;
 
 import java.io.File;
 import java.util.Locale;
 
 /**
- * Created by zhaoshuang on 17/3/21.
+ *
+ * @author yline 2017/11/14 -- 11:56
+ * @version 1.0.0
  */
-
-public class CutSizeActivity extends BaseActivity implements View.OnClickListener {
+public class CutSizeActivity extends Activity implements View.OnClickListener {
 
     private MyVideoView vv_play;
     private String path;
@@ -32,11 +35,16 @@ public class CutSizeActivity extends BaseActivity implements View.OnClickListene
     private int videoWidth;
     private int videoHeight;
 
+    // View
+    private DialogHelper mDialogHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_cut_size);
+
+        initView();
 
         windowWidth = getWindowManager().getDefaultDisplay().getWidth();
         windowHeight = getWindowManager().getDefaultDisplay().getHeight();
@@ -73,6 +81,10 @@ public class CutSizeActivity extends BaseActivity implements View.OnClickListene
                 cv_video.setMargin(vv_play.getLeft(), vv_play.getTop(), windowWidth - vv_play.getRight(), windowHeight - vv_play.getBottom() - dp50);
             }
         });
+    }
+
+    private void initView(){
+        mDialogHelper = new DialogHelper(this);
     }
 
     private void initUI() {
@@ -169,7 +181,7 @@ public class CutSizeActivity extends BaseActivity implements View.OnClickListene
                 new AsyncTask<Void, Void, String>() {
                     @Override
                     protected void onPreExecute() {
-                        showProgressDialog();
+                        mDialogHelper.show();
                     }
 
                     @Override
@@ -179,7 +191,7 @@ public class CutSizeActivity extends BaseActivity implements View.OnClickListene
 
                     @Override
                     protected void onPostExecute(String result) {
-                        closeProgressDialog();
+                        mDialogHelper.dismiss();
                         if (!TextUtils.isEmpty(result)) {
                             renameFile(result, path);
                             setResult(RESULT_OK);
@@ -187,6 +199,8 @@ public class CutSizeActivity extends BaseActivity implements View.OnClickListene
                         }
                     }
                 }.execute();
+                break;
+            default:
                 break;
         }
     }

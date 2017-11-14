@@ -1,5 +1,6 @@
 package com.yline.record;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -25,12 +26,13 @@ import android.widget.Toast;
 
 import com.video.lib.manager.MediaRecorderBase;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
+import com.yline.record.viewhelper.DialogHelper;
 
 /**
- * Created by zhaoshuang on 2017/9/30.
+ * @author yline 2017/11/14 -- 11:58
+ * @version 1.0.0
  */
-
-public class CutTimeActivity extends BaseActivity {
+public class CutTimeActivity extends Activity {
 
     private MediaPlayer mMediaPlayer;
     private String path;
@@ -47,6 +49,9 @@ public class CutTimeActivity extends BaseActivity {
     private int endTime;
     private int windowWidth;
     private int windowHeight;
+
+    // View
+    private DialogHelper mDialogHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -125,8 +130,8 @@ public class CutTimeActivity extends BaseActivity {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected void onPreExecute() {
-                TextView textView = showProgressDialog();
-                textView.setText("视频剪切中");
+                mDialogHelper.show();
+                mDialogHelper.setText("视频剪切中");
             }
 
             @Override
@@ -174,9 +179,9 @@ public class CutTimeActivity extends BaseActivity {
 
             @Override
             protected void onPostExecute(String result) {
-                closeProgressDialog();
+                mDialogHelper.dismiss();
                 if (!TextUtils.isEmpty(result)) {
-                    Toast.makeText(mContext, "剪切成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CutTimeActivity.this, "剪切成功", Toast.LENGTH_SHORT).show();
                     CutSizeActivity.renameFile(result, path);
                     setResult(RESULT_OK);
                     finish();
@@ -246,7 +251,7 @@ public class CutTimeActivity extends BaseActivity {
             @Override
             protected Boolean doInBackground(Void... params) {
                 MediaMetadataRetriever mediaMetadata = new MediaMetadataRetriever();
-                mediaMetadata.setDataSource(mContext, Uri.parse(path));
+                mediaMetadata.setDataSource(CutTimeActivity.this, Uri.parse(path));
                 for (int x = 0; x < frame; x++) {
                     Bitmap bitmap = mediaMetadata.getFrameAtTime(frameTime * x, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
                     Message msg = myHandler.obtainMessage();

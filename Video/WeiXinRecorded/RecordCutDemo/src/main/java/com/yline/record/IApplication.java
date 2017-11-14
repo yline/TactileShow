@@ -7,9 +7,10 @@ import com.video.lib.FfmpegManager;
 import java.io.File;
 
 /**
- * Created by zhaoshuang on 17/2/8.
+ * 入口
+ * @author yline 2017/11/14 -- 11:29
+ * @version 1.0.0
  */
-
 public class IApplication extends Application {
     public static String VIDEO_PATH = "/sdcard/WeiXinRecordedDemo/";
 

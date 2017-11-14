@@ -1,5 +1,6 @@
 package com.yline.record;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -8,12 +9,13 @@ import android.view.WindowManager;
 
 import com.video.lib.manager.MediaRecorderBase;
 
-
 /**
- * Created by zhaoshuang on 17/2/24.
+ * 播放界面
+ *
+ * @author yline 2017/11/14 -- 12:01
+ * @version 1.0.0
  */
-
-public class VideoPlayActivity extends BaseActivity {
+public class VideoPlayActivity extends Activity {
 
     private MyVideoView vv_play;
     private int windowWidth;

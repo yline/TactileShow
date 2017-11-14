@@ -3,6 +3,7 @@ package com.yline.record;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,6 +33,7 @@ import android.widget.Toast;
 
 import com.video.lib.manager.MediaRecorderBase;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
+import com.yline.record.viewhelper.DialogHelper;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -44,7 +46,7 @@ import java.util.Locale;
  * 视频编辑界面
  */
 
-public class EditVideoActivity extends BaseActivity implements View.OnClickListener {
+public class EditVideoActivity extends Activity implements View.OnClickListener {
 
     private MyVideoView vv_play;
     private LinearLayout ll_color;
@@ -83,11 +85,15 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     private int videoWidth;
     private int videoHeight;
 
+    private DialogHelper mDialogHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_edit_video);
+
+        initView();
 
         manager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         windowWidth = getWindowManager().getDefaultDisplay().getWidth();
@@ -145,6 +151,10 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
                 changeMode(true);
             }
         });
+    }
+
+    private void initView(){
+        mDialogHelper = new DialogHelper(this);
     }
 
     private void initUI() {
@@ -467,7 +477,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
                 rl_edit_text.setY(value);
             }
         });
-        if (listenerAdapter != null) va.addListener(listenerAdapter);
+        if (listenerAdapter != null){ va.addListener(listenerAdapter);}
         va.start();
     }
 
@@ -657,6 +667,8 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
                 vv_play.setVideoPath(path);
                 vv_play.start();
                 break;
+            default:
+                break;
         }
     }
 
@@ -665,7 +677,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
         new AsyncTask<Void, Void, String>() {
             @Override
             protected void onPreExecute() {
-                showProgressDialog();
+                mDialogHelper.show();
             }
 
             @Override
@@ -679,7 +691,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
 
             @Override
             protected void onPostExecute(String result) {
-                closeProgressDialog();
+                mDialogHelper.dismiss();
                 if (!TextUtils.isEmpty(result)) {
                     Intent intent = new Intent(EditVideoActivity.this, VideoPlayActivity.class);
                     intent.putExtra("path", result);
@@ -744,6 +756,8 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
                 Intent intent = new Intent(this, CutTimeActivity.class);
                 intent.putExtra("path", path);
                 startActivityForResult(intent, 2);
+                break;
+            default:
                 break;
         }
     }

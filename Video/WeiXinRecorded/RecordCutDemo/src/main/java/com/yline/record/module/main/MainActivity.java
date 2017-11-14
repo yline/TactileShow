@@ -1,5 +1,6 @@
-package com.yline.record;
+package com.yline.record.module.main;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -15,10 +16,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.video.lib.FfmpegManager;
+import com.video.lib.manager.MediaRecorderNativeCut;
 import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
-import com.video.lib.manager.MediaRecorderNativeCut;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
+import com.yline.record.EditVideoActivity;
+import com.yline.record.FocusSurfaceView;
+import com.yline.record.IApplication;
+import com.yline.record.MyVideoView;
+import com.yline.record.R;
+import com.yline.record.RecordedButton;
+import com.yline.record.viewhelper.DialogHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,7 +39,7 @@ import java.util.List;
  * 使用的是免费第三方VCamera
  * Created by zhaoshuang on 17/2/8.
  */
-public class MainActivity extends BaseActivity implements View.OnClickListener {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     private static final int REQUEST_KEY = 100;
     private static final int HANDLER_RECORD = 200;
@@ -45,7 +53,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private RelativeLayout rl_bottom2;
     private ImageView iv_back;
     private TextView tv_hint;
-    private TextView textView;
     private MyVideoView vv_play;
 
     //最大录制时间
@@ -55,11 +62,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private ImageView iv_change_flash;
     private List<Integer> cameraTypeList = new ArrayList<>();
 
+    // View
+    private DialogHelper mDialogHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+
+        initView();
 
         sv_ffmpeg = (FocusSurfaceView) findViewById(R.id.sv_ffmpeg);
         rb_start = (RecordedButton) findViewById(R.id.rb_start);
@@ -119,6 +131,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         iv_change_camera.setOnClickListener(this);
     }
 
+    private void initView(){
+        mDialogHelper = new DialogHelper(this);
+    }
+
     private void changeButton(boolean flag) {
 
         if (flag) {
@@ -155,11 +171,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void videoFinish() {
-
         changeButton(false);
         rb_start.setVisibility(View.GONE);
 
-        textView = showProgressDialog();
+        mDialogHelper.show();
 
         myHandler.sendEmptyMessage(HANDLER_EDIT_VIDEO);
     }
@@ -179,17 +194,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     break;
                 case HANDLER_EDIT_VIDEO://合成视频的handler
                     int progress = UtilityAdapter.FilterParserAction("", UtilityAdapter.PARSERACTION_PROGRESS);
-                    if (textView != null) {
-                        textView.setText("视频编译中 " + progress + "%");
-                    }
+                    mDialogHelper.setText("视频编译中 " + progress + "%");
                     if (progress == 100) {
                         syntVideo();
                     } else if (progress == -1) {
-                        closeProgressDialog();
+                        mDialogHelper.dismiss();
                         Toast.makeText(getApplicationContext(), "视频合成失败", Toast.LENGTH_SHORT).show();
                     } else {
                         sendEmptyMessageDelayed(HANDLER_EDIT_VIDEO, 30);
                     }
+                    break;
+                default:
                     break;
             }
         }
@@ -199,13 +214,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * 合成视频
      */
     private void syntVideo() {
-
         new AsyncTask<Void, Void, String>() {
             @Override
             protected void onPreExecute() {
-                if (textView != null) {
-                    textView.setText("视频合成中");
-                }
+                mDialogHelper.setText("视频合成中 ");
             }
 
             @Override
@@ -241,7 +253,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             @Override
             protected void onPostExecute(String result) {
-                closeProgressDialog();
+                mDialogHelper.dismiss();
                 if (!TextUtils.isEmpty(result)) {
                     rl_bottom2.setVisibility(View.VISIBLE);
                     vv_play.setVisibility(View.VISIBLE);
