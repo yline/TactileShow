@@ -2,12 +2,11 @@ package com.record.lib.temp.camera;
 
 import android.hardware.Camera;
 import android.media.MediaRecorder;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
+import com.video.lib.FfmpegManager;
 import com.video.lib.manager.AudioRecordThread;
 import com.video.lib.model.MediaPartModel;
-import com.video.lib.FfmpegManager;
 
 /**
  * 视频录制：边录制边底层处理视频（旋转和裁剪）
@@ -15,11 +14,7 @@ import com.video.lib.FfmpegManager;
  * @author yixia.com
  */
 public class MediaRecorderNative extends MediaRecorderBase implements MediaRecorder.OnErrorListener {
-
-    /**
-     * 视频后缀
-     */
-    private static final String VIDEO_SUFFIX = ".ts";
+    private static final String VIDEO_SUFFIX = ".ts"; // 视频后缀
 
     public MediaRecorderNative(SurfaceHolder surfaceHolder) {
         super(surfaceHolder);
@@ -77,10 +72,11 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
                 mr.reset();
             }
         } catch (IllegalStateException e) {
-            Log.w("Yixia", "onRecordStop", e);
+            FfmpegManager.v("onError", "onRecordStop IllegalStateException");
         } catch (Exception e) {
-            Log.w("Yixia", "onRecordStop", e);
+            FfmpegManager.v("onError", "onRecordStop Exception");
         }
+
         if (mOnErrorListener != null) {
             mOnErrorListener.onVideoError(what, extra);
         }

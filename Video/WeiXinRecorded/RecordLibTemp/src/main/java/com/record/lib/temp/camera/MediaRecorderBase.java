@@ -115,7 +115,7 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
     }
 
     /**
-     * 设置视频存储文件夹
+     * 设置视频临时存储文件夹
      *
      * @param dirPath 文件夹路径
      * @param key     视频输出的名称，同目录下唯一，一般取系统当前时间
@@ -477,12 +477,12 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
         try {
 
             if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                camera = Camera.open();
+                camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+                camera.setDisplayOrientation(90);
             } else {
-                camera = Camera.open(mCameraId);
+                camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+                camera.setDisplayOrientation(90);
             }
-
-            camera.setDisplayOrientation(90);
 
             try {
                 camera.setPreviewDisplay(mSurfaceHolder);
@@ -645,11 +645,16 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
 
             @Override
             protected Boolean doInBackground(Void... params) {
+                long startTime = System.currentTimeMillis();
+
                 //合并ts流
                 String cmd = String.format(FfmpegManager.COMMAND_MERGE_VIDEO_SIMPLE, FfmpegManager.getLogPathCommand(), mMediaObject.getConcatYUV(), mMediaObject.getOutputTempVideoPath());
                 boolean megerFlag = FfmpegManager.executeCommand("", cmd) == FfmpegManager.COMMAND_RESULT_SUCCESS;
+				FfmpegManager.v("concatVideoParts", "diffTime = " + (System.currentTimeMillis() - startTime));
+
                 //压缩ts
-                return compress(megerFlag);
+                boolean result = compress(megerFlag);
+                return result;
             }
 
             @Override
@@ -723,7 +728,7 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
                         sendEmptyMessage(MESSAGE_ENCODE_ERROR);
                     } else {
                         listener.onEncodeProgress(progress);
-                        sendEmptyMessageDelayed(MESSAGE_ENCODE_PROGRESS, 200);
+                        sendEmptyMessageDelayed(MESSAGE_ENCODE_PROGRESS, 50);
                     }
                     break;
                 case MESSAGE_ENCODE_COMPLETE://2

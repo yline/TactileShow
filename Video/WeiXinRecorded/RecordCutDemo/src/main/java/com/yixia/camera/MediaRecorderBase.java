@@ -26,7 +26,6 @@ import com.video.lib.manager.AudioRecordThread;
 import com.video.lib.manager.MediaRecordCallback;
 import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
-import com.yixia.videoeditor.adapter.UtilityAdapter;
 
 import java.io.File;
 import java.io.IOException;
@@ -228,9 +227,6 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
 
     /**
      * 自动对焦
-     *
-     * @param cb
-     * @return
      */
     public boolean autoFocus(AutoFocusCallback cb) {
         if (camera != null) {
@@ -413,7 +409,6 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
     }
 
     // ----------------------------------------------------------
-
     /**
      * 预处理一些拍摄参数
      * 注意：自动对焦参数cam_mode和cam-mode可能有些设备不支持，导致视频画面变形，需要判断一下，已知有"GT-N7100", "GT-I9308"会存在这个问题
@@ -440,9 +435,8 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
         }
 
         mParameters.setPreviewFrameRate(mFrameRate);
-        // mParameters.setPreviewFpsRange(15 * 1000, 20 * 1000);
-
-        mParameters.setPreviewSize(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT);
+//		 mParameters.setPreviewFpsRange(15 * 1000, 20 * 1000);
+        mParameters.setPreviewSize(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT);// 3:2
 
         // 设置输出视频流尺寸，采样率
         mParameters.setPreviewFormat(ImageFormat.NV21);
@@ -496,6 +490,7 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
                 if (mOnErrorListener != null) {
                     mOnErrorListener.onVideoError(MEDIA_ERROR_CAMERA_SET_PREVIEW_DISPLAY, 0);
                 }
+                Log.e("Yixia", "setPreviewDisplay fail " + e.getMessage());
             }
 
             //设置摄像头参数
@@ -518,7 +513,6 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
             Log.e("Yixia", "startPreview fail :" + e.getMessage());
         }
     }
-
 
     /**
      * 预览调用成功，子类可以做一些操作
@@ -643,7 +637,6 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
     }
 
     // -----------------------------------------------------------------
-
     /**
      * 合并视频片段
      */
@@ -652,16 +645,22 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
 
             @Override
             protected Boolean doInBackground(Void... params) {
+                long startTime = System.currentTimeMillis();
+
                 //合并ts流
-                String cmd = String.format("ffmpeg -i \"%s\" -vcodec copy -acodec copy -absf aac_adtstoasc -f mp4 -movflags faststart \"%s\"", mMediaObject.getConcatYUV(), mMediaObject.getOutputTempVideoPath());
-                long l = System.currentTimeMillis();
-                int i = UtilityAdapter.FFmpegRun("", cmd);
-                Log.i("Log.i", System.currentTimeMillis() - l + "   aaa");
-                return i == 0;
+                String cmd = String.format(FfmpegManager.COMMAND_MERGE_VIDEO_SIMPLE, FfmpegManager.getLogPathCommand(), mMediaObject.getConcatYUV(), mMediaObject.getOutputTempVideoPath());
+                boolean megerFlag = FfmpegManager.executeCommand("", cmd) == FfmpegManager.COMMAND_RESULT_SUCCESS;
+				FfmpegManager.v("concatVideoParts", "diffTime = " + (System.currentTimeMillis() - startTime));
+
+                //压缩ts
+//                boolean result = compress(megerFlag);
+                return megerFlag;
+                
             }
 
             @Override
             protected void onPostExecute(Boolean result) {
+                FfmpegManager.v("onPostExecute", "result = " + result);
                 if (result) {
                     mEncodeHanlder.sendEmptyMessage(MESSAGE_ENCODE_COMPLETE);
                 } else {
@@ -669,6 +668,29 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
                 }
             }
         }.execute();
+    }
+
+    protected boolean compress(boolean mergeFlag) {
+        if (!mergeFlag) {
+            return mergeFlag;
+        }
+
+        String cmd = String.format(FfmpegManager.COMMAND_COMPRESS_VIDEO, mMediaObject.getOutputTempVideoPath(), mMediaObject.getOutputVideoPath());
+        boolean compressFlag = FfmpegManager.executeCommand("", cmd) == FfmpegManager.COMMAND_RESULT_SUCCESS;
+
+        File file = new File(mMediaObject.getOutputTempVideoPath());
+        if (compressFlag) { //压缩成功删除临时文件
+            if (file.exists()) {
+                file.delete();
+            }
+
+            file = new File(mMediaObject.getTsPath());
+            if (file.exists()) {
+                file.delete();
+            }
+
+        }
+        return compressFlag;
     }
 
     /**
@@ -685,17 +707,21 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
         @Override
         public void handleMessage(Message msg) {
             MediaRecorderBase mrb = mMediaRecorderBase.get();
-            if (mrb == null || mrb.mOnEncodeListener == null)
+            if (mrb == null || mrb.mOnEncodeListener == null) {
                 return;
+            }
+
             OnEncodeListener listener = mrb.mOnEncodeListener;
             switch (msg.what) {
-                case MESSAGE_ENCODE_START:
+                case MESSAGE_ENCODE_START://0
                     listener.onEncodeStart();
                     sendEmptyMessage(MESSAGE_ENCODE_PROGRESS);
                     break;
-                case MESSAGE_ENCODE_PROGRESS:
+                case MESSAGE_ENCODE_PROGRESS://1
                     //查询片段是否都已经转码完成
-                    final int progress = UtilityAdapter.FilterParserAction("", UtilityAdapter.PARSERACTION_PROGRESS);
+                    final int progress = FfmpegManager.setParserActionState("", FfmpegManager.PARSER_ACTION_PROGRESS);
+                    FfmpegManager.v("EncodeHandler", "progress = " + progress);
+
                     if (progress == 100) {
                         listener.onEncodeProgress(progress);
                         mrb.concatVideoParts();//合并视频
@@ -706,16 +732,17 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
                         sendEmptyMessageDelayed(MESSAGE_ENCODE_PROGRESS, 50);
                     }
                     break;
-                case MESSAGE_ENCODE_COMPLETE:
+                case MESSAGE_ENCODE_COMPLETE://2
                     listener.onEncodeComplete();
                     break;
-                case MESSAGE_ENCODE_ERROR:
+                case MESSAGE_ENCODE_ERROR://3
                     listener.onEncodeError();
+                    break;
+                default:
                     break;
             }
         }
     }
-
 
     /**
      * 预处理监听

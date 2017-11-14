@@ -153,6 +153,7 @@ public class FfmpegManager {
     public static final String COMMAND_MERGE_VIDEO = "ffmpeg %s -i %s -vf %s %s -acodec copy -absf aac_adtstoasc -f mp4 -movflags faststart %s";
     // 合并视频流；{Log命令、流关联、临时输出文件}
     public static final String COMMAND_MERGE_VIDEO_SIMPLE = "ffmpeg %s -i %s -vcodec copy -acodec copy -absf aac_adtstoasc -f mp4 -movflags faststart %s";
+    public static final String COMMAND_MERGE_VIDEO_WITHOUT_LOG = "ffmpeg -i %s -vcodec copy -acodec copy -absf aac_adtstoasc -f mp4 -movflags faststart %s";
     // 压缩视频流；{输出的临时路径、输出的视频路径}
     public static final String COMMAND_COMPRESS_VIDEO = "ffmpeg -y -i %s -strict -2 -vcodec libx264 -preset ultrafast -crf 25 -acodec aac -ar 44100 -ac 2 -b:a 96k -s 360x640 -aspect 9:16 %s";
 
