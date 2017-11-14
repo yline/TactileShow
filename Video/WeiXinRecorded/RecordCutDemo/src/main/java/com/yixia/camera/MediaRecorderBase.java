@@ -21,11 +21,11 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 
-import com.video.lib.FfmpegManager;
 import com.video.lib.manager.AudioRecordThread;
-import com.video.lib.manager.MediaRecordCallback;
 import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
+import com.video.lib.manager.MediaRecordCallback;
+import com.video.lib.FfmpegManager;
 
 import java.io.File;
 import java.io.IOException;
