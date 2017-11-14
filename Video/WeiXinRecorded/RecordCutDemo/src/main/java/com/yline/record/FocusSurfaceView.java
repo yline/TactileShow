@@ -13,7 +13,7 @@ import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.yixia.camera.MediaRecorderBase;
+import com.video.lib.manager.MediaRecorderBase;
 
 import java.util.ArrayList;
 import java.util.List;

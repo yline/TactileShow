@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.video.lib.FfmpegManager;
 import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
-import com.yixia.camera.MediaRecorderNative;
+import com.video.lib.manager.MediaRecorderNativeCut;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
 
 import java.io.File;
@@ -37,7 +37,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final int HANDLER_RECORD = 200;
     private static final int HANDLER_EDIT_VIDEO = 201;
 
-    private MediaRecorderNative mMediaRecorder;
+    private MediaRecorderNativeCut mMediaRecorder;
     private MediaObject mMediaObject;
     private FocusSurfaceView sv_ffmpeg;
     private RecordedButton rb_start;
@@ -330,7 +330,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * 初始化录制对象
      */
     private void initMediaRecorder() {
-        mMediaRecorder = new MediaRecorderNative(sv_ffmpeg.getHolder());
+        mMediaRecorder = new MediaRecorderNativeCut(sv_ffmpeg.getHolder());
         String key = String.valueOf(System.currentTimeMillis());
         //设置缓存文件夹
         mMediaObject = mMediaRecorder.setOutputDirectory(FfmpegManager.getCachePath(), key);

@@ -30,7 +30,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.yixia.camera.MediaRecorderBase;
+import com.video.lib.manager.MediaRecorderBase;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
 
 import java.io.BufferedOutputStream;
@@ -44,7 +44,7 @@ import java.util.Locale;
  * 视频编辑界面
  */
 
-public class EditVideoActivity extends BaseActivity implements View.OnClickListener{
+public class EditVideoActivity extends BaseActivity implements View.OnClickListener {
 
     private MyVideoView vv_play;
     private LinearLayout ll_color;
@@ -112,17 +112,17 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
         vv_play.setOnPlayStateListener(new MyVideoView.OnPlayStateListener() {
             @Override
             public void onStateChanged(boolean isPlaying) {
-                if(isPlaying){
+                if (isPlaying) {
                     videoWidth = vv_play.getVideoWidth();
                     videoHeight = vv_play.getVideoHeight();
 
-                    float ra = videoWidth*1f/videoHeight;
+                    float ra = videoWidth * 1f / videoHeight;
 
-                    float widthF = videoWidth*1f/MediaRecorderBase.VIDEO_HEIGHT;
-                    float heightF = videoHeight*1f/MediaRecorderBase.VIDEO_WIDTH;
+                    float widthF = videoWidth * 1f / MediaRecorderBase.VIDEO_HEIGHT;
+                    float heightF = videoHeight * 1f / MediaRecorderBase.VIDEO_WIDTH;
                     ViewGroup.LayoutParams layoutParams = vv_play.getLayoutParams();
-                    layoutParams.width = (int) (windowWidth*widthF);
-                    layoutParams.height = (int) (layoutParams.width/ra);
+                    layoutParams.width = (int) (windowWidth * widthF);
+                    layoutParams.height = (int) (layoutParams.width / ra);
                     vv_play.setLayoutParams(layoutParams);
 
                     ViewGroup.LayoutParams layoutParams1 = rl_tuya.getLayoutParams();
@@ -139,6 +139,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
             public void onDown() {
                 changeMode(false);
             }
+
             @Override
             public void onUp() {
                 changeMode(true);
@@ -177,7 +178,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
         RelativeLayout rl_cut_size = (RelativeLayout) findViewById(R.id.rl_cut_size);
         RelativeLayout rl_cut_time = (RelativeLayout) findViewById(R.id.rl_cut_time);
 
-        RelativeLayout rl_back =  (RelativeLayout) findViewById(R.id.rl_back);
+        RelativeLayout rl_back = (RelativeLayout) findViewById(R.id.rl_back);
 
         rv_pen.setOnClickListener(this);
         rv_icon.setOnClickListener(this);
@@ -202,10 +203,12 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
             }
+
             @Override
             public void afterTextChanged(Editable s) {
                 tv_tag.setText(s.toString());
@@ -220,16 +223,18 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
         sb_speed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(progress < 50){
+                if (progress < 50) {
                     progress = 50;
                     sb_speed.setProgress(50);
                 }
-                videoSpeed = progress/100f;
-                tv_speed.setText(videoSpeed+"");
+                videoSpeed = progress / 100f;
+                tv_speed.setText(videoSpeed + "");
             }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
+
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
@@ -237,11 +242,11 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     }
 
     //更改界面模式
-    private void changeMode(boolean flag){
-        if(flag){
+    private void changeMode(boolean flag) {
+        if (flag) {
             rl_title.setVisibility(View.VISIBLE);
             rl_bottom.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             rl_title.setVisibility(View.GONE);
             rl_bottom.setVisibility(View.GONE);
         }
@@ -254,14 +259,14 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
 
         int dp80 = (int) getResources().getDimension(R.dimen.dp80);
         int dp10 = (int) getResources().getDimension(R.dimen.dp10);
-        for (int x=0; x<expressions.length; x++){
+        for (int x = 0; x < expressions.length; x++) {
             ImageView imageView = new ImageView(this);
             imageView.setPadding(dp10, dp10, dp10, dp10);
             final int result = expressions[x];
             imageView.setImageResource(result);
-            imageView.setLayoutParams(new ViewGroup.LayoutParams(windowWidth /4, dp80));
-            imageView.setX(x%4* windowWidth /4);
-            imageView.setY(x/4* dp80);
+            imageView.setLayoutParams(new ViewGroup.LayoutParams(windowWidth / 4, dp80));
+            imageView.setX(x % 4 * windowWidth / 4);
+            imageView.setY(x / 4 * dp80);
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -277,7 +282,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     /**
      * 添加表情到界面上
      */
-    private void addExpressionToWindow(int result){
+    private void addExpressionToWindow(int result) {
 
         TouchView touchView = new TouchView(this);
         touchView.setBackgroundResource(result);
@@ -286,12 +291,13 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
         touchView.setLayoutParams(layoutParams);
 
         touchView.setLimitsX(0, windowWidth);
-        touchView.setLimitsY(0, windowHeight-dp100/2);
+        touchView.setLimitsY(0, windowHeight - dp100 / 2);
         touchView.setOnLimitsListener(new TouchView.OnLimitsListener() {
             @Override
             public void OnOutLimits(float x, float y) {
                 tv_hint_delete.setTextColor(Color.RED);
             }
+
             @Override
             public void OnInnerLimits(float x, float y) {
                 tv_hint_delete.setTextColor(Color.WHITE);
@@ -303,15 +309,17 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
                 tv_hint_delete.setVisibility(View.VISIBLE);
                 changeMode(false);
             }
+
             @Override
             public void onMove(TouchView view, MotionEvent event) {
 
             }
+
             @Override
             public void onUp(TouchView view, MotionEvent event) {
                 tv_hint_delete.setVisibility(View.GONE);
                 changeMode(true);
-                if(view.isOutLimits()){
+                if (view.isOutLimits()) {
                     rl_touch_view.removeView(view);
                 }
             }
@@ -334,12 +342,13 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
         touchView.setBackground(new BitmapDrawable(bitmap));
 
         touchView.setLimitsX(0, windowWidth);
-        touchView.setLimitsY(0, windowHeight-dp100/2);
+        touchView.setLimitsY(0, windowHeight - dp100 / 2);
         touchView.setOnLimitsListener(new TouchView.OnLimitsListener() {
             @Override
             public void OnOutLimits(float x, float y) {
                 tv_hint_delete.setTextColor(Color.RED);
             }
+
             @Override
             public void OnInnerLimits(float x, float y) {
                 tv_hint_delete.setTextColor(Color.WHITE);
@@ -351,15 +360,17 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
                 tv_hint_delete.setVisibility(View.VISIBLE);
                 changeMode(false);
             }
+
             @Override
             public void onMove(TouchView view, MotionEvent event) {
 
             }
+
             @Override
             public void onUp(TouchView view, MotionEvent event) {
                 tv_hint_delete.setVisibility(View.GONE);
                 changeMode(true);
-                if(view.isOutLimits()){
+                if (view.isOutLimits()) {
                     rl_touch_view.removeView(view);
                 }
             }
@@ -376,10 +387,10 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
      */
     private void initColors() {
 
-        dp20 = (int)getResources().getDimension(R.dimen.dp20);
-        dp25 = (int)getResources().getDimension(R.dimen.dp25);
+        dp20 = (int) getResources().getDimension(R.dimen.dp20);
+        dp25 = (int) getResources().getDimension(R.dimen.dp25);
 
-        for (int x = 0; x< drawableBg.length; x++){
+        for (int x = 0; x < drawableBg.length; x++) {
             RelativeLayout relativeLayout = new RelativeLayout(this);
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT);
             layoutParams.weight = 1;
@@ -397,7 +408,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
             RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(dp25, dp25);
             layoutParams2.addRule(RelativeLayout.CENTER_IN_PARENT);
             view2.setLayoutParams(layoutParams2);
-            if(x != 0) {
+            if (x != 0) {
                 view2.setVisibility(View.GONE);
             }
             relativeLayout.addView(view2);
@@ -406,7 +417,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
             relativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(currentColorPosition != position) {
+                    if (currentColorPosition != position) {
                         view2.setVisibility(View.VISIBLE);
                         ViewGroup parent = (ViewGroup) v.getParent();
                         ViewGroup childView = (ViewGroup) parent.getChildAt(currentColorPosition);
@@ -422,16 +433,17 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     }
 
     boolean isFirstShowEditText;
+
     /**
      * 弹出键盘
      */
-    public void popupEditText(){
+    public void popupEditText() {
 
         isFirstShowEditText = true;
         et_tag.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if(isFirstShowEditText) {
+                if (isFirstShowEditText) {
                     isFirstShowEditText = false;
                     et_tag.setFocusable(true);
                     et_tag.setFocusableInTouchMode(true);
@@ -445,7 +457,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     /**
      * 执行文字编辑区域动画
      */
-    private void startAnim(float start, float end, AnimatorListenerAdapter listenerAdapter){
+    private void startAnim(float start, float end, AnimatorListenerAdapter listenerAdapter) {
 
         ValueAnimator va = ValueAnimator.ofFloat(start, end).setDuration(200);
         va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -455,21 +467,21 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
                 rl_edit_text.setY(value);
             }
         });
-        if(listenerAdapter != null) va.addListener(listenerAdapter);
+        if (listenerAdapter != null) va.addListener(listenerAdapter);
         va.start();
     }
 
     /**
      * 更改画笔状态的界面
      */
-    private void changePenState(boolean flag){
+    private void changePenState(boolean flag) {
 
-        if(flag){
+        if (flag) {
             tv_video.setDrawMode(flag);
             tv_video.setNewPaintColor(getResources().getColor(colors[currentColorPosition]));
             iv_pen.setImageResource(R.mipmap.pen_click);
             ll_color.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             tv_video.setDrawMode(flag);
             ll_color.setVisibility(View.GONE);
             iv_pen.setImageResource(R.mipmap.pen);
@@ -479,12 +491,12 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     /**
      * 更改表情状态的界面
      */
-    private void changeIconState(boolean flag){
+    private void changeIconState(boolean flag) {
 
-        if(flag){
+        if (flag) {
             iv_icon.setImageResource(R.mipmap.icon_click);
             rl_expression.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             rl_expression.setVisibility(View.GONE);
             iv_icon.setImageResource(R.mipmap.icon);
         }
@@ -493,14 +505,14 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     /**
      * 更改文字输入状态的界面
      */
-    private void changeTextState(boolean flag){
+    private void changeTextState(boolean flag) {
 
-        if(flag) {
+        if (flag) {
             rl_edit_text.setY(windowHeight);
             rl_edit_text.setVisibility(View.VISIBLE);
             startAnim(rl_edit_text.getY(), 0, null);
             popupEditText();
-        }else{
+        } else {
             manager.hideSoftInputFromWindow(et_tag.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
             startAnim(0, windowHeight, new AnimatorListenerAdapter() {
                 @Override
@@ -514,7 +526,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     /**
      * 更改视频剪切界面
      */
-    private void changeCutState(){
+    private void changeCutState() {
 
         Intent intent = new Intent(this, CutSizeActivity.class);
         intent.putExtra("path", path);
@@ -524,12 +536,12 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     /**
      * 更改视频加速
      */
-    private void changeSpeedState(boolean flag){
+    private void changeSpeedState(boolean flag) {
 
-        if(flag) {
+        if (flag) {
             ll_progress.setVisibility(View.VISIBLE);
             iv_speed.setImageResource(R.mipmap.speed_click);
-        }else{
+        } else {
             ll_progress.setVisibility(View.GONE);
             iv_speed.setImageResource(R.mipmap.speed);
         }
@@ -538,7 +550,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     /**
      * 合成图片到视频里
      */
-    private String mergeImage(String path){
+    private String mergeImage(String path) {
 
         //得到涂鸦view的bitmap图片
         Bitmap bitmap = Bitmap.createBitmap(rl_tuya.getWidth(), rl_tuya.getHeight(), Bitmap.Config.ARGB_8888);
@@ -548,7 +560,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
         matrix.postScale(videoWidth * 1f / bitmap.getWidth(), videoHeight * 1f / bitmap.getHeight());
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
-        String imagePath = IApplication.VIDEO_PATH +"/tuya.png";
+        String imagePath = IApplication.VIDEO_PATH + "/tuya.png";
         File file = new File(imagePath);//将要保存图片的路径
         try {
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
@@ -559,25 +571,25 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
             e.printStackTrace();
         }
 
-        String mergeVideo = IApplication.VIDEO_PATH+"/mergeVideo.mp4";
+        String mergeVideo = IApplication.VIDEO_PATH + "/mergeVideo.mp4";
 
         //ffmpeg -i videoPath -i imagePath -filter_complex overlay=0:0 -vcodec libx264 -profile:v baseline -preset ultrafast -b:v 3000k -g 30 -f mp4 outPath
         StringBuilder sb = new StringBuilder();
         sb.append("ffmpeg");
         sb.append(" -i");
-        sb.append(" "+path);
+        sb.append(" " + path);
         sb.append(" -i");
-        sb.append(" "+imagePath);
+        sb.append(" " + imagePath);
         sb.append(" -filter_complex");
         sb.append(" overlay=0:0");
         sb.append(" -vcodec libx264 -profile:v baseline -preset ultrafast -b:v 3000k -g 25");
         sb.append(" -f mp4");
-        sb.append(" "+mergeVideo);
+        sb.append(" " + mergeVideo);
 
         int i = UtilityAdapter.FFmpegRun("", sb.toString());
-        if(i == 0){
+        if (i == 0) {
             return mergeVideo;
-        }else{
+        } else {
             return "";
         }
     }
@@ -585,28 +597,28 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     /**
      * 调整视频播放速度
      */
-    private String adjustVideoSpeed(String path, float speed){
+    private String adjustVideoSpeed(String path, float speed) {
 
-        String outPut = IApplication.VIDEO_PATH+"/speedVideo.mp4";
+        String outPut = IApplication.VIDEO_PATH + "/speedVideo.mp4";
 
         //./ffmpeg -i 2x.mp4 -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" output3.mp4
-        String filter = String.format(Locale.getDefault(), "[0:v]setpts=%f*PTS[v];[0:a]atempo=%f[a]", 1/speed, speed);
+        String filter = String.format(Locale.getDefault(), "[0:v]setpts=%f*PTS[v];[0:a]atempo=%f[a]", 1 / speed, speed);
         StringBuilder sb = new StringBuilder("ffmpeg");
         sb.append(" -i");
-        sb.append(" "+path);
+        sb.append(" " + path);
         sb.append(" -filter_complex");
-        sb.append(" "+filter);
+        sb.append(" " + filter);
         sb.append(" -map");
         sb.append(" [v]");
         sb.append(" -map");
         sb.append(" [a]");
         sb.append(" -y");
-        sb.append(" "+outPut);
+        sb.append(" " + outPut);
 
         int i = UtilityAdapter.FFmpegRun("", sb.toString());
-        if(i == 0){
+        if (i == 0) {
             return outPut;
-        }else{
+        } else {
             return "";
         }
     }
@@ -632,11 +644,11 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if(resultCode!=RESULT_OK){
-            return ;
+        if (resultCode != RESULT_OK) {
+            return;
         }
 
-        switch (requestCode){
+        switch (requestCode) {
             case 1:
                 vv_play.setVideoPath(path);
                 vv_play.start();
@@ -648,29 +660,31 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    private void finishVideo(){
+    private void finishVideo() {
 
         new AsyncTask<Void, Void, String>() {
             @Override
             protected void onPreExecute() {
                 showProgressDialog();
             }
+
             @Override
             protected String doInBackground(Void... params) {
                 String videoPath = mergeImage(path);
-                if(videoSpeed != 1){
+                if (videoSpeed != 1) {
                     videoPath = adjustVideoSpeed(videoPath, videoSpeed);
                 }
                 return videoPath;
             }
+
             @Override
             protected void onPostExecute(String result) {
                 closeProgressDialog();
-                if(!TextUtils.isEmpty(result)) {
+                if (!TextUtils.isEmpty(result)) {
                     Intent intent = new Intent(EditVideoActivity.this, VideoPlayActivity.class);
                     intent.putExtra("path", result);
                     startActivity(intent);
-                }else{
+                } else {
                     Toast.makeText(getApplicationContext(), "视频编辑失败", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -680,21 +694,21 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.rl_pen:
-                changePenState(!(ll_color.getVisibility()==View.VISIBLE));
+                changePenState(!(ll_color.getVisibility() == View.VISIBLE));
                 changeIconState(false);
                 changeTextState(false);
                 changeSpeedState(false);
                 break;
             case R.id.rl_icon:
-                changeIconState(!(rl_expression.getVisibility()==View.VISIBLE));
+                changeIconState(!(rl_expression.getVisibility() == View.VISIBLE));
                 changePenState(false);
                 changeTextState(false);
                 changeSpeedState(false);
                 break;
             case R.id.rl_text:
-                changeTextState(!(rl_edit_text.getVisibility()==View.VISIBLE));
+                changeTextState(!(rl_edit_text.getVisibility() == View.VISIBLE));
                 changePenState(false);
                 changeIconState(false);
                 changeSpeedState(false);
@@ -703,11 +717,11 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
                 tv_video.backPath();
                 break;
             case R.id.tv_close:
-                changeTextState(!(rl_edit_text.getVisibility()==View.VISIBLE));
+                changeTextState(!(rl_edit_text.getVisibility() == View.VISIBLE));
                 break;
             case R.id.tv_finish:
-                changeTextState(!(rl_edit_text.getVisibility()==View.VISIBLE));
-                if(et_tag.getText().length() > 0) {
+                changeTextState(!(rl_edit_text.getVisibility() == View.VISIBLE));
+                if (et_tag.getText().length() > 0) {
                     addTextToWindow();
                 }
                 break;
@@ -721,7 +735,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
                 changeTextState(false);
                 changePenState(false);
                 changeIconState(false);
-                changeSpeedState(!(ll_progress.getVisibility()==View.VISIBLE));
+                changeSpeedState(!(ll_progress.getVisibility() == View.VISIBLE));
                 break;
             case R.id.rl_cut_size:
                 changeCutState();

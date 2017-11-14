@@ -1,11 +1,10 @@
-package com.yixia.camera;
+package com.video.lib.manager;
 
 import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.view.SurfaceHolder;
 
 import com.video.lib.FfmpegManager;
-import com.video.lib.manager.AudioRecordThread;
 import com.video.lib.model.MediaPartModel;
 
 import java.util.Locale;
@@ -16,12 +15,12 @@ import java.util.Locale;
  * @author yixia.com
  *
  */
-public class MediaRecorderNative extends MediaRecorderBase implements MediaRecorder.OnErrorListener {
+public class MediaRecorderNativeCut extends MediaRecorderBase implements MediaRecorder.OnErrorListener {
     private static final String VIDEO_SUFFIX = ".ts"; // 视频后缀
 
 	private int cameraState = 1;
 
-	public MediaRecorderNative(SurfaceHolder surfaceHolder) {
+	public MediaRecorderNativeCut(SurfaceHolder surfaceHolder) {
 		super(surfaceHolder);
 	}
 
@@ -109,5 +108,10 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
         if (mRecording && len > 0) {
             FfmpegManager.executeRenderAudioData(sampleBuffer);
         }
+    }
+
+    @Override
+    protected boolean compress(boolean mergeFlag) {
+        return mergeFlag;
     }
 }
