@@ -1,1 +1,1 @@
-include ':RecordCutDemo', ':VideoLib', ':RecordLibTemp', ':RecordDemo'
+include ':RecordCutDemo', ':VideoLib', ':RecordDemo'

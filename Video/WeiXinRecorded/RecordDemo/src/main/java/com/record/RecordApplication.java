@@ -1,6 +1,6 @@
 package com.record;
 
-import com.record.lib.temp.camera.MediaRecorderBase;
+import com.video.lib.manager.MediaRecorderBase;
 import com.video.lib.FfmpegManager;
 import com.yline.application.BaseApplication;
 

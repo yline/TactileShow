@@ -12,8 +12,8 @@ import android.widget.Toast;
 
 import com.record.R;
 import com.record.RecordApplication;
-import com.record.lib.temp.camera.MediaRecorderBase;
-import com.record.lib.temp.camera.MediaRecorderNative;
+import com.video.lib.manager.MediaRecorderBase;
+import com.video.lib.manager.MediaRecorderNativeSimple;
 import com.record.module.record.view.CircleTextView;
 import com.record.module.record.view.HintTextHelper;
 import com.record.module.record.view.RecordProgressView;
@@ -35,7 +35,7 @@ public class WeChatRecordActivity extends Activity {
     private final static float OffsetDuration = 25.0f; // 手指取消录制的偏移距离
 
     // 录制视频类
-    private MediaRecorderNative mMediaRecorder; // 录制视频 帮助类
+    private MediaRecorderNativeSimple mMediaRecorder; // 录制视频 帮助类
     private MediaObject mMediaObject; // 视频信息
     private SurfaceView mSurfaceView; // 录制视频，对象
 
@@ -219,7 +219,7 @@ public class WeChatRecordActivity extends Activity {
      * 初始化拍摄SDK
      */
     private void initMediaRecorder() {
-        mMediaRecorder = new MediaRecorderNative(mSurfaceView.getHolder());
+        mMediaRecorder = new MediaRecorderNativeSimple(mSurfaceView.getHolder());
         mMediaRecorder.setOnPreparedListener(new MediaRecorderBase.OnPreparedListener() {
             @Override
             public void onPrepared() {

@@ -8,16 +8,16 @@ import com.video.lib.FfmpegManager;
 import com.video.lib.manager.AudioRecordThread;
 import com.video.lib.model.MediaPartModel;
 
+import java.util.Locale;
+
 /**
  * 视频录制：边录制边底层处理视频（旋转和裁剪）
- * 
+ *
  * @author yixia.com
  *
  */
 public class MediaRecorderNative extends MediaRecorderBase implements MediaRecorder.OnErrorListener {
-
-	/** 视频后缀 */
-	private static final String VIDEO_SUFFIX = ".ts";
+    private static final String VIDEO_SUFFIX = ".ts"; // 视频后缀
 
 	private int cameraState = 1;
 
@@ -33,11 +33,12 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
 		if (mMediaObject != null) {
 			mRecording = true;
 			result = mMediaObject.buildMediaPart(mCameraId, VIDEO_SUFFIX);
-			String cmd = String.format("filename = \"%s\"; ", result.getMediaPath());
-			cmd += String.format("addcmd = %s; ", " -vf \"transpose="+cameraState+"\" ");
+
+			String cmd = String.format(Locale.CHINA, "filename = %s; addcmd =  -vf \"transpose=%d\" ;", result.getMediaPath(), cameraState);
+            FfmpegManager.v("onRecordStart", "cmd = " + cmd);
 
 			FfmpegManager.setParserActionState(cmd, FfmpegManager.PARSER_ACTION_START);
-			if (mAudioRecorder == null && result != null) {
+			if (mAudioRecorder == null) {
 				mAudioRecorder = new AudioRecordThread(this);
 				mAudioRecorder.start();
 			}

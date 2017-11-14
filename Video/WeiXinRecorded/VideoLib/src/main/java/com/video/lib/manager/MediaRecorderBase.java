@@ -1,4 +1,4 @@
-package com.record.lib.temp.camera;
+package com.video.lib.manager;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -21,10 +21,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 
-import com.video.lib.manager.AudioRecordThread;
 import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
-import com.video.lib.manager.MediaRecordCallback;
 import com.video.lib.FfmpegManager;
 
 import java.io.File;
@@ -669,28 +667,7 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
         }.execute();
     }
 
-    protected boolean compress(boolean mergeFlag) {
-        if (!mergeFlag) {
-            return mergeFlag;
-        }
-
-        String cmd = String.format(FfmpegManager.COMMAND_COMPRESS_VIDEO, mMediaObject.getOutputTempVideoPath(), mMediaObject.getOutputVideoPath());
-        boolean compressFlag = FfmpegManager.executeCommand("", cmd) == FfmpegManager.COMMAND_RESULT_SUCCESS;
-
-        File file = new File(mMediaObject.getOutputTempVideoPath());
-        if (compressFlag) { //压缩成功删除临时文件
-            if (file.exists()) {
-                file.delete();
-            }
-
-            file = new File(mMediaObject.getTsPath());
-            if (file.exists()) {
-                file.delete();
-            }
-
-        }
-        return compressFlag;
-    }
+    protected abstract boolean compress(boolean mergeFlag);
 
     /**
      * 转码队列
