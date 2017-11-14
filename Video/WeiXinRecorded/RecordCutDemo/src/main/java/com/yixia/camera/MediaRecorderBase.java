@@ -39,168 +39,71 @@ import java.util.List;
  *
  * @author yixia.com
  */
-public abstract class MediaRecorderBase implements Callback, PreviewCallback, MediaRecordCallback {
+public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordCallback {
+    public static int VIDEO_WIDTH = 1280; // 视频宽度
+    public static int VIDEO_HEIGHT = 720; // 视频高度
 
-    /**
-     * 视频宽度
-     */
-    public static int VIDEO_WIDTH = 1280;
-    /**
-     * 视频高度
-     */
-    public static int VIDEO_HEIGHT = 720;
+    public static final int MEDIA_ERROR_UNKNOWN = 1; // 未知错误
 
-    /**
-     * 未知错误
-     */
-    public static final int MEDIA_ERROR_UNKNOWN = 1;
-    /**
-     * 预览画布设置错误
-     */
-    public static final int MEDIA_ERROR_CAMERA_SET_PREVIEW_DISPLAY = 101;
-    /**
-     * 预览错误
-     */
-    public static final int MEDIA_ERROR_CAMERA_PREVIEW = 102;
-    /**
-     * 自动对焦错误
-     */
-    public static final int MEDIA_ERROR_CAMERA_AUTO_FOCUS = 103;
+    public static final int MEDIA_ERROR_CAMERA_SET_PREVIEW_DISPLAY = 101; // 预览画布设置错误
+    public static final int MEDIA_ERROR_CAMERA_PREVIEW = 102; // 预览错误
+    public static final int MEDIA_ERROR_CAMERA_AUTO_FOCUS = 103; // 自动对焦错误
 
-    public static final int AUDIO_RECORD_ERROR_UNKNOWN = 0;
-    /**
-     * 采样率设置不支持
-     */
-    public static final int AUDIO_RECORD_ERROR_SAMPLERATE_NOT_SUPPORT = 1;
-    /**
-     * 最小缓存获取失败
-     */
-    public static final int AUDIO_RECORD_ERROR_GET_MIN_BUFFER_SIZE_NOT_SUPPORT = 2;
-    /**
-     * 创建AudioRecord失败
-     */
-    public static final int AUDIO_RECORD_ERROR_CREATE_FAILED = 3;
+    public static final int VIDEO_BITRATE_NORMAL = 1024; // 视频码率 1M
+    public static final int VIDEO_BITRATE_MEDIUM = 1536; // 视频码率 1.5M（默认）
+    public static final int VIDEO_BITRATE_HIGH = 2048; // 视频码率 2M
 
-    /**
-     * 视频码率 1M
-     */
-    public static final int VIDEO_BITRATE_NORMAL = 1024;
-    /**
-     * 视频码率 1.5M（默认）
-     */
-    public static final int VIDEO_BITRATE_MEDIUM = 1536;
-    /**
-     * 视频码率 2M
-     */
-    public static final int VIDEO_BITRATE_HIGH = 2048;
+    protected static final int MESSAGE_ENCODE_START = 0; // 开始转码
+    protected static final int MESSAGE_ENCODE_PROGRESS = 1; // 转码进度
+    protected static final int MESSAGE_ENCODE_COMPLETE = 2; // 转码完成
+    protected static final int MESSAGE_ENCODE_ERROR = 3; // 转码失败
 
-    /**
-     * 开始转码
-     */
-    protected static final int MESSAGE_ENCODE_START = 0;
-    /**
-     * 转码进度
-     */
-    protected static final int MESSAGE_ENCODE_PROGRESS = 1;
-    /**
-     * 转码完成
-     */
-    protected static final int MESSAGE_ENCODE_COMPLETE = 2;
-    /**
-     * 转码失败
-     */
-    protected static final int MESSAGE_ENCODE_ERROR = 3;
+    public static final int MAX_FRAME_RATE = 25; // 最大帧率
+    public static final int MIN_FRAME_RATE = 15; // 最小帧率
 
-    /**
-     * 最大帧率
-     */
-    public static final int MAX_FRAME_RATE = 25;
-    /**
-     * 最小帧率
-     */
-    public static final int MIN_FRAME_RATE = 15;
+    protected Camera camera; // 摄像头对象
+    protected Camera.Parameters mParameters = null; // 摄像头参数
+    protected List<Size> mSupportedPreviewSizes; // 摄像头支持的预览尺寸集合
+    protected SurfaceHolder mSurfaceHolder; // 画布
 
-    /**
-     * 摄像头对象
-     */
-    protected Camera camera;
-    /**
-     * 摄像头参数
-     */
-    protected Camera.Parameters mParameters = null;
-    /**
-     * 摄像头支持的预览尺寸集合
-     */
-    protected List<Size> mSupportedPreviewSizes;
-    /**
-     * 画布
-     */
-    protected SurfaceHolder mSurfaceHolder;
+    protected AudioRecordThread mAudioRecorder; // 声音录制
+    protected EncodeHandler mEncodeHanlder; // 转码Handler
+    protected MediaObject mMediaObject; // 拍摄存储对象
 
-    /**
-     * 声音录制
-     */
-    protected AudioRecordThread mAudioRecorder;
-    /**
-     * 转码Handler
-     */
-    protected EncodeHandler mEncodeHanlder;
-    /**
-     * 拍摄存储对象
-     */
-    protected MediaObject mMediaObject;
+    protected OnEncodeListener mOnEncodeListener; // 转码监听器
+    protected OnErrorListener mOnErrorListener; // 录制错误监听
+    protected OnPreparedListener mOnPreparedListener; // 录制已经准备就绪的监听
 
-    /**
-     * 转码监听器
-     */
-    protected OnEncodeListener mOnEncodeListener;
-    /**
-     * 录制错误监听
-     */
-    protected OnErrorListener mOnErrorListener;
-    /**
-     * 录制已经准备就绪的监听
-     */
-    protected OnPreparedListener mOnPreparedListener;
+    protected int mFrameRate = MIN_FRAME_RATE; // 帧率
+    protected int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK; // 摄像头类型（前置/后置），默认后置
+    protected boolean mPrepared, mStartPreview, mSurfaceCreated; // 状态标记
+    protected volatile boolean mRecording; // 是否正在录制
+    protected volatile long mPreviewFrameCallCount = 0; // PreviewFrame调用次数，测试用
 
-    /**
-     * 帧率
-     */
-    protected int mFrameRate = MIN_FRAME_RATE;
-    /**
-     * 摄像头类型（前置/后置），默认后置
-     */
-    protected int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
-    /**
-     * 视频码率
-     */
-    protected int mVideoBitrate = VIDEO_BITRATE_HIGH;
-    /**
-     * 状态标记
-     */
-    protected boolean mPrepared, mStartPreview, mSurfaceCreated;
-    /**
-     * 是否正在录制
-     */
-    protected volatile boolean mRecording;
-    /**
-     * PreviewFrame调用次数，测试用
-     */
-    protected volatile long mPreviewFrameCallCount = 0;
+    public MediaRecorderBase(SurfaceHolder surfaceHolder) {
+        if (null != surfaceHolder) {
+            // 设置预览输出SurfaceHolder
+            surfaceHolder.addCallback(new Callback() {
+                @Override
+                public void surfaceCreated(SurfaceHolder holder) {
+                    mSurfaceHolder = holder;
+                    mSurfaceCreated = true;
+                    if (mPrepared && !mStartPreview) {
+                        startPreview();
+                    }
+                }
 
-    public MediaRecorderBase() {
+                @Override
+                public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                    mSurfaceHolder = holder;
+                }
 
-    }
-
-    /**
-     * 设置预览输出SurfaceHolder
-     *
-     * @param sh
-     */
-    @SuppressWarnings("deprecation")
-    public void setSurfaceHolder(SurfaceHolder sh) {
-        if (sh != null) {
-            sh.addCallback(this);
+                @Override
+                public void surfaceDestroyed(SurfaceHolder holder) {
+                    mSurfaceHolder = null;
+                    mSurfaceCreated = false;
+                }
+            });
         }
     }
 
@@ -215,11 +118,11 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
     /**
      * 设置视频临时存储文件夹
      *
-     * @param key     视频输出的名称，同目录下唯一，一般取系统当前时间
      * @param dirPath 文件夹路径
-     * @return 录制信息对象
+     * @param key     视频输出的名称，同目录下唯一，一般取系统当前时间
+     * @return 录制信息对象；设置失败{null}
      */
-    public MediaObject setOutputDirectory(String key, String dirPath) {
+    public MediaObject setOutputDirectory(String dirPath, String key) {
         if (TextUtils.isEmpty(key) || TextUtils.isEmpty(dirPath)) {
             return null;
         }
@@ -680,26 +583,6 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, Me
 
         mSurfaceHolder = null;
         mPrepared = false;
-        mSurfaceCreated = false;
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        this.mSurfaceHolder = holder;
-        this.mSurfaceCreated = true;
-        if (mPrepared && !mStartPreview) {
-            startPreview();
-        }
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        this.mSurfaceHolder = holder;
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        mSurfaceHolder = null;
         mSurfaceCreated = false;
     }
 

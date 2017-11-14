@@ -3,6 +3,7 @@ package com.yixia.camera;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.util.Log;
+import android.view.SurfaceHolder;
 
 import com.video.lib.manager.AudioRecordThread;
 import com.video.lib.model.MediaPartModel;
@@ -19,6 +20,10 @@ public class MediaRecorderNative extends MediaRecorderBase implements MediaRecor
 	/** 视频后缀 */
 	private static final String VIDEO_SUFFIX = ".ts";
 	private int cameraState = 1;
+
+	public MediaRecorderNative(SurfaceHolder surfaceHolder) {
+		super(surfaceHolder);
+	}
 
 	/** 开始录制 */
 	@Override

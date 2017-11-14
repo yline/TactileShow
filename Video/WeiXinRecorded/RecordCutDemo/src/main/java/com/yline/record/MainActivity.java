@@ -330,12 +330,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * 初始化录制对象
      */
     private void initMediaRecorder() {
-        mMediaRecorder = new MediaRecorderNative();
+        mMediaRecorder = new MediaRecorderNative(sv_ffmpeg.getHolder());
         String key = String.valueOf(System.currentTimeMillis());
         //设置缓存文件夹
-        mMediaObject = mMediaRecorder.setOutputDirectory(key, FfmpegManager.getCachePath());
-        //设置视频预览源
-        mMediaRecorder.setSurfaceHolder(sv_ffmpeg.getHolder());
+        mMediaObject = mMediaRecorder.setOutputDirectory(FfmpegManager.getCachePath(), key);
         //准备
         mMediaRecorder.prepare();
         //滤波器相关
