@@ -1,4 +1,4 @@
-package com.yline.record;
+package com.yline.record.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -7,6 +7,8 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.yline.record.R;
 
 /**
  * Created by zhaoshuang on 17/3/20.

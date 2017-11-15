@@ -1,4 +1,4 @@
-package com.yline.record;
+package com.yline.record.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -14,17 +14,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.video.lib.manager.MediaRecorderBase;
+import com.yline.record.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by zhaoshuang on 17/2/16.
  * 触摸对焦SurfaceView
+ *
+ * @author yline 2017/11/14 -- 14:08
+ * @version 1.0.0
  */
-
 public class FocusSurfaceView extends SurfaceView {
-
     private ValueAnimator va;
     private String focusMode;
     private ImageView imageView;
@@ -45,8 +46,7 @@ public class FocusSurfaceView extends SurfaceView {
     /**
      * 设置触摸对焦
      */
-    public void setTouchFocus(MediaRecorderBase mediaRecorderBase){
-
+    public void setTouchFocus(MediaRecorderBase mediaRecorderBase) {
         this.mediaRecorderBase = mediaRecorderBase;
     }
 
@@ -64,7 +64,7 @@ public class FocusSurfaceView extends SurfaceView {
         bottom = bottom > 1000 ? 1000 : bottom;
         try {
             focusOnRect(new Rect(left, top, right, bottom), camera);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -95,6 +95,7 @@ public class FocusSurfaceView extends SurfaceView {
 
     float downX;
     float downY;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
@@ -102,7 +103,7 @@ public class FocusSurfaceView extends SurfaceView {
                 downX = event.getX();
                 downY = event.getY();
                 //判断是否支持对焦模式
-                if(mediaRecorderBase!=null && mediaRecorderBase.getCamera()!=null) {
+                if (mediaRecorderBase != null && mediaRecorderBase.getCamera() != null) {
                     List<String> focusModes = mediaRecorderBase.getCamera().getParameters().getSupportedFocusModes();
                     if (focusModes != null && focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
                         focusOnTouch((int) event.getRawX(), (int) event.getRawY(), mediaRecorderBase.getCamera());
@@ -113,13 +114,14 @@ public class FocusSurfaceView extends SurfaceView {
                 break;
             case MotionEvent.ACTION_UP:
                 break;
+            default:
+                break;
         }
         return true;
     }
 
-    private void addFocusToWindow(){
-
-        if(va == null) {
+    private void addFocusToWindow() {
+        if (va == null) {
             imageView = new ImageView(getContext());
             imageView.setImageResource(R.mipmap.video_focus);
             imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -133,7 +135,7 @@ public class FocusSurfaceView extends SurfaceView {
             va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
                 public void onAnimationUpdate(ValueAnimator animation) {
-                    if(imageView != null) {
+                    if (imageView != null) {
                         float value = (float) animation.getAnimatedValue();
                         if (value <= 0.5f) {
                             imageView.setScaleX(1 + value);
@@ -148,7 +150,7 @@ public class FocusSurfaceView extends SurfaceView {
             va.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    if(imageView != null) {
+                    if (imageView != null) {
                         parent.removeView(imageView);
                         va = null;
                     }

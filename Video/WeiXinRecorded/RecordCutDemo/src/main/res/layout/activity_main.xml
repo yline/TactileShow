@@ -3,12 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.yline.record.FocusSurfaceView
-        android:id="@+id/sv_ffmpeg"
+    <com.yline.record.view.FocusSurfaceView
+        android:id="@+id/main_focus_surface_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.yline.record.MyVideoView
+    <com.yline.record.view.MyVideoView
         android:id="@+id/vv_play"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -24,14 +24,14 @@
         android:visibility="visible">
 
         <ImageView
-            android:id="@+id/iv_back"
+            android:id="@+id/main_iv_back"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginLeft="30dp"
             android:src="@mipmap/video_delete" />
 
         <ImageView
-            android:id="@+id/iv_finish"
+            android:id="@+id/main_iv_finish"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentRight="true"
@@ -49,7 +49,7 @@
         android:visibility="gone">
 
         <ImageView
-            android:id="@+id/iv_close"
+            android:id="@+id/main_iv_close"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginLeft="30dp"
@@ -58,7 +58,7 @@
             android:src="@mipmap/video_close" />
 
         <ImageView
-            android:id="@+id/iv_next"
+            android:id="@+id/main_iv_next"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentRight="true"
@@ -88,7 +88,7 @@
         android:src="@mipmap/video_flash_close" />
 
     <ImageView
-        android:id="@+id/iv_change_camera"
+        android:id="@+id/main_iv_change_camera"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentRight="true"
@@ -96,7 +96,7 @@
         android:padding="8dp"
         android:src="@mipmap/video_camera" />
 
-    <com.yline.record.RecordedButton
+    <com.yline.record.view.RecordedButton
         android:id="@+id/rb_start"
         android:layout_width="100dp"
         android:layout_height="120dp"

@@ -1,4 +1,4 @@
-package com.yline.record;
+package com.yline.record.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,6 +9,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.yline.record.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,9 +18,7 @@ import java.util.List;
  * Created by zhaoshuang on 16/12/14.
  * 手绘涂鸦界面
  */
-
-    public class TuyaView extends View {
-
+public class TuyaView extends View {
     private Paint mPaint;
     private Path mPath;
     private List<Path> savePathList = new ArrayList<>();
@@ -43,12 +43,12 @@ import java.util.List;
         init();
     }
 
-    public void setNewPaintColor(int color){
+    public void setNewPaintColor(int color) {
 
         mPaint.setColor(color);
     }
 
-    public Paint newPaint(int color){
+    public Paint newPaint(int color) {
 
         Paint paint = new Paint();
         paint.setAntiAlias(true);
@@ -65,27 +65,29 @@ import java.util.List;
         mPath = new Path();
     }
 
-    public void setDrawMode(boolean flag){
+    public void setDrawMode(boolean flag) {
         isDrawMode = flag;
     }
 
     /**
      * 清除上一个绘制线条
      */
-    public void backPath(){
+    public void backPath() {
 
-        if(savePathList.size() != 0){
-            if(savePathList.size() == 1){
+        if (savePathList.size() != 0) {
+            if (savePathList.size() == 1) {
                 mPath.reset();
                 savePathList.clear();
                 paintList.clear();
-            }else{
-                savePathList.remove(savePathList.size()-1);
-                paintList.remove(paintList.size()-1);
+            } else {
+                savePathList.remove(savePathList.size() - 1);
+                paintList.remove(paintList.size() - 1);
                 mPath = savePathList.get(savePathList.size() - 1);
                 mPaint = paintList.get(paintList.size() - 1);
             }
-            if(onLineChangeListener != null) onLineChangeListener.onDeleteLine(savePathList.size());
+            if (onLineChangeListener != null) {
+                onLineChangeListener.onDeleteLine(savePathList.size());
+            }
         }
         invalidate();
     }
@@ -93,39 +95,43 @@ import java.util.List;
     /**
      * 触摸状态的回调
      */
-    public interface OnTouchListener{
+    public interface OnTouchListener {
         void onDown();
+
         void onUp();
     }
 
     /**
      * 绘制状态的回调
      */
-    public interface OnLineChangeListener{
+    public interface OnLineChangeListener {
         /**
          * @param sum 现在总共绘制线条的数目
          */
         void onDrawLine(int sum);
+
         void onDeleteLine(int sum);
     }
 
-    public void setOnLineChangeListener(OnLineChangeListener onLineChangeListener){
+    public void setOnLineChangeListener(OnLineChangeListener onLineChangeListener) {
         this.onLineChangeListener = onLineChangeListener;
     }
 
-    public void setOnTouchListener(OnTouchListener onTouchListener){
+    public void setOnTouchListener(OnTouchListener onTouchListener) {
         this.onTouchListener = onTouchListener;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if(isDrawMode) {
+        if (isDrawMode) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     touchMode = true;
                     touchDown(event);
-                    if(onTouchListener != null) onTouchListener.onDown();
+                    if (onTouchListener != null) {
+                        onTouchListener.onDown();
+                    }
                     break;
                 case MotionEvent.ACTION_MOVE:
                     touchMove(event);
@@ -135,8 +141,14 @@ import java.util.List;
                     touchMode = false;
                     savePathList.add(new Path(mPath));
                     paintList.add(new Paint(mPaint));
-                    if(onTouchListener != null) onTouchListener.onUp();
-                    if(onLineChangeListener != null) onLineChangeListener.onDrawLine(savePathList.size());
+                    if (onTouchListener != null) {
+                        onTouchListener.onUp();
+                    }
+                    if (onLineChangeListener != null) {
+                        onLineChangeListener.onDrawLine(savePathList.size());
+                    }
+                    break;
+                default:
                     break;
             }
             invalidate();
@@ -190,12 +202,14 @@ import java.util.List;
         super.onDraw(canvas);
 
         //绘制之前的线条
-        for (int x=0; x<savePathList.size(); x++){
+        for (int x = 0; x < savePathList.size(); x++) {
             Path path = savePathList.get(x);
             Paint paint = paintList.get(x);
             canvas.drawPath(path, paint);
         }
         //绘制刚画的线条
-        if(touchMode) canvas.drawPath(mPath, mPaint);
+        if (touchMode) {
+            canvas.drawPath(mPath, mPaint);
+        }
     }
 }

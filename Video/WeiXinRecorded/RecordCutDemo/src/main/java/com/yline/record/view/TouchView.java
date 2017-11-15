@@ -1,4 +1,4 @@
-package com.yline.record;
+package com.yline.record.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -11,7 +11,6 @@ import android.view.ViewGroup;
  * 手势控制旋转放大缩小View
  */
 public class TouchView extends View {
-
     private float downX;
     private float downY;
     private float firstX;
@@ -54,7 +53,7 @@ public class TouchView extends View {
     /**
      * 设置边界X
      */
-    public void setLimitsX(int minX, int maxX){
+    public void setLimitsX(int minX, int maxX) {
         this.minX = minX;
         this.maxX = maxX;
     }
@@ -62,7 +61,7 @@ public class TouchView extends View {
     /**
      * 设置边界Y
      */
-    public void setLimitsY(int minY, int maxY){
+    public void setLimitsY(int minY, int maxY) {
         this.minY = minY;
         this.maxY = maxY;
     }
@@ -72,30 +71,33 @@ public class TouchView extends View {
      */
     public interface OnLimitsListener {
         void OnOutLimits(float x, float y);
+
         void OnInnerLimits(float x, float y);
     }
 
-    public void setOnLimitsListener(OnLimitsListener onLimitsListener){
+    public void setOnLimitsListener(OnLimitsListener onLimitsListener) {
         this.onLimitsListener = onLimitsListener;
     }
 
     /**
      * 手指触摸事件
      */
-    public interface OnTouchListener{
+    public interface OnTouchListener {
         void onDown(TouchView view, MotionEvent event);
+
         void onMove(TouchView view, MotionEvent event);
+
         void onUp(TouchView view, MotionEvent event);
     }
 
-    public void setOnTouchListener(OnTouchListener listener){
+    public void setOnTouchListener(OnTouchListener listener) {
         this.onTouchListener = listener;
     }
 
     /**
      * 是否超出范围
      */
-    public boolean isOutLimits(){
+    public boolean isOutLimits() {
         return isOutLimits;
     }
 
@@ -108,12 +110,12 @@ public class TouchView extends View {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
 
-        if(minWidth == 0){
-            whRatio = getWidth()*1f/getHeight();
-            minWidth = getWidth()/2;
+        if (minWidth == 0) {
+            whRatio = getWidth() * 1f / getHeight();
+            minWidth = getWidth() / 2;
             ViewGroup parent = (ViewGroup) getParent();
             maxWidth = parent.getWidth();
-            minHeight = getHeight()/2;
+            minHeight = getHeight() / 2;
             maxHeight = (int) (maxWidth / whRatio);
         }
     }
@@ -126,19 +128,21 @@ public class TouchView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if(onTouchListener != null) onTouchListener.onDown(this, event);
+                if (onTouchListener != null) {
+                    onTouchListener.onDown(this, event);
+                }
                 firstX = downX = event.getRawX();
                 firstY = downY = event.getRawY();
-                coreX = getWidth()/2+getX();//view的中心点坐标
-                coreY = getHeight()/2+getY();
+                coreX = getWidth() / 2 + getX();//view的中心点坐标
+                coreY = getHeight() / 2 + getY();
                 break;
             case MotionEvent.ACTION_MOVE:
                 int pointerCount = event.getPointerCount();
-                if(pointerCount >= 2){//双点触摸事件
+                if (pointerCount >= 2) {//双点触摸事件
                     doubleMove = true;
                     float distance = getSlideDis(event);
                     float spaceRotation = getRotation(event);
-                    if(tempView == null){//创建镜像
+                    if (tempView == null) {//创建镜像
                         tempView = new View(getContext());
                         tempView.setX(getX());
                         tempView.setY(getY());
@@ -148,17 +152,17 @@ public class TouchView extends View {
                         ViewGroup parent = (ViewGroup) getParent();
                         parent.addView(tempView);
                         setAlpha(0);
-                    }else{
+                    } else {
                         float slide = lastDis - distance;
                         ViewGroup.LayoutParams layoutParams = getLayoutParams();
                         layoutParams.width = (int) (layoutParams.width - slide);
-                        float slide2 = slide/whRatio;
+                        float slide2 = slide / whRatio;
                         layoutParams.height = (int) (layoutParams.height - slide2);
 
-                        if(layoutParams.width > maxWidth || layoutParams.height > maxHeight){
+                        if (layoutParams.width > maxWidth || layoutParams.height > maxHeight) {
                             layoutParams.width = maxWidth;
                             layoutParams.height = maxHeight;
-                        }else if(layoutParams.width < minWidth || layoutParams.height < minHeight){
+                        } else if (layoutParams.width < minWidth || layoutParams.height < minHeight) {
                             layoutParams.width = minWidth;
                             layoutParams.height = minHeight;
                         }
@@ -176,23 +180,29 @@ public class TouchView extends View {
                         layoutParams1.width = layoutParams.width;
                         layoutParams1.height = layoutParams.height;
                         tempView.setLayoutParams(layoutParams1);
-                        if(lastRota != 0){
-                            float f = lastRota-spaceRotation;
-                            tempView.setRotation(tempView.getRotation()-f);
+                        if (lastRota != 0) {
+                            float f = lastRota - spaceRotation;
+                            tempView.setRotation(tempView.getRotation() - f);
                         }
                     }
                     lastRota = spaceRotation;
                     lastDis = distance;
-                }else if(!doubleMove && pointerCount == 1){//单点移动事件
-                    if(onTouchListener != null) onTouchListener.onMove(this, event);
+                } else if (!doubleMove && pointerCount == 1) {//单点移动事件
+                    if (onTouchListener != null) {
+                        onTouchListener.onMove(this, event);
+                    }
                     float moveX = event.getRawX();
                     float moveY = event.getRawY();
-                    if(moveX != -1 && moveY != -1){
-                        if(moveX<=minX || moveX>=maxX || moveY<=minY || moveY>=maxY){
-                            if(onLimitsListener != null) onLimitsListener.OnOutLimits(moveX, moveY);
+                    if (moveX != -1 && moveY != -1) {
+                        if (moveX <= minX || moveX >= maxX || moveY <= minY || moveY >= maxY) {
+                            if (onLimitsListener != null) {
+                                onLimitsListener.OnOutLimits(moveX, moveY);
+                            }
                             isOutLimits = true;
-                        }else if(moveX>minX && moveX<maxX && moveY>minY && moveY<maxY){
-                            if(onLimitsListener != null) onLimitsListener.OnInnerLimits(moveX, moveY);
+                        } else if (moveX > minX && moveX < maxX && moveY > minY && moveY < maxY) {
+                            if (onLimitsListener != null) {
+                                onLimitsListener.OnInnerLimits(moveX, moveY);
+                            }
                             isOutLimits = false;
                         }
                     }
@@ -207,7 +217,7 @@ public class TouchView extends View {
             case MotionEvent.ACTION_POINTER_UP:
                 break;
             case MotionEvent.ACTION_UP:
-                if(tempView != null){//镜像赋值回去
+                if (tempView != null) {//镜像赋值回去
                     setAlpha(1);
                     setRotation(tempView.getRotation());
                     ViewGroup parent = (ViewGroup) getParent();
@@ -218,13 +228,19 @@ public class TouchView extends View {
                 doubleMove = false;
                 lastDis = 0;
 
-                if(onTouchListener != null) onTouchListener.onUp(this, event);
+                if (onTouchListener != null) {
+                    onTouchListener.onUp(this, event);
+                }
 
                 float upX = event.getRawX();
                 float upY = event.getRawY();
                 if (Math.abs(upX - firstX) < 10 && Math.abs(upY - firstY) < 10 && clickable) {
-                    if (listener != null) listener.onClick(this);//单击事件
+                    if (listener != null) {
+                        listener.onClick(this);
+                    }//单击事件
                 }
+                break;
+            default:
                 break;
         }
         return true;

@@ -1,4 +1,4 @@
-package com.yline.record;
+package com.yline.record.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -12,6 +12,8 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.yline.record.R;
 
 /**
  * Created by zhaoshuang on 17/8/22.

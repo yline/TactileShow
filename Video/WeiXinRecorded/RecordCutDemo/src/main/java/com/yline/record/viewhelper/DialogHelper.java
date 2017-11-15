@@ -11,8 +11,6 @@ import android.widget.TextView;
 
 import com.yline.record.R;
 
-import static com.yline.record.R.id.pb_loading;
-
 /**
  * Dialog 弹框
  *
@@ -35,11 +33,11 @@ public class DialogHelper {
         builder.setView(view);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            ProgressBar loadingProgressBar = view.findViewById(pb_loading);
+            ProgressBar loadingProgressBar = view.findViewById(R.id.dialog_loading);
             loadingProgressBar.setIndeterminateTintList(ContextCompat.getColorStateList(context, R.color.dialog_pro_color));
         }
 
-        mHintTextView = view.findViewById(R.id.tv_hint);
+        mHintTextView = view.findViewById(R.id.dialog_tv_hint);
         mHintTextView.setText("视频编译中");
 
         mProgressDialog = builder.create();

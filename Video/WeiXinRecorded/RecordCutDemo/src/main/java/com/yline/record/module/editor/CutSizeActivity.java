@@ -1,6 +1,5 @@
-package com.yline.record;
+package com.yline.record.module.editor;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -14,17 +13,22 @@ import android.widget.TextView;
 
 import com.video.lib.manager.MediaRecorderBase;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
+import com.yline.base.BaseActivity;
+import com.yline.record.view.CutView;
+import com.yline.record.IApplication;
+import com.yline.record.view.MyVideoView;
+import com.yline.record.R;
 import com.yline.record.viewhelper.DialogHelper;
 
 import java.io.File;
 import java.util.Locale;
 
 /**
- *
+ * 剪切宽高
  * @author yline 2017/11/14 -- 11:56
  * @version 1.0.0
  */
-public class CutSizeActivity extends Activity implements View.OnClickListener {
+public class CutSizeActivity extends BaseActivity implements View.OnClickListener {
 
     private MyVideoView vv_play;
     private String path;

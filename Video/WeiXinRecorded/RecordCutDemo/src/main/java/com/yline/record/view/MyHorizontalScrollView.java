@@ -1,4 +1,4 @@
-package com.yline.record;
+package com.yline.record.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -1,6 +1,5 @@
-package com.yline.record;
+package com.yline.record.module.editor;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -26,13 +25,18 @@ import android.widget.Toast;
 
 import com.video.lib.manager.MediaRecorderBase;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
+import com.yline.base.BaseActivity;
+import com.yline.record.IApplication;
+import com.yline.record.R;
+import com.yline.record.view.ThumbnailView;
 import com.yline.record.viewhelper.DialogHelper;
 
 /**
- * @author yline 2017/11/14 -- 11:58
+ * 剪切时长
+ * @author yline 2017/11/14 -- 15:20
  * @version 1.0.0
  */
-public class CutTimeActivity extends Activity {
+public class CutTimeActivity extends BaseActivity {
 
     private MediaPlayer mMediaPlayer;
     private String path;

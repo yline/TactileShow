@@ -1,8 +1,7 @@
 package com.yline.record;
 
-import android.app.Application;
-
 import com.video.lib.FfmpegManager;
+import com.yline.application.BaseApplication;
 
 import java.io.File;
 
@@ -11,11 +10,12 @@ import java.io.File;
  * @author yline 2017/11/14 -- 11:29
  * @version 1.0.0
  */
-public class IApplication extends Application {
+public class IApplication extends BaseApplication {
     public static String VIDEO_PATH = "/sdcard/WeiXinRecordedDemo/";
 
     @Override
     public void onCreate() {
+        super.onCreate();
 
         VIDEO_PATH += String.valueOf(System.currentTimeMillis());
         File file = new File(VIDEO_PATH);

@@ -1,9 +1,8 @@
-package com.yline.record;
+package com.yline.record.module.editor;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -33,6 +32,13 @@ import android.widget.Toast;
 
 import com.video.lib.manager.MediaRecorderBase;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
+import com.yline.base.BaseActivity;
+import com.yline.record.IApplication;
+import com.yline.record.view.MyVideoView;
+import com.yline.record.R;
+import com.yline.record.view.TouchView;
+import com.yline.record.view.TuyaView;
+import com.yline.record.module.player.VideoPlayActivity;
 import com.yline.record.viewhelper.DialogHelper;
 
 import java.io.BufferedOutputStream;
@@ -42,11 +48,11 @@ import java.io.IOException;
 import java.util.Locale;
 
 /**
- * Created by zhaoshuang on 17/2/21.
- * 视频编辑界面
+ * 视频编辑
+ * @author yline 2017/11/14 -- 15:20
+ * @version 1.0.0
  */
-
-public class EditVideoActivity extends Activity implements View.OnClickListener {
+public class EditVideoActivity extends BaseActivity implements View.OnClickListener {
 
     private MyVideoView vv_play;
     private LinearLayout ll_color;
@@ -693,9 +699,7 @@ public class EditVideoActivity extends Activity implements View.OnClickListener 
             protected void onPostExecute(String result) {
                 mDialogHelper.dismiss();
                 if (!TextUtils.isEmpty(result)) {
-                    Intent intent = new Intent(EditVideoActivity.this, VideoPlayActivity.class);
-                    intent.putExtra("path", result);
-                    startActivity(intent);
+                    VideoPlayActivity.launcher(EditVideoActivity.this, result);
                 } else {
                     Toast.makeText(getApplicationContext(), "视频编辑失败", Toast.LENGTH_SHORT).show();
                 }

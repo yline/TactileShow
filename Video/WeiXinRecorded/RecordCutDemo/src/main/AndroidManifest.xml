@@ -21,10 +21,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.yline.record.EditVideoActivity"
+            android:name="com.yline.record.module.editor.EditVideoActivity"
             android:windowSoftInputMode="adjustResize|adjustPan" />
-        <activity android:name="com.yline.record.VideoPlayActivity" />
-        <activity android:name="com.yline.record.CutSizeActivity" />
-        <activity android:name="com.yline.record.CutTimeActivity" />
+        <activity android:name="com.yline.record.module.player.VideoPlayActivity" />
+        <activity android:name="com.yline.record.module.editor.CutSizeActivity" />
+        <activity android:name="com.yline.record.module.editor.CutTimeActivity" />
     </application>
 </manifest>

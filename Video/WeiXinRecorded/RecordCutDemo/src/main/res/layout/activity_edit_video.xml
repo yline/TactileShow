@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#000">
 
-    <com.yline.record.MyVideoView
+    <com.yline.record.view.MyVideoView
         android:id="@+id/vv_play"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true">
-        <com.yline.record.TuyaView
+        <com.yline.record.view.TuyaView
             android:id="@+id/tv_video"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

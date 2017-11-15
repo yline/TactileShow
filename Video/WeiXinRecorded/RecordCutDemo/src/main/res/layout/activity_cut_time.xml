@@ -71,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"/>
-        <com.yline.record.ThumbnailView
+        <com.yline.record.view.ThumbnailView
             android:id="@+id/thumbnailView"
             android:layout_width="match_parent"
             android:layout_height="50dp" />

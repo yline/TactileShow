@@ -1,6 +1,5 @@
 package com.yline.record.module.main;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -8,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -20,12 +20,14 @@ import com.video.lib.manager.MediaRecorderNativeCut;
 import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
-import com.yline.record.EditVideoActivity;
-import com.yline.record.FocusSurfaceView;
+import com.yline.base.BaseActivity;
+import com.yline.record.module.editor.EditVideoActivity;
+import com.yline.record.view.FocusSurfaceView;
 import com.yline.record.IApplication;
-import com.yline.record.MyVideoView;
+import com.yline.record.view.MyVideoView;
 import com.yline.record.R;
-import com.yline.record.RecordedButton;
+import com.yline.record.view.RecordedButton;
+import com.yline.record.view.AbstractViewHolder;
 import com.yline.record.viewhelper.DialogHelper;
 
 import java.io.File;
@@ -36,22 +38,20 @@ import java.util.List;
 /**
  * 仿新版微信录制视频
  * 基于ffmpeg视频编译
- * 使用的是免费第三方VCamera
- * Created by zhaoshuang on 17/2/8.
+ *
+ * @author yline 2017/11/14 -- 14:06
+ * @version 1.0.0
  */
-public class MainActivity extends Activity implements View.OnClickListener {
-
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final int REQUEST_KEY = 100;
     private static final int HANDLER_RECORD = 200;
     private static final int HANDLER_EDIT_VIDEO = 201;
 
     private MediaRecorderNativeCut mMediaRecorder;
     private MediaObject mMediaObject;
-    private FocusSurfaceView sv_ffmpeg;
     private RecordedButton rb_start;
     private RelativeLayout rl_bottom;
     private RelativeLayout rl_bottom2;
-    private ImageView iv_back;
     private TextView tv_hint;
     private MyVideoView vv_play;
 
@@ -64,6 +64,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     // View
     private DialogHelper mDialogHelper;
+    private AbstractViewHolder mViewHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,25 +74,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         initView();
 
-        sv_ffmpeg = (FocusSurfaceView) findViewById(R.id.sv_ffmpeg);
-        rb_start = (RecordedButton) findViewById(R.id.rb_start);
         vv_play = (MyVideoView) findViewById(R.id.vv_play);
-        ImageView iv_finish = (ImageView) findViewById(R.id.iv_finish);
-        iv_back = (ImageView) findViewById(R.id.iv_back);
+
         tv_hint = (TextView) findViewById(R.id.tv_hint);
         rl_bottom = (RelativeLayout) findViewById(R.id.rl_bottom);
         rl_bottom2 = (RelativeLayout) findViewById(R.id.rl_bottom2);
-        ImageView iv_next = (ImageView) findViewById(R.id.iv_next);
-        ImageView iv_close = (ImageView) findViewById(R.id.iv_close);
+
         iv_change_flash = (ImageView) findViewById(R.id.iv_change_flash);
-        ImageView iv_change_camera = (ImageView) findViewById(R.id.iv_change_camera);
 
-        initMediaRecorder();
-
-        sv_ffmpeg.setTouchFocus(mMediaRecorder);
-
+        rb_start = (RecordedButton) findViewById(R.id.rb_start);
         rb_start.setMax(maxDuration);
-
         rb_start.setOnGestureListener(new RecordedButton.OnGestureListener() {
             @Override
             public void onLongClick() {
@@ -123,20 +115,94 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         });
 
-        iv_back.setOnClickListener(this);
-        iv_finish.setOnClickListener(this);
-        iv_next.setOnClickListener(this);
-        iv_close.setOnClickListener(this);
         iv_change_flash.setOnClickListener(this);
-        iv_change_camera.setOnClickListener(this);
     }
 
-    private void initView(){
+    private void initView() {
+        mViewHolder = new AbstractViewHolder(this);
         mDialogHelper = new DialogHelper(this);
+
+        FocusSurfaceView surfaceView = findViewById(R.id.main_focus_surface_view);
+
+        initMediaRecorder(surfaceView.getHolder());
+        surfaceView.setTouchFocus(mMediaRecorder);
+
+        initViewClick();
+    }
+
+    /**
+     * 初始化录制对象
+     */
+    private void initMediaRecorder(SurfaceHolder surfaceHolder) {
+        mMediaRecorder = new MediaRecorderNativeCut(surfaceHolder);
+        String key = String.valueOf(System.currentTimeMillis());
+        //设置缓存文件夹
+        mMediaObject = mMediaRecorder.setOutputDirectory(FfmpegManager.getCachePath(), key);
+        //准备
+        mMediaRecorder.prepare();
+        //滤波器相关
+        UtilityAdapter.freeFilterParser();
+        UtilityAdapter.initFilterParser();
+    }
+
+    private void initViewClick() {
+        mViewHolder.setOnClickListener(R.id.main_iv_finish, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                videoFinish();
+            }
+        });
+
+        mViewHolder.setOnClickListener(R.id.main_iv_next, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rb_start.setDeleteMode(false);
+                Intent intent = new Intent(MainActivity.this, EditVideoActivity.class);
+                intent.putExtra("path", IApplication.VIDEO_PATH + "/finish.mp4");
+                startActivityForResult(intent, REQUEST_KEY);
+            }
+        });
+
+        mViewHolder.setOnClickListener(R.id.main_iv_close, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initMediaRecorderState();
+            }
+        });
+
+        mViewHolder.setOnClickListener(R.id.main_iv_change_camera, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMediaRecorder.switchCamera();
+
+                iv_change_flash.setImageResource(R.mipmap.video_flash_close);
+            }
+        });
+
+        mViewHolder.setOnClickListener(R.id.main_iv_back, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImageView backImageView = mViewHolder.get(R.id.main_iv_back);
+
+                if (rb_start.isDeleteMode()) {//判断是否要删除视频段落
+                    MediaPartModel lastPart = mMediaObject.getPart(mMediaObject.getMediaParts().size() - 1);
+                    mMediaObject.removePart(lastPart, true);
+                    rb_start.setProgress(mMediaObject.getDuration());
+                    rb_start.deleteSplit();
+                    if (cameraTypeList.size() > 0) {
+                        cameraTypeList.remove(cameraTypeList.size() - 1);
+                    }
+                    changeButton(mMediaObject.getMediaParts().size() > 0);
+                    backImageView.setImageResource(R.mipmap.video_delete);
+                } else if (mMediaObject.getMediaParts().size() > 0) {
+                    rb_start.setDeleteMode(true);
+                    backImageView.setImageResource(R.mipmap.video_delete_click);
+                }
+            }
+        });
     }
 
     private void changeButton(boolean flag) {
-
         if (flag) {
             tv_hint.setVisibility(View.VISIBLE);
             rl_bottom.setVisibility(View.VISIBLE);
@@ -150,7 +216,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
      * 初始化视频拍摄状态
      */
     private void initMediaRecorderState() {
-
         vv_play.setVisibility(View.GONE);
         vv_play.pause();
 
@@ -282,8 +347,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
      *
      * @param fileName 保留的文件名称
      */
-    public static void deleteDirRoom(File dir, String fileName) {
-
+    private static void deleteDirRoom(File dir, String fileName) {
         if (dir.exists() && dir.isDirectory()) {
             File[] files = dir.listFiles();
             for (File f : files) {
@@ -297,9 +361,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     public void mp4ToTs(String path, String output) {
-
         //./ffmpeg -i 0.mp4 -c copy -bsf:v h264_mp4toannexb -f mpegts ts0.ts
-
         StringBuilder sb = new StringBuilder("ffmpeg");
         sb.append(" -i");
         sb.append(" " + path);
@@ -315,7 +377,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     public boolean tsToMp4(List<String> path, String output) {
-
         //ffmpeg -i "concat:ts0.ts|ts1.ts|ts2.ts|ts3.ts" -c copy -bsf:a aac_adtstoasc out2.mp4
 
         StringBuilder sb = new StringBuilder("ffmpeg");
@@ -336,21 +397,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         int i = UtilityAdapter.FFmpegRun("", sb.toString());
         return i == 0;
-    }
-
-    /**
-     * 初始化录制对象
-     */
-    private void initMediaRecorder() {
-        mMediaRecorder = new MediaRecorderNativeCut(sv_ffmpeg.getHolder());
-        String key = String.valueOf(System.currentTimeMillis());
-        //设置缓存文件夹
-        mMediaObject = mMediaRecorder.setOutputDirectory(FfmpegManager.getCachePath(), key);
-        //准备
-        mMediaRecorder.prepare();
-        //滤波器相关
-        UtilityAdapter.freeFilterParser();
-        UtilityAdapter.initFilterParser();
     }
 
     @Override
@@ -395,38 +441,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.iv_back:
-                if (rb_start.isDeleteMode()) {//判断是否要删除视频段落
-                    MediaPartModel lastPart = mMediaObject.getPart(mMediaObject.getMediaParts().size() - 1);
-                    mMediaObject.removePart(lastPart, true);
-                    rb_start.setProgress(mMediaObject.getDuration());
-                    rb_start.deleteSplit();
-                    if (cameraTypeList.size() > 0) {
-                        cameraTypeList.remove(cameraTypeList.size() - 1);
-                    }
-                    changeButton(mMediaObject.getMediaParts().size() > 0);
-                    iv_back.setImageResource(R.mipmap.video_delete);
-                } else if (mMediaObject.getMediaParts().size() > 0) {
-                    rb_start.setDeleteMode(true);
-                    iv_back.setImageResource(R.mipmap.video_delete_click);
-                }
-                break;
-            case R.id.iv_finish:
-                videoFinish();
-                break;
-            case R.id.iv_next:
-                rb_start.setDeleteMode(false);
-                Intent intent = new Intent(MainActivity.this, EditVideoActivity.class);
-                intent.putExtra("path", IApplication.VIDEO_PATH + "/finish.mp4");
-                startActivityForResult(intent, REQUEST_KEY);
-                break;
-            case R.id.iv_close:
-                initMediaRecorderState();
-                break;
-            case R.id.iv_change_camera:
-                mMediaRecorder.switchCamera();
-                iv_change_flash.setImageResource(R.mipmap.video_flash_close);
-                break;
             case R.id.iv_change_flash:
                 if (mMediaRecorder.changeFlash(this)) {
                     iv_change_flash.setImageResource(R.mipmap.video_flash_open);
