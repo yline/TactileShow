@@ -89,10 +89,24 @@ public class MediaPlayerManager {
         }
     }
 
-    public void prepareAsync(Context context, Uri uri) throws IOException {
+    /**
+     * 准备加载视频
+     *
+     * @param context 环境变量
+     * @param uri     视频路径
+     */
+    public void prepareAsync(Context context, Uri uri) {
         if (null != mMediaPlayer && null != uri) {
-            mMediaPlayer.setDataSource(context, uri);
-            mMediaPlayer.prepareAsync();
+            try {
+                mMediaPlayer.setDataSource(context, uri);
+                mMediaPlayer.prepareAsync();
+            } catch (IOException e) {
+                e.printStackTrace();
+                // we don't set the target state here either, but preserve the target state that was there before.
+                if (null != mOnErrorListener) {
+                    mOnErrorListener.onError(mMediaPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, MediaPlayer.MEDIA_ERROR_IO);
+                }
+            }
         }
     }
 
@@ -154,14 +168,13 @@ public class MediaPlayerManager {
         return false;
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return (null == mMediaPlayer);
     }
 
-    public MediaPlayer getMediaPlayer(){
-        return mMediaPlayer;
-    }
-
+    /**
+     * 彻底释放，MediaPlayer
+     */
     public void release() {
         if (null != mMediaPlayer) {
             mMediaPlayer.release();
