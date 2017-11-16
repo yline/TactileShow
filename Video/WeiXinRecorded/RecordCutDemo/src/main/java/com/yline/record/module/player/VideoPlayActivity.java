@@ -10,7 +10,7 @@ import android.view.WindowManager;
 import com.video.lib.manager.MediaRecorderBase;
 import com.yline.base.BaseActivity;
 import com.yline.record.R;
-import com.yline.record.view.MyVideoView;
+import com.yline.record.view.MediaTextureView;
 import com.yline.utils.LogUtil;
 
 /**
@@ -22,7 +22,7 @@ import com.yline.utils.LogUtil;
 public class VideoPlayActivity extends BaseActivity {
     private static final String KEY_VIDEO_PATH = "path";
 
-    private MyVideoView vv_play;
+    private MediaTextureView vv_play;
 
     public static void launcher(Context context, String path) {
         if (null != context) {

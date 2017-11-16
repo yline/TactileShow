@@ -17,7 +17,7 @@ import com.yline.base.BaseActivity;
 import com.yline.record.IApplication;
 import com.yline.record.R;
 import com.yline.record.view.CutView;
-import com.yline.record.view.MyVideoView;
+import com.yline.record.view.MediaTextureView;
 import com.yline.record.viewhelper.DialogHelper;
 
 import java.io.File;
@@ -30,7 +30,7 @@ import java.util.Locale;
  */
 public class CutSizeActivity extends BaseActivity implements View.OnClickListener {
 
-    private MyVideoView vv_play;
+    private MediaTextureView vv_play;
     private String path;
     private CutView cv_video;
     private int windowWidth;
@@ -93,7 +93,7 @@ public class CutSizeActivity extends BaseActivity implements View.OnClickListene
 
     private void initUI() {
 
-        vv_play = (MyVideoView) findViewById(R.id.vv_play);
+        vv_play = (MediaTextureView) findViewById(R.id.vv_play);
         cv_video = (CutView) findViewById(R.id.cv_video);
         RelativeLayout rl_close = (RelativeLayout) findViewById(R.id.rl_close);
         TextView rl_finish = (TextView) findViewById(R.id.rl_finish);

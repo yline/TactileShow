@@ -10,24 +10,27 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.TextureView;
 
-import com.yline.record.module.player.MediaPlayerManager;
-
-public class MyVideoView extends TextureView {
+/**
+ * 展示 视频的封装类
+ *
+ * @author yline 2017/11/16 -- 11:28
+ * @version 1.0.0
+ */
+public class MediaTextureView extends TextureView {
     private Uri mUri;
-
     private MediaPlayerManager mMediaPlayerManager;
 
-    public MyVideoView(Context context, AttributeSet attrs, int defStyle) {
+    public MediaTextureView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initVideoView();
     }
 
-    public MyVideoView(Context context) {
+    public MediaTextureView(Context context) {
         super(context);
         initVideoView();
     }
 
-    public MyVideoView(Context context, AttributeSet attrs) {
+    public MediaTextureView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initVideoView();
     }
@@ -74,7 +77,6 @@ public class MyVideoView extends TextureView {
     }
 
     public void start() {
-        //可用状态{Prepared, Started, Paused, PlaybackCompleted}
         boolean isStarted = mMediaPlayerManager.start();
         if (!isStarted) {
             mMediaPlayerManager.prepareAsync(getContext(), mUri);
@@ -82,7 +84,6 @@ public class MyVideoView extends TextureView {
     }
 
     public void pause() {
-        //可用状态{Started, Paused}
         boolean isPaused = mMediaPlayerManager.pause();
         if (!isPaused) {
             mMediaPlayerManager.prepareAsync(getContext(), mUri);
@@ -96,41 +97,6 @@ public class MyVideoView extends TextureView {
         }
     }
 
-    public void setVolume(float volume) {
-        //可用状态{Idle, Initialized, Stopped, Prepared, Started, Paused, PlaybackCompleted}
-        mMediaPlayerManager.setVolume(volume);
-    }
-
-    public void setLooping(boolean looping) {
-        //可用状态{Idle, Initialized, Stopped, Prepared, Started, Paused, PlaybackCompleted}
-        mMediaPlayerManager.setLooping(looping);
-    }
-
-    public void seekTo(int msec) {
-        // 可用状态{Prepared, Started, Paused, PlaybackCompleted}
-        mMediaPlayerManager.seekTo(msec);
-    }
-
-    /**
-     * 获取当前播放位置
-     */
-    public int getCurrentPosition() {
-        //可用状态{Idle, Initialized, Prepared, Started, Paused, Stopped, PlaybackCompleted}
-        return mMediaPlayerManager.getCurrentPosition();
-    }
-
-    private boolean isPlaying() {
-        // 可用状态{Idle, Initialized, Prepared, Started, Paused, Stopped, PlaybackCompleted}
-        return mMediaPlayerManager.isPlaying();
-    }
-
-    /**
-     * 是否可用
-     */
-    public boolean isPrepared() {
-        return !mMediaPlayerManager.isEmpty();
-    }
-
     private static final int HANDLER_MESSAGE_PARSE = 0;
     private static final int HANDLER_MESSAGE_LOOP = 1;
 
@@ -142,8 +108,8 @@ public class MyVideoView extends TextureView {
                     pause();
                     break;
                 case HANDLER_MESSAGE_LOOP:
-                    if (isPlaying()) {
-                        seekTo(msg.arg1);
+                    if (mMediaPlayerManager.isPlaying()) {
+                        mMediaPlayerManager.seekTo(msg.arg1);
                         sendMessageDelayed(mVideoHandler.obtainMessage(HANDLER_MESSAGE_LOOP, msg.arg1, msg.arg2), msg.arg2);
                     }
                     break;
@@ -182,14 +148,24 @@ public class MyVideoView extends TextureView {
      */
     public void loopDelayed(int startTime, int endTime) {
         int delayMillis = endTime - startTime;
-        seekTo(startTime);
-        if (!isPlaying()) {
+        mMediaPlayerManager.seekTo(startTime);
+        if (!mMediaPlayerManager.isPlaying()) {
             start();
         }
         if (mVideoHandler.hasMessages(HANDLER_MESSAGE_LOOP)) {
             mVideoHandler.removeMessages(HANDLER_MESSAGE_LOOP);
         }
-        mVideoHandler.sendMessageDelayed(mVideoHandler.obtainMessage(HANDLER_MESSAGE_LOOP, getCurrentPosition(), delayMillis), delayMillis);
+        mVideoHandler.sendMessageDelayed(mVideoHandler.obtainMessage(HANDLER_MESSAGE_LOOP, mMediaPlayerManager.getCurrentPosition(), delayMillis), delayMillis);
+    }
+
+    /* -------------------------------- 只是向外提供方法 -------------------------- */
+
+    public void setLooping(boolean looping) {
+        mMediaPlayerManager.setLooping(looping);
+    }
+
+    public void setVolume(float volume) {
+        mMediaPlayerManager.setVolume(volume);
     }
 
     public void setOnCompletionListener(MediaPlayer.OnCompletionListener onCompletionListener) {

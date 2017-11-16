@@ -1,4 +1,4 @@
-package com.yline.record.module.player;
+package com.yline.record.view;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -110,6 +110,10 @@ public class MediaPlayerManager {
         }
     }
 
+    /**
+     * 可用状态{Prepared, Started, Paused, PlaybackCompleted}
+     * @return 是否成功
+     */
     public boolean start() {
         if (null != mMediaPlayer) {
             if (!mMediaPlayer.isPlaying()) {
@@ -120,6 +124,10 @@ public class MediaPlayerManager {
         return false;
     }
 
+    /**
+     * 可用状态{Started, Paused}
+     * @return 是否成功
+     */
     public boolean pause() {
         if (null != mMediaPlayer) {
             mMediaPlayer.pause();
@@ -136,24 +144,40 @@ public class MediaPlayerManager {
         return false;
     }
 
+    /**
+     * 可用状态{Idle, Initialized, Stopped, Prepared, Started, Paused, PlaybackCompleted}
+     * @param volume 设置音量
+     */
     public void setVolume(float volume) {
         if (null != mMediaPlayer) {
             mMediaPlayer.setVolume(volume, volume);
         }
     }
 
+    /**
+     * 可用状态{Idle, Initialized, Stopped, Prepared, Started, Paused, PlaybackCompleted}
+     * @param looping 是否循环
+     */
     public void setLooping(boolean looping) {
         if (null != mMediaPlayer) {
             mMediaPlayer.setLooping(looping);
         }
     }
 
+    /**
+     * 可用状态{Prepared, Started, Paused, PlaybackCompleted}
+     * @param msec 进度
+     */
     public void seekTo(int msec) {
         if (null != mMediaPlayer) {
             mMediaPlayer.seekTo(Math.max(0, msec));
         }
     }
 
+    /**
+     * 可用状态{Idle, Initialized, Prepared, Started, Paused, Stopped, PlaybackCompleted}
+     * @return 当前播放位置
+     */
     public int getCurrentPosition() {
         if (null != mMediaPlayer) {
             return mMediaPlayer.getCurrentPosition();
@@ -161,11 +185,13 @@ public class MediaPlayerManager {
         return 0;
     }
 
+    /**
+     * 可用状态{Idle, Initialized, Prepared, Started, Paused, Stopped, PlaybackCompleted}
+     *
+     * @return 是否可播放
+     */
     public boolean isPlaying() {
-        if (null != mMediaPlayer) {
-            return mMediaPlayer.isPlaying();
-        }
-        return false;
+        return (null != mMediaPlayer) && mMediaPlayer.isPlaying();
     }
 
     public boolean isEmpty() {

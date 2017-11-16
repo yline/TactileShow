@@ -24,7 +24,7 @@ import com.yline.base.BaseActivity;
 import com.yline.record.module.editor.EditVideoActivity;
 import com.yline.record.view.FocusSurfaceView;
 import com.yline.record.IApplication;
-import com.yline.record.view.MyVideoView;
+import com.yline.record.view.MediaTextureView;
 import com.yline.record.R;
 import com.yline.record.view.RecordedButton;
 import com.yline.record.view.AbstractViewHolder;
@@ -53,7 +53,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private RelativeLayout rl_bottom;
     private RelativeLayout rl_bottom2;
     private TextView tv_hint;
-    private MyVideoView vv_play;
+    private MediaTextureView vv_play;
 
     //最大录制时间
     private int maxDuration = 8000;
@@ -74,7 +74,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         initView();
 
-        vv_play = (MyVideoView) findViewById(R.id.vv_play);
+        vv_play = (MediaTextureView) findViewById(R.id.vv_play);
 
         tv_hint = (TextView) findViewById(R.id.tv_hint);
         rl_bottom = (RelativeLayout) findViewById(R.id.rl_bottom);
@@ -331,10 +331,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                             vv_play.start();
                         }
                     });
-                    if (vv_play.isPrepared()) {
-                        vv_play.setLooping(true);
-                        vv_play.start();
-                    }
+
+                    vv_play.setLooping(true);
+                    vv_play.start();
                 } else {
                     Toast.makeText(getApplicationContext(), "视频合成失败", Toast.LENGTH_SHORT).show();
                 }

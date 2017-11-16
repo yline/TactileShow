@@ -34,7 +34,7 @@ import com.video.lib.manager.MediaRecorderBase;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
 import com.yline.base.BaseActivity;
 import com.yline.record.IApplication;
-import com.yline.record.view.MyVideoView;
+import com.yline.record.view.MediaTextureView;
 import com.yline.record.R;
 import com.yline.record.view.TouchView;
 import com.yline.record.view.TuyaView;
@@ -54,7 +54,7 @@ import java.util.Locale;
  */
 public class EditVideoActivity extends BaseActivity implements View.OnClickListener {
 
-    private MyVideoView vv_play;
+    private MediaTextureView vv_play;
     private LinearLayout ll_color;
 
     private int[] drawableBg = new int[]{R.drawable.color1, R.drawable.color2, R.drawable.color3, R.drawable.color4, R.drawable.color5};
@@ -158,7 +158,7 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
 
     private void initUI() {
 
-        vv_play = (MyVideoView) findViewById(R.id.vv_play);
+        vv_play = (MediaTextureView) findViewById(R.id.vv_play);
         RelativeLayout rv_pen = (RelativeLayout) findViewById(R.id.rl_pen);
         RelativeLayout rv_icon = (RelativeLayout) findViewById(R.id.rl_icon);
         RelativeLayout rv_text = (RelativeLayout) findViewById(R.id.rl_text);
