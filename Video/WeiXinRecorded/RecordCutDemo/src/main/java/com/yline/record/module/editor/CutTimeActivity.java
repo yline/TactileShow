@@ -62,6 +62,8 @@ public class CutTimeActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cut_time);
 
+        mDialogHelper = new DialogHelper(CutTimeActivity.this);
+
         windowWidth = getWindowManager().getDefaultDisplay().getWidth();
         windowHeight = getWindowManager().getDefaultDisplay().getHeight();
 

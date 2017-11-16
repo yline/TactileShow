@@ -14,10 +14,10 @@ import android.widget.TextView;
 import com.video.lib.manager.MediaRecorderBase;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
 import com.yline.base.BaseActivity;
-import com.yline.record.view.CutView;
 import com.yline.record.IApplication;
-import com.yline.record.view.MyVideoView;
 import com.yline.record.R;
+import com.yline.record.view.CutView;
+import com.yline.record.view.MyVideoView;
 import com.yline.record.viewhelper.DialogHelper;
 
 import java.io.File;
@@ -65,8 +65,8 @@ public class CutSizeActivity extends BaseActivity implements View.OnClickListene
                 vv_play.setLooping(true);
                 vv_play.start();
 
-                videoWidth = vv_play.getVideoWidth();
-                videoHeight = vv_play.getVideoHeight();
+                videoWidth = mp.getVideoWidth();
+                videoHeight = mp.getVideoHeight();
 
                 float ra = videoWidth * 1f / videoHeight;
 

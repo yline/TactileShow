@@ -2,7 +2,6 @@ package com.yline.record.view;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
@@ -36,12 +35,7 @@ public class MyVideoView extends TextureView {
     private static final int STATE_RELEASED = 5;
 
     private int mCurrentState = STATE_IDLE;
-    private int mTargetState = STATE_IDLE;
 
-    private int mVideoWidth;
-    private int mVideoHeight;
-
-    private float mVolumn = -1;
     private int mDuration;
     private Uri mUri;
 
@@ -50,7 +44,6 @@ public class MyVideoView extends TextureView {
     private MediaPlayer.OnPreparedListener mOnPreparedListener;
     private MediaPlayer.OnErrorListener mOnErrorListener;
     private MediaPlayer.OnSeekCompleteListener mOnSeekCompleteListener;
-    private OnPlayStateListener mOnPlayStateListener;
 
     private MediaPlayerManager mMediaPlayerManager;
 
@@ -72,14 +65,7 @@ public class MyVideoView extends TextureView {
     protected void initVideoView() {
         mMediaPlayerManager = new MediaPlayerManager();
 
-        AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
-        mVolumn = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-
-        mVideoWidth = 0;
-        mVideoHeight = 0;
-
         mCurrentState = STATE_IDLE;
-        mTargetState = STATE_IDLE;
 
         //		setFocusable(true);
         //		setFocusableInTouchMode(true);
@@ -91,7 +77,6 @@ public class MyVideoView extends TextureView {
                 mSurfaceHolder = surface;
 
                 if (needReOpen) {
-                    mTargetState = STATE_PREPARED;
                     openVideo(mUri);
                 }
             }
@@ -122,15 +107,8 @@ public class MyVideoView extends TextureView {
 
                     mDuration = mp.getDuration();
 
-                    mVideoWidth = mp.getVideoWidth();
-                    mVideoHeight = mp.getVideoHeight();
-
-                    if (mTargetState == STATE_PREPARED) {
-                        if (mOnPreparedListener != null) {
-                            mOnPreparedListener.onPrepared(mMediaPlayerManager.getMediaPlayer());
-                        }
-                    } else if (mTargetState == STATE_PLAYING) {
-                        start();
+                    if (mOnPreparedListener != null) {
+                        mOnPreparedListener.onPrepared(mp);
                     }
                 }
             }
@@ -166,40 +144,15 @@ public class MyVideoView extends TextureView {
     }
 
     public void setVideoPath(String path) {
-        mTargetState = STATE_PREPARED;
-        openVideo(Uri.parse(path));
-    }
-
-    public int getVideoWidth() {
-        return mVideoWidth;
-    }
-
-    public int getVideoHeight() {
-        return mVideoHeight;
-    }
-
-    public int getDuration() {
-        return mDuration;
-    }
-
-    /**
-     * 重试
-     */
-    private void tryAgain() {
-        mCurrentState = STATE_ERROR;
-        openVideo(mUri);
+        mUri = Uri.parse(path);
     }
 
     public void start() {
-        mTargetState = STATE_PLAYING;
         //可用状态{Prepared, Started, Paused, PlaybackCompleted}
         if ((mCurrentState == STATE_PREPARED || mCurrentState == STATE_PAUSED || mCurrentState == STATE_PLAYING || mCurrentState == STATE_PLAYBACK_COMPLETED)) {
             boolean isStarted = mMediaPlayerManager.start();
             if (isStarted) {
                 mCurrentState = STATE_PLAYING;
-                if (mOnPlayStateListener != null) {
-                    mOnPlayStateListener.onStateChanged(true);
-                }
             } else {
                 mCurrentState = STATE_ERROR;
                 openVideo(mUri);
@@ -208,15 +161,11 @@ public class MyVideoView extends TextureView {
     }
 
     public void pause() {
-        mTargetState = STATE_PAUSED;
         //可用状态{Started, Paused}
         if ((mCurrentState == STATE_PLAYING || mCurrentState == STATE_PAUSED)) {
             boolean isPaused = mMediaPlayerManager.pause();
             if (isPaused) {
                 mCurrentState = STATE_PAUSED;
-                if (mOnPlayStateListener != null) {
-                    mOnPlayStateListener.onStateChanged(false);
-                }
             } else {
                 mCurrentState = STATE_ERROR;
                 openVideo(mUri);
@@ -225,14 +174,10 @@ public class MyVideoView extends TextureView {
     }
 
     public void stop() {
-        mTargetState = STATE_STOP;
         if ((mCurrentState == STATE_PLAYING || mCurrentState == STATE_PAUSED)) {
-            boolean isStoped = mMediaPlayerManager.isPlaying();
+            boolean isStoped = mMediaPlayerManager.stop();
             if (isStoped) {
                 mCurrentState = STATE_STOP;
-                if (mOnPlayStateListener != null) {
-                    mOnPlayStateListener.onStateChanged(false);
-                }
             } else {
                 mCurrentState = STATE_ERROR;
                 openVideo(mUri);
@@ -267,9 +212,9 @@ public class MyVideoView extends TextureView {
     public int getCurrentPosition() {
         int position = 0;
         //可用状态{Idle, Initialized, Prepared, Started, Paused, Stopped, PlaybackCompleted}
-        if (mCurrentState == STATE_PLAYBACK_COMPLETED){
-            position = getDuration();
-        }else if (mCurrentState == STATE_PLAYING || mCurrentState == STATE_PAUSED){
+        if (mCurrentState == STATE_PLAYBACK_COMPLETED) {
+            position = mDuration;
+        } else if (mCurrentState == STATE_PLAYING || mCurrentState == STATE_PAUSED) {
             return mMediaPlayerManager.getCurrentPosition();
         }
         return position;
@@ -284,7 +229,6 @@ public class MyVideoView extends TextureView {
      * 调用release方法以后MediaPlayer无法再恢复使用
      */
     public void release() {
-        mTargetState = STATE_RELEASED;
         mCurrentState = STATE_RELEASED;
         mMediaPlayerManager.release();
     }
@@ -325,14 +269,8 @@ public class MyVideoView extends TextureView {
      * 是否可用
      */
     public boolean isPrepared() {
-        //|| mCurrentState == STATE_PAUSED || mCurrentState == STATE_PLAYING
         return !mMediaPlayerManager.isEmpty() && (mCurrentState == STATE_PREPARED);
     }
-
-    //	/** 是否能即可播放 */
-    //	public boolean canStart() {
-    //		return mMediaPlayer != null && (mCurrentState == STATE_PREPARED || mCurrentState == STATE_PAUSED);
-    //	}
 
     private static final int HANDLER_MESSAGE_PARSE = 0;
     private static final int HANDLER_MESSAGE_LOOP = 1;
@@ -409,13 +347,5 @@ public class MyVideoView extends TextureView {
 
     public void setOnSeekCompleteListener(MediaPlayer.OnSeekCompleteListener onSeekCompleteListener) {
         this.mOnSeekCompleteListener = onSeekCompleteListener;
-    }
-
-    public void setOnPlayStateListener(OnPlayStateListener onPlayStateListener) {
-        this.mOnPlayStateListener = onPlayStateListener;
-    }
-
-    public interface OnPlayStateListener {
-        void onStateChanged(boolean isPlaying);
     }
 }

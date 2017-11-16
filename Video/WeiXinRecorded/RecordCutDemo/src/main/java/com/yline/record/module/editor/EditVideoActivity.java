@@ -118,30 +118,23 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
             public void onPrepared(MediaPlayer mp) {
                 vv_play.setLooping(true);
                 vv_play.start();
-            }
-        });
 
-        vv_play.setOnPlayStateListener(new MyVideoView.OnPlayStateListener() {
-            @Override
-            public void onStateChanged(boolean isPlaying) {
-                if (isPlaying) {
-                    videoWidth = vv_play.getVideoWidth();
-                    videoHeight = vv_play.getVideoHeight();
+                videoWidth = mp.getVideoWidth();
+                videoHeight = mp.getVideoHeight();
 
-                    float ra = videoWidth * 1f / videoHeight;
+                float ra = videoWidth * 1f / videoHeight;
 
-                    float widthF = videoWidth * 1f / MediaRecorderBase.VIDEO_HEIGHT;
-                    float heightF = videoHeight * 1f / MediaRecorderBase.VIDEO_WIDTH;
-                    ViewGroup.LayoutParams layoutParams = vv_play.getLayoutParams();
-                    layoutParams.width = (int) (windowWidth * widthF);
-                    layoutParams.height = (int) (layoutParams.width / ra);
-                    vv_play.setLayoutParams(layoutParams);
+                float widthF = videoWidth * 1f / MediaRecorderBase.VIDEO_HEIGHT;
+                float heightF = videoHeight * 1f / MediaRecorderBase.VIDEO_WIDTH;
+                ViewGroup.LayoutParams layoutParams = vv_play.getLayoutParams();
+                layoutParams.width = (int) (windowWidth * widthF);
+                layoutParams.height = (int) (layoutParams.width / ra);
+                vv_play.setLayoutParams(layoutParams);
 
-                    ViewGroup.LayoutParams layoutParams1 = rl_tuya.getLayoutParams();
-                    layoutParams1.width = layoutParams.width;
-                    layoutParams1.height = layoutParams.height;
-                    rl_tuya.setLayoutParams(layoutParams1);
-                }
+                ViewGroup.LayoutParams layoutParams1 = rl_tuya.getLayoutParams();
+                layoutParams1.width = layoutParams.width;
+                layoutParams1.height = layoutParams.height;
+                rl_tuya.setLayoutParams(layoutParams1);
             }
         });
 
@@ -659,7 +652,6 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         if (resultCode != RESULT_OK) {
             return;
         }
@@ -697,7 +689,10 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
 
             @Override
             protected void onPostExecute(String result) {
-                mDialogHelper.dismiss();
+                if (!isFinishing()){
+                    mDialogHelper.dismiss();
+                }
+
                 if (!TextUtils.isEmpty(result)) {
                     VideoPlayActivity.launcher(EditVideoActivity.this, result);
                 } else {
