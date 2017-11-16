@@ -16,9 +16,10 @@ import android.view.View;
 import com.yline.record.R;
 
 /**
- * Created by zhaoshuang on 17/8/22.
+ * 裁剪框
+ * @author yline 2017/11/16 -- 11:32
+ * @version 1.0.0
  */
-
 public class ThumbnailView extends View {
 
     private int mWidth;

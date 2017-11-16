@@ -15,8 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by zhaoshuang on 16/12/14.
  * 手绘涂鸦界面
+ * @author yline 2017/11/16 -- 11:31
+ * @version 1.0.0
  */
 public class TuyaView extends View {
     private Paint mPaint;
@@ -44,7 +45,6 @@ public class TuyaView extends View {
     }
 
     public void setNewPaintColor(int color) {
-
         mPaint.setColor(color);
     }
 

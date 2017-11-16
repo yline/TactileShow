@@ -11,10 +11,10 @@ import android.view.View;
 import com.yline.record.R;
 
 /**
- * Created by zhaoshuang on 17/3/20.
  * 裁剪视频的View
+ * @author yline 2017/11/16 -- 11:35
+ * @version 1.0.0
  */
-
 public class CutView extends View {
 
     private int measuredWidth;
