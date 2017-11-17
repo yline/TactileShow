@@ -3,6 +3,7 @@ package com.yline.record.view;
 import android.app.Activity;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -33,6 +34,12 @@ public class AbstractViewHolder {
             sArray.put(viewId, view);
         }
         return (T) sArray.get(viewId);
+    }
+
+    public ImageView setImageResource(int viewId, int resId){
+        ImageView imageView = get(viewId);
+        imageView.setImageResource(resId);
+        return imageView;
     }
 
     public TextView setText(int viewId, String content) {

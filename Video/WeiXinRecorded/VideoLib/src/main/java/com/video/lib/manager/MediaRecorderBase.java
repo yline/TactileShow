@@ -21,9 +21,9 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 
+import com.video.lib.FfmpegManager;
 import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
-import com.video.lib.FfmpegManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -192,12 +192,18 @@ public abstract class MediaRecorderBase implements PreviewCallback, MediaRecordC
         return false;
     }
 
+    /**
+     * 切换闪光灯
+     * @param context 环境变量
+     * @return 是否是打开状态
+     */
     public boolean changeFlash(Context context) {
         boolean flashOn = false;
         if (flashEnable(context)) {
             Camera.Parameters params = camera.getParameters();
             if (Camera.Parameters.FLASH_MODE_TORCH.equals(params.getFlashMode())) {
                 params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+
                 flashOn = false;
             } else {
                 params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);

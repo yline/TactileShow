@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -21,13 +20,13 @@ import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
 import com.yixia.videoeditor.adapter.UtilityAdapter;
 import com.yline.base.BaseActivity;
-import com.yline.record.module.editor.EditVideoActivity;
-import com.yline.record.view.FocusSurfaceView;
 import com.yline.record.IApplication;
-import com.yline.record.view.MediaTextureView;
 import com.yline.record.R;
-import com.yline.record.view.RecordedButton;
+import com.yline.record.module.editor.EditVideoActivity;
 import com.yline.record.view.AbstractViewHolder;
+import com.yline.record.view.FocusSurfaceView;
+import com.yline.record.view.MediaTextureView;
+import com.yline.record.view.RecordedButton;
 import com.yline.record.viewhelper.DialogHelper;
 
 import java.io.File;
@@ -42,7 +41,7 @@ import java.util.List;
  * @author yline 2017/11/14 -- 14:06
  * @version 1.0.0
  */
-public class MainActivity extends BaseActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity {
     private static final int REQUEST_KEY = 100;
     private static final int HANDLER_RECORD = 200;
     private static final int HANDLER_EDIT_VIDEO = 201;
@@ -51,7 +50,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private MediaObject mMediaObject;
     private RecordedButton rb_start;
     private RelativeLayout rl_bottom;
-    private RelativeLayout rl_bottom2;
     private TextView tv_hint;
     private MediaTextureView vv_play;
 
@@ -59,12 +57,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private int maxDuration = 8000;
     //本次段落是否录制完成
     private boolean isRecordedOver;
-    private ImageView iv_change_flash;
     private List<Integer> cameraTypeList = new ArrayList<>();
 
     // View
     private DialogHelper mDialogHelper;
     private AbstractViewHolder mViewHolder;
+
+    private MainRecordManager mRecordManager;
+    private MainTextureManager mTextureManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,13 +74,67 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         initView();
 
+        mRecordManager = new MainRecordManager(findViewById(R.id.main_rl_record));
+        mRecordManager.setOnRecordClickCallback(new MainRecordManager.OnMainRecordClickCallback() {
+            @Override
+            public boolean onRecordFlashSwitch() {
+                return mMediaRecorder.changeFlash(MainActivity.this);
+            }
+
+            @Override
+            public void onRecordCameraSwitch() {
+                mMediaRecorder.switchCamera();
+
+                mRecordManager.setFlashImageClose();
+            }
+
+            @Override
+            public int onRecordDeleteClick() {
+                ImageView backImageView = mViewHolder.get(R.id.main_iv_back);
+
+                if (rb_start.isDeleteMode()) {//判断是否要删除视频段落
+                    MediaPartModel lastPart = mMediaObject.getPart(mMediaObject.getMediaParts().size() - 1);
+                    mMediaObject.removePart(lastPart, true);
+                    rb_start.setProgress(mMediaObject.getDuration());
+                    rb_start.deleteSplit();
+                    if (cameraTypeList.size() > 0) {
+                        cameraTypeList.remove(cameraTypeList.size() - 1);
+                    }
+                    changeButton(mMediaObject.getMediaParts().size() > 0);
+                    backImageView.setImageResource(R.mipmap.video_delete);
+                } else if (mMediaObject.getMediaParts().size() > 0) {
+                    rb_start.setDeleteMode(true);
+                    backImageView.setImageResource(R.mipmap.video_delete_click);
+                }
+                return 0;
+            }
+
+            @Override
+            public void onRecordFinishClick() {
+                videoFinish();
+            }
+        });
+
+        mTextureManager = new MainTextureManager(findViewById(R.id.main_rl_texture));
+        mTextureManager.setOnMainTextureCallback(new MainTextureManager.OnMainTextureCallback() {
+            @Override
+            public void onTextureFinishClick() {
+                rb_start.setDeleteMode(false);
+                Intent intent = new Intent(MainActivity.this, EditVideoActivity.class);
+                intent.putExtra("path", IApplication.VIDEO_PATH + "/finish.mp4");
+                startActivityForResult(intent, REQUEST_KEY);
+            }
+
+            @Override
+            public void onTextureCloseClick() {
+                initMediaRecorderState();
+            }
+        });
+
         vv_play = (MediaTextureView) findViewById(R.id.vv_play);
 
         tv_hint = (TextView) findViewById(R.id.tv_hint);
         rl_bottom = (RelativeLayout) findViewById(R.id.rl_bottom);
-        rl_bottom2 = (RelativeLayout) findViewById(R.id.rl_bottom2);
-
-        iv_change_flash = (ImageView) findViewById(R.id.iv_change_flash);
 
         rb_start = (RecordedButton) findViewById(R.id.rb_start);
         rb_start.setMax(maxDuration);
@@ -114,8 +168,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 videoFinish();
             }
         });
-
-        iv_change_flash.setOnClickListener(this);
     }
 
     private void initView() {
@@ -124,82 +176,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         FocusSurfaceView surfaceView = findViewById(R.id.main_focus_surface_view);
 
-        initMediaRecorder(surfaceView.getHolder());
-        surfaceView.setTouchFocus(mMediaRecorder);
+        mMediaRecorder = new MediaRecorderNativeCut(surfaceView.getHolder());
 
-        initViewClick();
-    }
-
-    /**
-     * 初始化录制对象
-     */
-    private void initMediaRecorder(SurfaceHolder surfaceHolder) {
-        mMediaRecorder = new MediaRecorderNativeCut(surfaceHolder);
-        String key = String.valueOf(System.currentTimeMillis());
         //设置缓存文件夹
+        String key = String.valueOf(System.currentTimeMillis());
         mMediaObject = mMediaRecorder.setOutputDirectory(FfmpegManager.getCachePath(), key);
         //准备
         mMediaRecorder.prepare();
         //滤波器相关
         UtilityAdapter.freeFilterParser();
         UtilityAdapter.initFilterParser();
-    }
 
-    private void initViewClick() {
-        mViewHolder.setOnClickListener(R.id.main_iv_finish, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                videoFinish();
-            }
-        });
-
-        mViewHolder.setOnClickListener(R.id.main_iv_next, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                rb_start.setDeleteMode(false);
-                Intent intent = new Intent(MainActivity.this, EditVideoActivity.class);
-                intent.putExtra("path", IApplication.VIDEO_PATH + "/finish.mp4");
-                startActivityForResult(intent, REQUEST_KEY);
-            }
-        });
-
-        mViewHolder.setOnClickListener(R.id.main_iv_close, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                initMediaRecorderState();
-            }
-        });
-
-        mViewHolder.setOnClickListener(R.id.main_iv_change_camera, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMediaRecorder.switchCamera();
-
-                iv_change_flash.setImageResource(R.mipmap.video_flash_close);
-            }
-        });
-
-        mViewHolder.setOnClickListener(R.id.main_iv_back, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ImageView backImageView = mViewHolder.get(R.id.main_iv_back);
-
-                if (rb_start.isDeleteMode()) {//判断是否要删除视频段落
-                    MediaPartModel lastPart = mMediaObject.getPart(mMediaObject.getMediaParts().size() - 1);
-                    mMediaObject.removePart(lastPart, true);
-                    rb_start.setProgress(mMediaObject.getDuration());
-                    rb_start.deleteSplit();
-                    if (cameraTypeList.size() > 0) {
-                        cameraTypeList.remove(cameraTypeList.size() - 1);
-                    }
-                    changeButton(mMediaObject.getMediaParts().size() > 0);
-                    backImageView.setImageResource(R.mipmap.video_delete);
-                } else if (mMediaObject.getMediaParts().size() > 0) {
-                    rb_start.setDeleteMode(true);
-                    backImageView.setImageResource(R.mipmap.video_delete_click);
-                }
-            }
-        });
+        surfaceView.setTouchFocus(mMediaRecorder);
     }
 
     private void changeButton(boolean flag) {
@@ -220,7 +208,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         vv_play.pause();
 
         rb_start.setVisibility(View.VISIBLE);
-        rl_bottom2.setVisibility(View.GONE);
+        mTextureManager.setRelativeVisibility(View.GONE);
         changeButton(false);
         tv_hint.setVisibility(View.VISIBLE);
 
@@ -320,7 +308,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             protected void onPostExecute(String result) {
                 mDialogHelper.dismiss();
                 if (!TextUtils.isEmpty(result)) {
-                    rl_bottom2.setVisibility(View.VISIBLE);
+                    mTextureManager.setRelativeVisibility(View.VISIBLE);
                     vv_play.setVisibility(View.VISIBLE);
 
                     vv_play.setVideoPath(result);
@@ -408,7 +396,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onPause() {
         super.onPause();
         mMediaRecorder.stopPreview();
-        iv_change_flash.setImageResource(R.mipmap.video_flash_close);
+        mRecordManager.setFlashImageClose();
     }
 
     @Override
@@ -434,21 +422,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             if (requestCode == REQUEST_KEY) {
                 initMediaRecorderState();
             }
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.iv_change_flash:
-                if (mMediaRecorder.changeFlash(this)) {
-                    iv_change_flash.setImageResource(R.mipmap.video_flash_open);
-                } else {
-                    iv_change_flash.setImageResource(R.mipmap.video_flash_close);
-                }
-                break;
-            default:
-                break;
         }
     }
 }
