@@ -172,7 +172,7 @@ public class MainRecordManager {
 //                    mRecordHandler.sendEmptyMessageDelayed(HANDLER_RECORD, 30);
 //                }
 //            } else if (msg.what == HANDLER_EDIT_VIDEO) {
-//                int progress = UtilityAdapter.FilterParserAction("", UtilityAdapter.PARSERACTION_PROGRESS);
+//                int progress = FfmpegManager.setParserActionState("", FfmpegManager.PARSER_ACTION_PROGRESS);
 //                if (progress == 100) {
 //                    if (null != mCompileProgressCallback) {
 //                        mCompileProgressCallback.onCompileFinish(progress);

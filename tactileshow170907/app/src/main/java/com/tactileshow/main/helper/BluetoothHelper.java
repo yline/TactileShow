@@ -77,25 +77,29 @@ public class BluetoothHelper {
      * @param context         上下文
      * @param bluetoothDevice 连接的设备
      * @param autoConnect     是否自动连接
-     * @return
+     * @return 蓝牙名称
      */
     public String connectGatt(Context context, final BluetoothDevice bluetoothDevice, boolean autoConnect) {
+        LogFileUtil.v("helper connectGatt do");
         if (null != bluetoothDevice) {
+            if (null != mBluetoothGatt) {
+                mBluetoothGatt.close();
+            }
             mBluetoothGatt = bluetoothDevice.connectGatt(context, autoConnect, new BluetoothGattCallback() {
 
                 // 蓝牙连接状态
                 @Override
                 public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int newState) {
                     super.onConnectionStateChange(gatt, status, newState);
-
                     LogFileUtil.i(TAG, "onConnectionStateChange status = " + status + ", newState = " + newState);
-                    if (newState == BluetoothProfile.STATE_CONNECTED) {
+
+                    if (newState == BluetoothProfile.STATE_CONNECTED) { // {2}
                         // 发现服务
                         if (null != mBluetoothGatt) {
                             boolean discoverResult = mBluetoothGatt.discoverServices();
-                            LogFileUtil.v("discoverServices result = " + discoverResult);
+                            LogFileUtil.v("onConnectionStateChange connectGatt result = " + discoverResult);
                         }
-                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) { // 断掉重连，就在这里了
+                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) { // 断掉重连，就在这里了 {0}
                         mBluetoothGatt.connect();
                     }
 
@@ -141,8 +145,6 @@ public class BluetoothHelper {
                 @Override
                 public void onCharacteristicChanged(final BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
                     super.onCharacteristicChanged(gatt, characteristic);
-                    LogFileUtil.i(TAG, "onCharacteristicChanged characteristic = " + characteristic);
-
                     if (null != onConnectCallback) {
                         onConnectCallback.onCharacteristicChanged(gatt, characteristic);
                     }
@@ -214,6 +216,12 @@ public class BluetoothHelper {
     public String logService(String uuid) {
         StringBuilder stringBuilder = new StringBuilder();
         if (null != mBluetoothGatt) {
+            UUID uuidUrl = UUID.fromString(uuid);
+            LogFileUtil.v("uuid = " + uuid + ", uuidUrl = " + uuidUrl);
+
+            BluetoothDevice device = mBluetoothGatt.getDevice();
+            List<BluetoothGattService> serviceList = mBluetoothGatt.getServices();
+
             mGattService = mBluetoothGatt.getService(UUID.fromString(uuid));
             List<BluetoothGattCharacteristic> tempCharList;
             if (null != mGattService) {
@@ -224,17 +232,17 @@ public class BluetoothHelper {
                     charUuid = tempCharList.get(i).getUuid();
                     valueByte = tempCharList.get(i).getValue();
 
-                    Log.i(TAG, "找到的特征为: " + i + charUuid + " " + valueByte);
+                    Log.i(TAG, "找到的特征为: " + charUuid + " " + valueByte);
                     stringBuilder.append('\n');
                     stringBuilder.append(charUuid);
                     stringBuilder.append(" ");
                     stringBuilder.append(valueByte);
                 }
             } else {
-                Log.e(TAG, "getServiceInfo: mGattService is null");
+                LogFileUtil.e(TAG, "getServiceInfo: mGattService is null");
             }
         } else {
-            Log.e(TAG, "getServiceInfo: mBluetoothGatt is null");
+            LogFileUtil.e(TAG, "getServiceInfo: mBluetoothGatt is null");
         }
         return stringBuilder.toString();
     }
@@ -253,6 +261,7 @@ public class BluetoothHelper {
     }
 
     private void scanDevice(boolean enable, long milliSecond) {
+        LogFileUtil.v("enable = " + enable + ", milliSecond = " + milliSecond);
         if (enable) {
             SDKManager.getHandler().postDelayed(new Runnable() {
                 @Override
@@ -261,8 +270,21 @@ public class BluetoothHelper {
                         isScan = false;
 
                         mBluetoothAdapter.stopLeScan(leScanCallback);
+//                        BluetoothLeScanner leScanner = mBluetoothAdapter.getBluetoothLeScanner();
+//                        leScanner.startScan(new ScanCallback() {
+//                            @Override
+//                            public void onBatchScanResults(List<ScanResult> results) {
+//                                super.onBatchScanResults(results);
+//                            }
+//
+//                            @Override
+//                            public void onScanResult(int callbackType, ScanResult result) {
+//                                super.onScanResult(callbackType, result);
+//                            }
+//                        });
+
                         if (null != onScanCallback) {
-                            LogFileUtil.i(TAG, "onScanCallback onFinish");
+                            LogFileUtil.i(TAG, "getHandler onFinish");
                             onScanCallback.onFinish();
                         }
                     }
@@ -272,7 +294,7 @@ public class BluetoothHelper {
             isScan = true;
             mBluetoothAdapter.startLeScan(leScanCallback);
             if (null != onScanCallback) {
-                LogFileUtil.i(TAG, "onScanCallback onStart");
+                LogFileUtil.i(TAG, "scanDevice onStart");
                 onScanCallback.onStart();
             }
         } else {
@@ -280,10 +302,20 @@ public class BluetoothHelper {
 
             mBluetoothAdapter.stopLeScan(leScanCallback);
             if (null != onScanCallback) {
-                LogFileUtil.i(TAG, "onScanCallback onBreak");
+                LogFileUtil.i(TAG, "scanDevice onBreak");
                 onScanCallback.onBreak();
             }
         }
+    }
+
+    public void disConnect() {
+        if (null != mBluetoothGatt) {
+            mBluetoothGatt.disconnect();
+        }
+        // close和disconnect的区别: close除了断开连接外，还会释放掉所有资源，导致不可以直接在后面的操作中用gatt对象的connect直接连接，
+        //                            而disconnect并不释放资源 ，所以，所有的资源还保存着，就可以用Gatt的connect进行简单恢复连接，
+        //                            而不是在device那一层进行操作
+        // 调用disconnect断开连接，然后在回调函数中使用close()释放资源
     }
 
     private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {

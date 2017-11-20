@@ -14,11 +14,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.video.lib.FfmpegCommandManager;
 import com.video.lib.FfmpegManager;
 import com.video.lib.manager.MediaRecorderNativeCut;
 import com.video.lib.model.MediaObject;
 import com.video.lib.model.MediaPartModel;
-import com.yixia.videoeditor.adapter.UtilityAdapter;
 import com.yline.base.BaseActivity;
 import com.yline.record.IApplication;
 import com.yline.record.R;
@@ -184,8 +184,8 @@ public class MainActivity extends BaseActivity {
         //准备
         mMediaRecorder.prepare();
         //滤波器相关
-        UtilityAdapter.freeFilterParser();
-        UtilityAdapter.initFilterParser();
+        FfmpegManager.setParserActionState("", FfmpegManager.PARSER_ACTION_FREE);
+        FfmpegManager.setParserActionState("", FfmpegManager.PARSER_ACTION_INIT);
 
         surfaceView.setTouchFocus(mMediaRecorder);
     }
@@ -246,7 +246,7 @@ public class MainActivity extends BaseActivity {
                     }
                     break;
                 case HANDLER_EDIT_VIDEO://合成视频的handler
-                    int progress = UtilityAdapter.FilterParserAction("", UtilityAdapter.PARSERACTION_PROGRESS);
+                    int progress = FfmpegManager.setParserActionState("", FfmpegManager.PARSER_ACTION_PROGRESS);
                     mDialogHelper.setText("视频编译中 " + progress + "%");
                     if (progress == 100) {
                         syntVideo();
@@ -348,41 +348,14 @@ public class MainActivity extends BaseActivity {
     }
 
     public void mp4ToTs(String path, String output) {
-        //./ffmpeg -i 0.mp4 -c copy -bsf:v h264_mp4toannexb -f mpegts ts0.ts
-        StringBuilder sb = new StringBuilder("ffmpeg");
-        sb.append(" -i");
-        sb.append(" " + path);
-        sb.append(" -c");
-        sb.append(" copy");
-        sb.append(" -bsf:v");
-        sb.append(" h264_mp4toannexb");
-        sb.append(" -f");
-        sb.append(" mpegts");
-        sb.append(" " + output);
-
-        int i = UtilityAdapter.FFmpegRun("", sb.toString());
+        //./ffmpeg -i .mp4 -c copy -bsf:v h264_mp4toannexb -f mpegts ts0.ts
+        int i =  FfmpegManager.executeCommand("", FfmpegCommandManager.getCommandMainMp4ToTs(path, output));
     }
 
     public boolean tsToMp4(List<String> path, String output) {
         //ffmpeg -i "concat:ts0.ts|ts1.ts|ts2.ts|ts3.ts" -c copy -bsf:a aac_adtstoasc out2.mp4
 
-        StringBuilder sb = new StringBuilder("ffmpeg");
-        sb.append(" -i");
-        String concat = "concat:";
-        for (String part : path) {
-            concat += part;
-            concat += "|";
-        }
-        concat = concat.substring(0, concat.length() - 1);
-        sb.append(" " + concat);
-        sb.append(" -c");
-        sb.append(" copy");
-        sb.append(" -bsf:a");
-        sb.append(" aac_adtstoasc");
-        sb.append(" -y");
-        sb.append(" " + output);
-
-        int i = UtilityAdapter.FFmpegRun("", sb.toString());
+        int i = FfmpegManager.executeCommand("", FfmpegCommandManager.getCommandMainTsToMp4(path, output));
         return i == 0;
     }
 

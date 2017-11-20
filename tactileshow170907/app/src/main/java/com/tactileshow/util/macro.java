@@ -31,15 +31,17 @@ public class macro
 	public static final String  UUID_CLIENT_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
 	
 	public static String UUID_IRT_SER = "f000aa00-0451-4000-b000-000000000000";
-	
 	public static String UUID_IRT_DAT = "f000aa01-0451-4000-b000-000000000000";
-	
 	public static String UUID_IRT_CON = "f000aa02-0451-4000-b000-000000000000"; // 0: disable, 1: enable
 	
-	public static final String UUID_MAG_SER = "f000aa30-0451-4000-b000-000000000000";//温度
-	public static final String UUID_MAG_DAT = "f000aa31-0451-4000-b000-000000000000";
-	public static final String UUID_MAG_CON = "f000aa32-0451-4000-b000-000000000000"; // 0: disable, 1: enable
-	
+	public static final String UUID_MAG_SER = "f000aa30-0451-4000-b000-000000000000";//温度  启用刷数据
+	public static final String UUID_MAG_DAT = "f000aa31-0451-4000-b000-000000000000"; // 数据
+	public static final String UUID_MAG_CON = "f000aa32-0451-4000-b000-000000000000"; // 0: disable, 1: enable 配置
+
+	public static final String UUID_NEW_SER = "0000fee0-0000-1000-8000-00805f9b34fb";
+	public static final String UUID_NEW_DAT = "0000fee1-0000-1000-8000-00805f9b34fb";
+	public static final String UUID_NEW_CON = "0000fee2-0000-1000-8000-00805f9b34fb";
+
 	public static String UUID_MAG_PER = "f000aa33-0451-4000-b000-000000000000"; // Period in tens of milliseconds
 
 	public final static String ACTION_GATT_CONNECTED = "com.example.bluetooth.le.ACTION_GATT_CONNECTED";

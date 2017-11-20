@@ -30,22 +30,22 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.video.lib.FfmpegCommandManager;
+import com.video.lib.FfmpegManager;
 import com.video.lib.manager.MediaRecorderBase;
-import com.yixia.videoeditor.adapter.UtilityAdapter;
 import com.yline.base.BaseActivity;
 import com.yline.record.IApplication;
-import com.yline.record.view.MediaTextureView;
 import com.yline.record.R;
+import com.yline.record.module.player.VideoPlayActivity;
+import com.yline.record.view.MediaTextureView;
 import com.yline.record.view.TouchView;
 import com.yline.record.view.TuyaView;
-import com.yline.record.module.player.VideoPlayActivity;
 import com.yline.record.viewhelper.DialogHelper;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Locale;
 
 /**
  * 视频编辑
@@ -582,20 +582,8 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
 
         String mergeVideo = IApplication.VIDEO_PATH + "/mergeVideo.mp4";
 
-        //ffmpeg -i videoPath -i imagePath -filter_complex overlay=0:0 -vcodec libx264 -profile:v baseline -preset ultrafast -b:v 3000k -g 30 -f mp4 outPath
-        StringBuilder sb = new StringBuilder();
-        sb.append("ffmpeg");
-        sb.append(" -i");
-        sb.append(" " + path);
-        sb.append(" -i");
-        sb.append(" " + imagePath);
-        sb.append(" -filter_complex");
-        sb.append(" overlay=0:0");
-        sb.append(" -vcodec libx264 -profile:v baseline -preset ultrafast -b:v 3000k -g 25");
-        sb.append(" -f mp4");
-        sb.append(" " + mergeVideo);
-
-        int i = UtilityAdapter.FFmpegRun("", sb.toString());
+        // ffmpeg -i videoPath -i imagePath -filter_complex overlay=0:0 -vcodec libx264 -profile:v baseline -preset ultrafast -b:v 3000k -g 30 -f mp4 outPath
+        int i = FfmpegManager.executeCommand("", FfmpegCommandManager.getCommandEditVideo(path, imagePath, mergeVideo));
         if (i == 0) {
             return mergeVideo;
         } else {
@@ -607,24 +595,9 @@ public class EditVideoActivity extends BaseActivity implements View.OnClickListe
      * 调整视频播放速度
      */
     private String adjustVideoSpeed(String path, float speed) {
-
         String outPut = IApplication.VIDEO_PATH + "/speedVideo.mp4";
 
-        //./ffmpeg -i 2x.mp4 -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" output3.mp4
-        String filter = String.format(Locale.getDefault(), "[0:v]setpts=%f*PTS[v];[0:a]atempo=%f[a]", 1 / speed, speed);
-        StringBuilder sb = new StringBuilder("ffmpeg");
-        sb.append(" -i");
-        sb.append(" " + path);
-        sb.append(" -filter_complex");
-        sb.append(" " + filter);
-        sb.append(" -map");
-        sb.append(" [v]");
-        sb.append(" -map");
-        sb.append(" [a]");
-        sb.append(" -y");
-        sb.append(" " + outPut);
-
-        int i = UtilityAdapter.FFmpegRun("", sb.toString());
+        int i = FfmpegManager.executeCommand("", FfmpegCommandManager.getCommandEditVideoSpeed(path, outPut, speed));
         if (i == 0) {
             return outPut;
         } else {

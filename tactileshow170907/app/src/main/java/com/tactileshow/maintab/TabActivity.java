@@ -125,10 +125,18 @@ public class TabActivity extends BaseActivity {
         settingViewHelper.finish();
     }
 
+    private long time;
+
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = TactileModel.receiveBroadcast(intent);
+
+            if (System.currentTimeMillis() - time > 5000) {
+                LogUtil.v("Tab Receiver action = " + action);
+                time = System.currentTimeMillis();
+            }
+
             if (TextUtils.isEmpty(action)) {
                 return;
             }

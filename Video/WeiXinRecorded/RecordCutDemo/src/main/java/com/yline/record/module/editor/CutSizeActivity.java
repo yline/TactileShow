@@ -11,8 +11,9 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.video.lib.FfmpegCommandManager;
+import com.video.lib.FfmpegManager;
 import com.video.lib.manager.MediaRecorderBase;
-import com.yixia.videoeditor.adapter.UtilityAdapter;
 import com.yline.base.BaseActivity;
 import com.yline.record.IApplication;
 import com.yline.record.R;
@@ -21,10 +22,10 @@ import com.yline.record.view.MediaTextureView;
 import com.yline.record.viewhelper.DialogHelper;
 
 import java.io.File;
-import java.util.Locale;
 
 /**
  * 剪切宽高
+ *
  * @author yline 2017/11/14 -- 11:56
  * @version 1.0.0
  */
@@ -87,7 +88,7 @@ public class CutSizeActivity extends BaseActivity implements View.OnClickListene
         });
     }
 
-    private void initView(){
+    private void initView() {
         mDialogHelper = new DialogHelper(this);
     }
 
@@ -106,25 +107,10 @@ public class CutSizeActivity extends BaseActivity implements View.OnClickListene
      * 裁剪视频大小
      */
     private String cutVideo(String path, int cropWidth, int cropHeight, int x, int y) {
-
         String outPut = IApplication.VIDEO_PATH + "/cutVideo.mp4";
 
-        //./ffmpeg -i 2x.mp4 -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" output3.mp4
-        String filter = String.format(Locale.getDefault(), "crop=%d:%d:%d:%d", cropWidth, cropHeight, x, y);
-        StringBuilder sb = new StringBuilder("ffmpeg");
-        sb.append(" -i");
-        sb.append(" " + path);
-        sb.append(" -vf");
-        sb.append(" " + filter);
-        sb.append(" -acodec");
-        sb.append(" copy");
-        sb.append(" -b:v");
-        int rate = (int) (MediaRecorderBase.VIDEO_BITRATE_HIGH * 1.5f);
-        sb.append(" " + rate + "k");
-        sb.append(" -y");
-        sb.append(" " + outPut);
-
-        int i = UtilityAdapter.FFmpegRun("", sb.toString());
+        String command = FfmpegCommandManager.getCutSizeCutVideo(outPut, path, cropWidth, cropHeight, x, y);
+        int i = FfmpegManager.executeCommand("", command);
         if (i == 0) {
             return outPut;
         } else {

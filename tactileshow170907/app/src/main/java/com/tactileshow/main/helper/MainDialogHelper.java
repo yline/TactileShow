@@ -17,67 +17,55 @@ import com.tactileshow.main.R;
  * @author yline 2017/9/12 -- 19:35
  * @version 1.0.0
  */
-public class MainDialogHelper
-{
-	private AlertDialog dialog;
+public class MainDialogHelper {
+    private AlertDialog dialog;
 
-	private TextView tvConnectInfo;
+    private TextView tvConnectInfo;
 
-	private DialogInterface.OnClickListener listener;
+    private DialogInterface.OnClickListener listener;
 
-	public MainDialogHelper(Context context)
-	{
-		View dialogView = LayoutInflater.from(context).inflate(R.layout.activity_main_dialog_connect, null);
-		
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-		dialogBuilder.setTitle("连接状态");
-		dialogBuilder.setView(dialogView);
-		dialogBuilder.setNegativeButton("取消连接", new DialogInterface.OnClickListener()
-		{
-			@Override
-			public void onClick(DialogInterface dialog, int which)
-			{
-				if (null != listener)
-				{
-					listener.onClick(dialog, which);
-				}
-				dialog.dismiss();
-			}
-		});
-		
-		tvConnectInfo = (TextView) dialogView.findViewById(R.id.tv_ble_connect_info);
-		tvConnectInfo.setText("正在连接中");
-		dialog = dialogBuilder.create();
-	}
-	
-	public void setOnNegativeClickListener(DialogInterface.OnClickListener listener)
-	{
-		this.listener = listener;
-	}
-	
-	public void show()
-	{
-		boolean result = (null != dialog && !dialog.isShowing());
-		Log.i("xxx-", "show: result = " + result);
-		if (null != dialog && !dialog.isShowing())
-		{
-			dialog.show();
-		}
-	}
-	
-	public void dismiss()
-	{
-		if (null != dialog && dialog.isShowing())
-		{
-			dialog.dismiss();
-		}
-	}
-	
-	public void setText(String text)
-	{
-		if (null != tvConnectInfo)
-		{
-			tvConnectInfo.setText(text);
-		}
-	}
+    public MainDialogHelper(Context context) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.activity_main_dialog_connect, null);
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder.setTitle("连接状态");
+        dialogBuilder.setView(dialogView);
+        dialogBuilder.setNegativeButton("取消连接", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (null != listener) {
+                    listener.onClick(dialog, which);
+                }
+                dialog.dismiss();
+            }
+        });
+
+        tvConnectInfo = (TextView) dialogView.findViewById(R.id.tv_ble_connect_info);
+        tvConnectInfo.setText("正在连接中");
+        dialog = dialogBuilder.create();
+    }
+
+    public void setOnNegativeClickListener(DialogInterface.OnClickListener listener) {
+        this.listener = listener;
+    }
+
+    public void show() {
+        boolean result = (null != dialog && !dialog.isShowing());
+        Log.i("xxx-", "show: result = " + result);
+        if (null != dialog && !dialog.isShowing()) {
+            dialog.show();
+        }
+    }
+
+    public void dismiss() {
+        if (null != dialog && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+    }
+
+    public void setText(String text) {
+        if (null != tvConnectInfo) {
+            tvConnectInfo.setText(text);
+        }
+    }
 }

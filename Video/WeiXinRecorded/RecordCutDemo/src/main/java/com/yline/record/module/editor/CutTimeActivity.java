@@ -23,8 +23,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.video.lib.FfmpegCommandManager;
+import com.video.lib.FfmpegManager;
 import com.video.lib.manager.MediaRecorderBase;
-import com.yixia.videoeditor.adapter.UtilityAdapter;
 import com.yline.base.BaseActivity;
 import com.yline.record.IApplication;
 import com.yline.record.R;
@@ -163,19 +164,7 @@ public class CutTimeActivity extends BaseActivity {
                     endStr = "00:00:" + endM;
                 }
 
-                StringBuilder sb = new StringBuilder("ffmpeg");
-                sb.append(" -i");
-                sb.append(" " + path);
-                sb.append(" -vcodec");
-                sb.append(" copy");
-                sb.append(" -acodec");
-                sb.append(" copy");
-                sb.append(" -ss");
-                sb.append(" " + startStr);
-                sb.append(" -t");
-                sb.append(" " + endStr);
-                sb.append(" " + output);
-                int i = UtilityAdapter.FFmpegRun("", sb.toString());
+                int i = FfmpegManager.executeCommand("", FfmpegCommandManager.getCommandCutTime(path, startStr, endStr, output));
                 if (i == 0) {
                     return output;
                 } else {

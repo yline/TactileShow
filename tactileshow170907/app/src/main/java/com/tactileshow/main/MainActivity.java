@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,8 +35,10 @@ import com.yline.application.SDKConstant;
 import com.yline.application.SDKManager;
 import com.yline.base.BaseActivity;
 import com.yline.log.LogFileUtil;
+import com.yline.utils.LogUtil;
 import com.yline.utils.PermissionUtil;
 
+import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -62,7 +63,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         BaseApplication.addActivity(this);
 
-        String[] strings = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION};
+        String[] strings = new String[]{Manifest.permission_group.LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission_group.CONTACTS};
         PermissionUtil.request(this, SDKConstant.REQUEST_CODE_PERMISSION, strings); // 权限申请
 
         LogFileUtil.i(TAG, "Fuck");
@@ -104,9 +105,15 @@ public class MainActivity extends BaseActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 BluetoothDevice bluetoothDevice = viewAdapter.getItem(i);
 
-                LogFileUtil.i(TAG, "bluetoothDevice = " + bluetoothDevice);
                 if (null != bluetoothDevice) {
-                    String deviceName = mBluetoothHelper.connectGatt(MainActivity.this, bluetoothDevice, true);
+                    String name = bluetoothDevice.getName();
+                    String address = bluetoothDevice.getAddress();
+                    String uuid = Arrays.toString(bluetoothDevice.getUuids());
+                    int type = bluetoothDevice.getType();
+                    LogFileUtil.v("start connect click position = " + i + ", bluetooth name = " + name + ", address = " + address + ", uuid = " + uuid + ", type = " + type);
+
+                    String deviceName = mBluetoothHelper.connectGatt(MainActivity.this, bluetoothDevice, false);
+                    LogFileUtil.v("connectGatt devicename = " + deviceName);
 
                     if (!TextUtils.isEmpty(deviceName)) {
                         SDKManager.toast("连接" + deviceName);
@@ -131,6 +138,7 @@ public class MainActivity extends BaseActivity {
         mBluetoothHelper.setOnScanCallback(new BluetoothHelper.OnScanCallback() {
             @Override
             public void onStart() {
+                LogFileUtil.v("bluetooth start scan");
                 MenuItemCompat.setActionView(freshMenuItem, R.layout.activity_main_dialog_progressbar);
             }
 
@@ -139,18 +147,20 @@ public class MainActivity extends BaseActivity {
                 boolean isSuccess = viewAdapter.addData(device); // 这里做了 去重复的操作
                 if (isSuccess) {
                     SDKManager.toast("扫描到新BLE设备 " + device.getName());
-                    String out_info = device.getAddress() + " " + device.getName() + " " + device.getBondState();
-                    helloTextView.setText(helloTextView.getText() + "\n" + out_info);
+                    String outInfo = device.getAddress() + " " + device.getName() + " " + device.getBondState();
+                    helloTextView.setText(helloTextView.getText() + "\n" + outInfo);
                 }
             }
 
             @Override
             public void onBreak() {
+                LogFileUtil.v("bluetooth break scan");
                 MenuItemCompat.setActionView(freshMenuItem, null);
             }
 
             @Override
             public void onFinish() {
+                LogFileUtil.v("bluetooth finish scan");
                 MenuItemCompat.setActionView(freshMenuItem, null);
                 helloTextView.setText(helloTextView.getText() + "\n" + "扫描结束");
             }
@@ -160,54 +170,55 @@ public class MainActivity extends BaseActivity {
         mBluetoothHelper.setOnConnectCallback(new BluetoothHelper.OnConnectCallback() {
             @Override
             public void onConnectionStateChangeHandler(BluetoothGatt gatt, int status, int newState) {
-                LogFileUtil.v("setOnConnectCallback onConnectionStateChangeHandler status = " + status + ", newState = " + newState);
-                if (newState == BluetoothProfile.STATE_CONNECTED) {
+                LogFileUtil.v("setOnConnectCallback status = " + status + ", newState = " + newState);
+
+                if (newState == BluetoothProfile.STATE_CONNECTED) { // {2}
                     mDialogHelper.setText("连接成功，开始寻找服务");
-                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) { // 当设备无法连接
+                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) { // 当设备无法连接 {0}
                     mDialogHelper.setText("连接失败，请返回重连");
                 }
             }
 
             @Override
             public void onServicesDiscoveredHandler(BluetoothGatt gatt, int status) {
-                LogFileUtil.v("onServicesDiscoveredHandler status = " + status);
+                LogFileUtil.v("setOnConnectCallback status = " + status);
 
-                if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (status == BluetoothGatt.GATT_SUCCESS) { // {0}
                     mDialogHelper.setText("成功发现服务，开始启动服务");
                     mBluetoothHelper.logServiceInfo();
 
-                    String ser_str = mBluetoothHelper.logService(macro.UUID_MAG_SER);
-                    if (TextUtils.isEmpty(ser_str)) {
+                    String serStr = mBluetoothHelper.logService(macro.UUID_NEW_SER);
+                    if (TextUtils.isEmpty(serStr)) {
                         SDKManager.toast("服务获取失败");
                     } else {
                         SDKManager.toast("服务获取成功");
                     }
 
                     boolean isMAGValid = false;
-                    if (enableConfig(macro.UUID_MAG_CON) && enableData(macro.UUID_MAG_DAT)) {
+                    if (enableConfig(macro.UUID_NEW_CON) && enableData(macro.UUID_NEW_DAT)) {
                         mDialogHelper.setText("温度数据激活成功");
                         isMAGValid = true;
                     } else {
                         mDialogHelper.setText("温度数据激活失败");
                     }
-
-                    ser_str = mBluetoothHelper.logService(macro.UUID_HUM_SER);
-                    if (TextUtils.isEmpty(ser_str)) {
-                        SDKManager.toast("服务获取失败");
-                    } else {
-                        SDKManager.toast("服务获取成功");
-                    }
-
-                    boolean isHUMValid = false;
-                    if (enableConfig(macro.UUID_HUM_CON) && enableData(macro.UUID_HUM_DAT)) {
-                        mDialogHelper.setText("湿度数据激活成功");
-                        isHUMValid = true;
-                    } else {
-                        mDialogHelper.setText("湿度数据激活失败");
-                    }
-
+//
+//                    serStr = mBluetoothHelper.logService(macro.UUID_NEW_SER);
+//                    if (TextUtils.isEmpty(serStr)) {
+//                        SDKManager.toast("服务获取失败");
+//                    } else {
+//                        SDKManager.toast("服务获取成功");
+//                    }
+//
+//                    boolean isHUMValid = false;
+//                    if (enableConfig(macro.UUID_HUM_CON) && enableData(macro.UUID_HUM_DAT)) {
+//                        mDialogHelper.setText("湿度数据激活成功");
+//                        isHUMValid = true;
+//                    } else {
+//                        mDialogHelper.setText("湿度数据激活失败");
+//                    }
+//
                     LogFileUtil.i(TAG, "isMAGValid = " + isMAGValid + ", isMAGValid = " + isMAGValid);
-                    if (isMAGValid || isHUMValid) {
+                    if (isMAGValid) { //  || isHUMValid
                         SDKManager.getHandler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -229,7 +240,10 @@ public class MainActivity extends BaseActivity {
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
                 String uuid = characteristic.getUuid().toString();
 
-                if (uuid.equals(macro.UUID_HUM_DAT)) {
+                boolean isEqual = uuid.equals(macro.UUID_NEW_DAT);
+                LogFileUtil.v("setOnConnectCallback onCharacteristicChanged do uuid = " + uuid + ", isEqual = " + isEqual);
+
+                if (isEqual) {
                     Point3D p3d_hum = convertHum(characteristic.getValue());
                     float hum = (float) p3d_hum.x;
 
@@ -285,6 +299,7 @@ public class MainActivity extends BaseActivity {
      */
     private boolean enableData(String uuid) {
         boolean result = mBluetoothHelper.enableData(uuid);
+        LogFileUtil.v("enableData result = " + result);
 
         // 传输协议，需要一定的时间
         try {
@@ -302,6 +317,7 @@ public class MainActivity extends BaseActivity {
         val[0] = 1;
 
         boolean result = mBluetoothHelper.enableConfig(uuid, val);
+        LogFileUtil.v("enableConfig result = " + result);
 
         // 传输协议，需要一定的时间
         try {
@@ -316,10 +332,10 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i(TAG, "onActivityResult: requestCode = " + requestCode + ", resultCode = " + ", data = " + data);
-        if (requestCode == RequestCodeOfTab) {
-            mBluetoothHelper.closeBluetooth();
-        }
+        LogUtil.i("onActivityResult: requestCode = " + requestCode + ", resultCode = " + ", data = " + data);
+//        if (requestCode == RequestCodeOfTab) {
+//            mBluetoothHelper.closeBluetooth();
+//        }
     }
 
     public Point3D convertHum(final byte[] value) {
@@ -378,8 +394,9 @@ public class MainActivity extends BaseActivity {
         super.onDestroy();
         BaseApplication.removeActivity(this);
 
-        unregisterReceiver(mGattUpdateReceiver);
-        mBluetoothHelper.closeBluetooth();
+//        unregisterReceiver(mGattUpdateReceiver);
+//        mBluetoothHelper.closeBluetooth();
+//        mBluetoothHelper.disConnect();
     }
 
     // 广播 A，只是打个日志
