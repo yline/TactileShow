@@ -1,6 +1,7 @@
 package com.tactileshow.main;
 
 import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -33,7 +34,6 @@ import com.tactileshow.util.macro;
 import com.yline.application.BaseApplication;
 import com.yline.application.SDKConstant;
 import com.yline.application.SDKManager;
-import com.yline.base.BaseActivity;
 import com.yline.log.LogFileUtil;
 import com.yline.utils.LogUtil;
 import com.yline.utils.PermissionUtil;
@@ -46,7 +46,7 @@ import java.util.List;
  * 整个连接执行过程为：onMenuItemSelected里的macro.MENU_ITEMID_FRESH情况（当点击刷新时，进行设备扫描），scanLeDevice（真正开始扫描）
  * deviceListView.setOnItemClickListener（当点击设备时，进行连接）
  */
-public class MainActivity extends BaseActivity {
+public class MainActivity extends Activity {
     private final static String TAG = "xxx-Main";
     private static final int RequestCodeOfTab = 1;
 
@@ -63,7 +63,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         BaseApplication.addActivity(this);
 
-        String[] strings = new String[]{Manifest.permission_group.LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission_group.CONTACTS};
+        String[] strings = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         PermissionUtil.request(this, SDKConstant.REQUEST_CODE_PERMISSION, strings); // 权限申请
 
         LogFileUtil.i(TAG, "Fuck");
@@ -138,12 +138,14 @@ public class MainActivity extends BaseActivity {
         mBluetoothHelper.setOnScanCallback(new BluetoothHelper.OnScanCallback() {
             @Override
             public void onStart() {
-                LogFileUtil.v("bluetooth start scan");
+                LogFileUtil.v("bluetooth scan start");
                 MenuItemCompat.setActionView(freshMenuItem, R.layout.activity_main_dialog_progressbar);
             }
 
             @Override
             public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
+                LogFileUtil.v("bluetooth scan onScanning device = " + device + ", rssi = " + rssi + ", scanRecord = " + scanRecord);
+
                 boolean isSuccess = viewAdapter.addData(device); // 这里做了 去重复的操作
                 if (isSuccess) {
                     SDKManager.toast("扫描到新BLE设备 " + device.getName());
@@ -154,13 +156,13 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onBreak() {
-                LogFileUtil.v("bluetooth break scan");
+                LogFileUtil.v("bluetooth scan break");
                 MenuItemCompat.setActionView(freshMenuItem, null);
             }
 
             @Override
             public void onFinish() {
-                LogFileUtil.v("bluetooth finish scan");
+                LogFileUtil.v("bluetooth scan finish");
                 MenuItemCompat.setActionView(freshMenuItem, null);
                 helloTextView.setText(helloTextView.getText() + "\n" + "扫描结束");
             }
@@ -244,6 +246,10 @@ public class MainActivity extends BaseActivity {
                 LogFileUtil.v("setOnConnectCallback onCharacteristicChanged do uuid = " + uuid + ", isEqual = " + isEqual);
 
                 if (isEqual) {
+                    byte[] receiveBytes = characteristic.getValue();
+                    String receiveString = new String(receiveBytes);
+
+
                     Point3D p3d_hum = convertHum(characteristic.getValue());
                     float hum = (float) p3d_hum.x;
 
@@ -394,9 +400,8 @@ public class MainActivity extends BaseActivity {
         super.onDestroy();
         BaseApplication.removeActivity(this);
 
-//        unregisterReceiver(mGattUpdateReceiver);
-//        mBluetoothHelper.closeBluetooth();
-//        mBluetoothHelper.disConnect();
+        unregisterReceiver(mGattUpdateReceiver);
+        mBluetoothHelper.closeBluetooth();
     }
 
     // 广播 A，只是打个日志
