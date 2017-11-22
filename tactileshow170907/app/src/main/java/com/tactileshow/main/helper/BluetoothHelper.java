@@ -189,6 +189,7 @@ public class BluetoothHelper {
     }
 
     /* --------------------------------------------- 链接 ------------------------------------------------- */
+    private int mLogCharChanged = 0;
 
     /**
      * 连接蓝牙
@@ -199,7 +200,7 @@ public class BluetoothHelper {
      * @return 蓝牙名称
      */
     public String connectGatt(Context context, final BluetoothDevice bluetoothDevice, boolean autoConnect) {
-        LogFileUtil.v("helper connectGatt do");
+        LogUtil.v("connect bluetoothDevice: " + (null == bluetoothDevice ? "null" : "name = " + bluetoothDevice.getName() + ", address = " + bluetoothDevice.getAddress()));
         if (null != bluetoothDevice) {
             if (null != mBluetoothGatt) {
                 mBluetoothGatt.close();
@@ -210,16 +211,14 @@ public class BluetoothHelper {
                 @Override
                 public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int newState) {
                     super.onConnectionStateChange(gatt, status, newState);
-                    LogFileUtil.i(TAG, "onConnectionStateChange status = " + status + ", newState = " + newState);
+                    LogFileUtil.v("connect stateChange gatt = " + gatt + ",status = " + status + ", newState = " + newState);
 
                     if (newState == BluetoothProfile.STATE_CONNECTED) { // {2}
-                        // 发现服务
-                        if (null != mBluetoothGatt) {
-                            boolean discoverResult = mBluetoothGatt.discoverServices();
-                            LogFileUtil.v("onConnectionStateChange connectGatt result = " + discoverResult);
-                        }
+                        discoverServices(gatt);
                     } else if (newState == BluetoothProfile.STATE_DISCONNECTED) { // 断掉重连，就在这里了 {0}
-                        mBluetoothGatt.connect();
+                        if (null != gatt) {
+                            gatt.connect();
+                        }
                     }
 
                     SDKManager.getHandler().post(new Runnable() {
@@ -236,8 +235,7 @@ public class BluetoothHelper {
                 @Override
                 public void onServicesDiscovered(final BluetoothGatt gatt, final int status) {
                     super.onServicesDiscovered(gatt, status);
-
-                    LogFileUtil.i(TAG, "onServicesDiscovered status = " + status);
+                    LogFileUtil.v("connect ServiceDisCovered status = " + status);
 
                     SDKManager.getHandler().post(new Runnable() {
                         @Override
@@ -253,7 +251,7 @@ public class BluetoothHelper {
                 @Override
                 public void onCharacteristicRead(final BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic, final int status) {
                     super.onCharacteristicRead(gatt, characteristic, status);
-                    LogFileUtil.i(TAG, "onCharacteristicRead characteristic = " + characteristic + ", status = " + status);
+                    LogFileUtil.v("connect characteristicRead characteristic = " + (null == characteristic ? "null" : new String(characteristic.getValue())) + ", status = " + status);
 
                     if (null != onConnectCallback) {
                         onConnectCallback.onCharacteristicRead(gatt, characteristic, status);
@@ -264,8 +262,17 @@ public class BluetoothHelper {
                 @Override
                 public void onCharacteristicChanged(final BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
                     super.onCharacteristicChanged(gatt, characteristic);
+
+                    boolean isLog = mLogCharChanged % 100 == 0;
+                    if (isLog) {
+                        mLogCharChanged = 1;
+                        LogFileUtil.v("connect characteristicChanged characteristic = " + (null == characteristic ? "null" : new String(characteristic.getValue())));
+                    } else {
+                        mLogCharChanged++;
+                    }
+
                     if (null != onConnectCallback) {
-                        onConnectCallback.onCharacteristicChanged(gatt, characteristic);
+                        onConnectCallback.onCharacteristicChanged(gatt, characteristic, isLog);
                     }
                 }
             });
@@ -275,6 +282,13 @@ public class BluetoothHelper {
     }
 
     /* --------------------------------------------- 发现服务，并通信 ------------------------------------------------- */
+    private void discoverServices(BluetoothGatt gatt) {
+        if (null != gatt) {
+            boolean discoverResult = gatt.discoverServices();
+            LogFileUtil.v("discoverService result = " + discoverResult);
+        }
+        LogFileUtil.v("discoverService mBluetoothGatt is null; failed");
+    }
 
     public boolean enableConfig(String uuid, byte[] value) {
         if (null != mGattService) {
@@ -324,7 +338,7 @@ public class BluetoothHelper {
             UUID serviceUUID;
             for (int i = 0; i < gattServiceList.size(); i++) {
                 serviceUUID = gattServiceList.get(i).getUuid();
-                Log.i(TAG, "找到的服务为: " + i + serviceUUID);
+                LogUtil.v("找到的服务为: uuid = " + serviceUUID);
                 stringBuilder.append('\n');
                 stringBuilder.append(serviceUUID);
             }
@@ -337,9 +351,6 @@ public class BluetoothHelper {
     public String logService(String uuid) {
         StringBuilder stringBuilder = new StringBuilder();
         if (null != mBluetoothGatt) {
-            UUID uuidUrl = UUID.fromString(uuid);
-            LogFileUtil.v("uuid = " + uuid + ", uuidUrl = " + uuidUrl);
-
             mGattService = mBluetoothGatt.getService(UUID.fromString(uuid));
             List<BluetoothGattCharacteristic> tempCharList;
             if (null != mGattService) {
@@ -350,7 +361,7 @@ public class BluetoothHelper {
                     charUuid = tempCharList.get(i).getUuid();
                     valueByte = tempCharList.get(i).getValue();
 
-                    Log.i(TAG, "找到的特征为: " + charUuid + " " + valueByte);
+                    LogUtil.v("找到的特征为: charUuid = " + charUuid + " byte = " + new String(valueByte));
                     stringBuilder.append('\n');
                     stringBuilder.append(charUuid);
                     stringBuilder.append(" ");
@@ -448,6 +459,6 @@ public class BluetoothHelper {
          * @param gatt
          * @param characteristic
          */
-        void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic);
+        void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, boolean isLog);
     }
 }

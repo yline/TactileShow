@@ -117,7 +117,6 @@ public class MainActivity extends Activity {
 
                     if (!TextUtils.isEmpty(deviceName)) {
                         SDKManager.toast("连接" + deviceName);
-
                         mBluetoothHelper.stopScanDevice();
 
                         mDialogHelper.show();
@@ -172,8 +171,6 @@ public class MainActivity extends Activity {
         mBluetoothHelper.setOnConnectCallback(new BluetoothHelper.OnConnectCallback() {
             @Override
             public void onConnectionStateChangeHandler(BluetoothGatt gatt, int status, int newState) {
-                LogFileUtil.v("setOnConnectCallback status = " + status + ", newState = " + newState);
-
                 if (newState == BluetoothProfile.STATE_CONNECTED) { // {2}
                     mDialogHelper.setText("连接成功，开始寻找服务");
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) { // 当设备无法连接 {0}
@@ -183,8 +180,6 @@ public class MainActivity extends Activity {
 
             @Override
             public void onServicesDiscoveredHandler(BluetoothGatt gatt, int status) {
-                LogFileUtil.v("setOnConnectCallback status = " + status);
-
                 if (status == BluetoothGatt.GATT_SUCCESS) { // {0}
                     mDialogHelper.setText("成功发现服务，开始启动服务");
                     mBluetoothHelper.logServiceInfo();
@@ -239,16 +234,18 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, boolean isLog) {
                 String uuid = characteristic.getUuid().toString();
 
                 boolean isEqual = uuid.equals(macro.UUID_NEW_DAT);
-                LogFileUtil.v("setOnConnectCallback onCharacteristicChanged do uuid = " + uuid + ", isEqual = " + isEqual);
+                if (isLog){
+                    LogFileUtil.v("setOnConnectCallback onCharacteristicChanged do uuid = " + uuid + ", isEqual = " + isEqual);
+                }
 
                 if (isEqual) {
                     byte[] receiveBytes = characteristic.getValue();
                     String receiveString = new String(receiveBytes);
-
+                    LogUtil.v("receiveString = " + receiveString);
 
                     Point3D p3d_hum = convertHum(characteristic.getValue());
                     float hum = (float) p3d_hum.x;
@@ -346,12 +343,7 @@ public class MainActivity extends Activity {
 
     public Point3D convertHum(final byte[] value) {
         int a = shortUnsignedAtOffset(value, 2);   // 湿度
-
-        // bits [1..0] are status bits and need to be cleared according
-        // to the user guide, but the iOS code doesn't bother. It should
-        // have minimal impact.
         a = a - (a % 4);
-
         return new Point3D((-6f) + 125f * (a / 65535f), 0, 0);    //湿度
     }
 
