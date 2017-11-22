@@ -17,7 +17,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 
 import com.tactileshow.util.macro;
 import com.yline.application.SDKManager;
@@ -39,7 +38,6 @@ public class BluetoothHelper {
 
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothGatt mBluetoothGatt;
-    private BluetoothGattService mGattService;
     private boolean isScan;
 
     // 扫描时，回调
@@ -290,13 +288,14 @@ public class BluetoothHelper {
         LogFileUtil.v("discoverService mBluetoothGatt is null; failed");
     }
 
-    public boolean enableConfig(String uuid, byte[] value) {
-        if (null != mGattService) {
-            BluetoothGattCharacteristic characteristic = mGattService.getCharacteristic(UUID.fromString(uuid));
+    public boolean enableConfig(BluetoothGatt gatt, BluetoothGattService gattService, String uuid, byte[] value) {
+        LogFileUtil.v("enableConfig inputUuid = " + uuid + ",value = " + new String(value));
+        if (null != gattService) {
+            BluetoothGattCharacteristic characteristic = gattService.getCharacteristic(UUID.fromString(uuid));
             if (null != characteristic) {
                 characteristic.setValue(value);
-                if (null != mBluetoothGatt) {
-                    mBluetoothGatt.writeCharacteristic(characteristic);
+                if (null != gatt) {
+                    gatt.writeCharacteristic(characteristic);
 
                     return true;
                 }
@@ -305,16 +304,17 @@ public class BluetoothHelper {
         return false;
     }
 
-    public boolean enableData(String uuid) {
-        if (null != mGattService) {
-            BluetoothGattCharacteristic characteristic = mGattService.getCharacteristic(UUID.fromString(uuid));
-            if (null != characteristic && null != mBluetoothGatt) {
-                boolean notify = mBluetoothGatt.setCharacteristicNotification(characteristic, true);
-                Log.i(TAG, "enableData: notify = " + notify);
+    public boolean enableData(BluetoothGatt gatt, BluetoothGattService gattService, String uuid) {
+        LogFileUtil.v("enableData inputUuid = " + uuid);
+        if (null != gattService) {
+            BluetoothGattCharacteristic characteristic = gattService.getCharacteristic(UUID.fromString(uuid));
+            if (null != characteristic && null != gatt) {
+                boolean notify = gatt.setCharacteristicNotification(characteristic, true);
+                LogUtil.v("enableData: notify = " + notify);
 
                 BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString(macro.UUID_CLIENT_CONFIG));
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                mBluetoothGatt.writeDescriptor(descriptor);
+                gatt.writeDescriptor(descriptor);
 
                 return true;
             }
@@ -323,6 +323,12 @@ public class BluetoothHelper {
         return false;
     }
 
+    /**
+     * close和disconnect的区别: close除了断开连接外，还会释放掉所有资源，导致不可以直接在后面的操作中用gatt对象的connect直接连接，
+     * 而disconnect并不释放资源 ，所以，所有的资源还保存着，就可以用Gatt的connect进行简单恢复连接，
+     * 而不是在device那一层进行操作
+     * 调用disconnect断开连接，然后在回调函数中使用close()释放资源
+     */
     public void closeBluetooth() {
         if (null == mBluetoothGatt) {
             return;
@@ -331,59 +337,57 @@ public class BluetoothHelper {
         mBluetoothGatt = null;
     }
 
-    public String logServiceInfo() {
+    public String printServiceInfo(BluetoothGatt gatt) {
         StringBuilder stringBuilder = new StringBuilder();
-        if (null != mBluetoothGatt) {
-            List<BluetoothGattService> gattServiceList = mBluetoothGatt.getServices();
+        if (null != gatt) {
+            List<BluetoothGattService> gattServiceList = gatt.getServices();
+
+            BluetoothGattService gattService;
             UUID serviceUUID;
             for (int i = 0; i < gattServiceList.size(); i++) {
-                serviceUUID = gattServiceList.get(i).getUuid();
-                LogUtil.v("找到的服务为: uuid = " + serviceUUID);
-                stringBuilder.append('\n');
+                gattService = gattServiceList.get(i);
+                serviceUUID = gattService.getUuid();
+
+                stringBuilder.append("Main:");
                 stringBuilder.append(serviceUUID);
+                stringBuilder.append('\n');
+                for (BluetoothGattCharacteristic gattCharacteristic : gattService.getCharacteristics()) {
+                    stringBuilder.append("\tsub:");
+                    stringBuilder.append(gattCharacteristic.getUuid());
+                    stringBuilder.append('\n');
+                }
             }
         } else {
-            Log.e(TAG, "getServiceInfo: mBluetoothGatt is null");
+            LogFileUtil.e(TAG, "printServiceInfo: gatt is null");
         }
-        return stringBuilder.toString();
+        String serviceInfo = stringBuilder.toString();
+        LogFileUtil.v("gatt ServiceInfo UUID = \n" + serviceInfo);
+        return serviceInfo;
     }
 
-    public String logService(String uuid) {
-        StringBuilder stringBuilder = new StringBuilder();
-        if (null != mBluetoothGatt) {
-            mGattService = mBluetoothGatt.getService(UUID.fromString(uuid));
-            List<BluetoothGattCharacteristic> tempCharList;
-            if (null != mGattService) {
-                tempCharList = mGattService.getCharacteristics();
-                UUID charUuid;
-                byte[] valueByte;
-                for (int i = 0; i < tempCharList.size(); i++) {
-                    charUuid = tempCharList.get(i).getUuid();
-                    valueByte = tempCharList.get(i).getValue();
+    public BluetoothGattService printService(BluetoothGatt gatt, String uuid) {
+        LogFileUtil.v("printService inputUUid = " + uuid);
 
-                    LogUtil.v("找到的特征为: charUuid = " + charUuid + " byte = " + new String(valueByte));
+        StringBuilder stringBuilder = new StringBuilder();
+        BluetoothGattService gattService = null;
+        if (null != gatt) {
+            gattService = gatt.getService(UUID.fromString(uuid));
+            if (null != gattService) {
+                for (BluetoothGattCharacteristic gattCharacteristic : gattService.getCharacteristics()) {
+                    stringBuilder.append("uuid:");
+                    stringBuilder.append(gattCharacteristic.getUuid());
+                    stringBuilder.append(";value:");
+                    stringBuilder.append(new String(gattCharacteristic.getValue()));
                     stringBuilder.append('\n');
-                    stringBuilder.append(charUuid);
-                    stringBuilder.append(" ");
-                    stringBuilder.append(valueByte);
                 }
+                LogFileUtil.v("gatt Service Characteristic = \n" + stringBuilder.toString());
             } else {
                 LogFileUtil.e(TAG, "getServiceInfo: mGattService is null");
             }
         } else {
             LogFileUtil.e(TAG, "getServiceInfo: mBluetoothGatt is null");
         }
-        return stringBuilder.toString();
-    }
-
-    public void disConnect() {
-        if (null != mBluetoothGatt) {
-            mBluetoothGatt.disconnect();
-        }
-        // close和disconnect的区别: close除了断开连接外，还会释放掉所有资源，导致不可以直接在后面的操作中用gatt对象的connect直接连接，
-        //                            而disconnect并不释放资源 ，所以，所有的资源还保存着，就可以用Gatt的connect进行简单恢复连接，
-        //                            而不是在device那一层进行操作
-        // 调用disconnect断开连接，然后在回调函数中使用close()释放资源
+        return gattService;
     }
 
     public void setOnScanCallback(OnScanCallback onScanCallback) {

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -182,24 +183,44 @@ public class MainActivity extends Activity {
             public void onServicesDiscoveredHandler(BluetoothGatt gatt, int status) {
                 if (status == BluetoothGatt.GATT_SUCCESS) { // {0}
                     mDialogHelper.setText("成功发现服务，开始启动服务");
-                    mBluetoothHelper.logServiceInfo();
+                    mBluetoothHelper.printServiceInfo(gatt);
 
-                    String serStr = mBluetoothHelper.logService(macro.UUID_NEW_SER);
-                    if (TextUtils.isEmpty(serStr)) {
+                    BluetoothGattService gattService = mBluetoothHelper.printService(gatt, macro.UUID_NEW_SER);
+                    if (null == gattService) {
                         SDKManager.toast("服务获取失败");
                     } else {
                         SDKManager.toast("服务获取成功");
                     }
 
-                    boolean isMAGValid = false;
-                    if (enableConfig(macro.UUID_NEW_CON) && enableData(macro.UUID_NEW_DAT)) {
+                    // 配置信息
+                    byte[] val = new byte[]{1};
+                    boolean isEnableConfig = mBluetoothHelper.enableConfig(gatt, gattService, macro.UUID_NEW_CON, val);
+                    LogFileUtil.v("serviceDiscoveredHandler enableConfig result = " + isEnableConfig);
+
+                    // 传输协议，需要一定的时间
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    // 配置信息
+                    boolean isEnableData = mBluetoothHelper.enableData(gatt, gattService, macro.UUID_NEW_DAT);
+
+                    // 传输协议，需要一定的时间
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (isEnableConfig && isEnableData) {
                         mDialogHelper.setText("温度数据激活成功");
-                        isMAGValid = true;
                     } else {
                         mDialogHelper.setText("温度数据激活失败");
                     }
 //
-//                    serStr = mBluetoothHelper.logService(macro.UUID_NEW_SER);
+//                    serStr = mBluetoothHelper.printService(macro.UUID_NEW_SER);
 //                    if (TextUtils.isEmpty(serStr)) {
 //                        SDKManager.toast("服务获取失败");
 //                    } else {
@@ -214,8 +235,9 @@ public class MainActivity extends Activity {
 //                        mDialogHelper.setText("湿度数据激活失败");
 //                    }
 //
-                    LogFileUtil.i(TAG, "isMAGValid = " + isMAGValid + ", isMAGValid = " + isMAGValid);
-                    if (isMAGValid) { //  || isHUMValid
+
+                    LogFileUtil.i(TAG, "isEnableConfig = " + isEnableConfig + ", isEnableData = " + isEnableData);
+                    if (isEnableConfig && isEnableData) { //  || isHUMValid
                         SDKManager.getHandler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -223,7 +245,7 @@ public class MainActivity extends Activity {
 
                                 mDialogHelper.dismiss();
                             }
-                        }, 1000);
+                        }, 350);
                     }
                 }
             }
@@ -238,7 +260,7 @@ public class MainActivity extends Activity {
                 String uuid = characteristic.getUuid().toString();
 
                 boolean isEqual = uuid.equals(macro.UUID_NEW_DAT);
-                if (isLog){
+                if (isLog) {
                     LogFileUtil.v("setOnConnectCallback onCharacteristicChanged do uuid = " + uuid + ", isEqual = " + isEqual);
                 }
 
@@ -295,41 +317,6 @@ public class MainActivity extends Activity {
         }
 
         return super.onMenuItemSelected(featureId, item);
-    }
-
-    /*
-     * 读取数据前的配置工作，温度和湿度传感器的读取都要执行这个方法
-     */
-    private boolean enableData(String uuid) {
-        boolean result = mBluetoothHelper.enableData(uuid);
-        LogFileUtil.v("enableData result = " + result);
-
-        // 传输协议，需要一定的时间
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return result;
-    }
-
-    private boolean enableConfig(String uuid) {
-        // 此处开始按照协议对内容进行获取
-        byte[] val = new byte[1];
-        val[0] = 1;
-
-        boolean result = mBluetoothHelper.enableConfig(uuid, val);
-        LogFileUtil.v("enableConfig result = " + result);
-
-        // 传输协议，需要一定的时间
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return result;
     }
 
     @Override
