@@ -133,6 +133,9 @@ public class MainActivity extends Activity {
         });
     }
 
+    private byte[] mCacheBytes = new byte[BluetoothHelper.CACHE_CAPACITY];
+    private int mRealDataSize = 0;
+
     private void initListener() {
         // 设定蓝牙扫描监听事件
         mBluetoothHelper.setOnScanCallback(new BluetoothHelper.OnScanCallback() {
@@ -266,25 +269,45 @@ public class MainActivity extends Activity {
 
                 if (isEqual) {
                     byte[] receiveBytes = characteristic.getValue();
-                    String receiveString = new String(receiveBytes);
-                    LogUtil.v("receiveString = " + receiveString);
-
-                    Point3D p3d_hum = convertHum(characteristic.getValue());
-                    float hum = (float) p3d_hum.x;
-
-                    Point3D p3d_temp = convertTemp(characteristic.getValue());
-                    float temp = (float) p3d_temp.x;
-
-                    float header = TactileModel.Empty;
-
-                    LogFileUtil.i(TAG, "onCharacteristicChanged: value = " + characteristic.getValue());
-
-                    TactileModel model = new TactileModel(System.currentTimeMillis(), hum, temp, header);
-                    TactileModel.sendBroadcast(MainActivity.this, model);
-
-                    if (!model.isDataEmpty()) {
-                        SQLiteManager.getInstance().insert(model);
+                    if (isLog) {
+                        LogUtil.v("receiveString = " + new String(receiveBytes));
                     }
+
+                    mBluetoothHelper.readByte(mCacheBytes, receiveBytes, mRealDataSize, new BluetoothHelper.OnReceiveCallback() {
+                        @Override
+                        public void onUpdateParam(byte[] cacheByte, int realSize) {
+                            mCacheBytes = cacheByte;
+                            mRealDataSize = realSize;
+
+                            LogUtil.v("onUpdateParam realSize = " + realSize);
+                        }
+
+                        @Override
+                        public void onCalculateResult(float hum, float temp, float header) {
+                            LogUtil.v("onCalculateResult hum = " + hum + ", temp = " + temp + ", header = " + header);
+
+                            TactileModel model = new TactileModel(System.currentTimeMillis(), hum, temp, header);
+                            TactileModel.sendBroadcast(MainActivity.this, model);
+
+                            if (!model.isDataEmpty()) {
+                                SQLiteManager.getInstance().insert(model);
+                            }
+                        }
+                    });
+//
+//
+//
+//                    String receiveString = new String(receiveBytes);
+//                    Point3D p3d_hum = convertHum(characteristic.getValue());
+//                    float hum = (float) p3d_hum.x;
+//
+//                    Point3D p3d_temp = convertTemp(characteristic.getValue());
+//                    float temp = (float) p3d_temp.x;
+//
+//                    float header = TactileModel.Empty;
+//
+//                    LogFileUtil.i(TAG, "onCharacteristicChanged: value = " + characteristic.getValue());
+
                 }
             }
         });
