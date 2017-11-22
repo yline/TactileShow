@@ -37,13 +37,13 @@ public class VisualViewHelper {
         final List<String> titleList = new ArrayList<>();
 
         viewList.add(tempViewHelper.getView());
-        titleList.add("温度信息");
+        titleList.add("Red LED");
 
         viewList.add(humViewHelper.getView());
-        titleList.add("湿度信息");
+        titleList.add("IR LED");
 
         viewList.add(headerViewHelper.getView());
-        titleList.add("第三渠道信息");
+        titleList.add("Green LED");
 
         TabLayout tabLayout = parentView.findViewById(R.id.visual_tab_layout);
         ViewPagerAdapter pagerAdapter = new ViewPagerAdapter();
