@@ -28,6 +28,7 @@ import com.tactileshow.main.helper.BluetoothHelper;
 import com.tactileshow.main.helper.MainDialogHelper;
 import com.tactileshow.main.helper.MainListViewAdapter;
 import com.tactileshow.maintab.TabActivity;
+import com.tactileshow.manager.CacheFileManager;
 import com.tactileshow.manager.SQLiteManager;
 import com.tactileshow.manager.TactileModel;
 import com.tactileshow.util.Point3D;
@@ -291,6 +292,7 @@ public class MainActivity extends Activity {
 
                             if (!model.isDataEmpty()) {
                                 SQLiteManager.getInstance().insert(model);
+                                CacheFileManager.writeData(model);
                             }
                         }
                     });

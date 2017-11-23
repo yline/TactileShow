@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 
+import com.tactileshow.manager.CacheFileManager;
 import com.tactileshow.manager.SQLiteManager;
 import com.tactileshow.manager.TactileModel;
 import com.yline.log.LogFileUtil;
@@ -49,6 +50,7 @@ public class MockDataHandler extends Handler {
                 if (null != tactileModel && !tactileModel.isDataEmpty()) {
                     if (!tactileModel.isDataEmpty()) {
                         SQLiteManager.getInstance().insert(tactileModel);
+                        CacheFileManager.writeData(tactileModel);
                     }
                     TactileModel.sendBroadcast(mWeakContext.get(), tactileModel);
                 } else {

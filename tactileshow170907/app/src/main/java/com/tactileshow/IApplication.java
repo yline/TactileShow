@@ -1,5 +1,6 @@
 package com.tactileshow;
 
+import com.tactileshow.manager.CacheFileManager;
 import com.yline.application.BaseApplication;
 
 /**
@@ -13,5 +14,6 @@ public class IApplication extends BaseApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        CacheFileManager.init(this);
     }
 }
