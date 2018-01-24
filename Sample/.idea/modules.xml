@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Sample.iml" filepath="$PROJECT_DIR$/Sample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TaskCenter/TaskCenter.iml" filepath="$PROJECT_DIR$/TaskCenter/TaskCenter.iml" />
       <module fileurl="file://$PROJECT_DIR$/concurrentmodificationexception/concurrentmodificationexception.iml" filepath="$PROJECT_DIR$/concurrentmodificationexception/concurrentmodificationexception.iml" />
       <module fileurl="file://$PROJECT_DIR$/notify/notify.iml" filepath="$PROJECT_DIR$/notify/notify.iml" />
       <module fileurl="file://$PROJECT_DIR$/sockpuppet/sockpuppet.iml" filepath="$PROJECT_DIR$/sockpuppet/sockpuppet.iml" />

@@ -1,1 +1,1 @@
-include ':sockpuppet', ':concurrentmodificationexception', ':notify'
+include ':sockpuppet', ':concurrentmodificationexception', ':notify', ':TaskCenter'
